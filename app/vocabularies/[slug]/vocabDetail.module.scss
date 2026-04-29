@@ -1,0 +1,125 @@
+.vocabulary_detail_wrapper {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background-color: #f0f4f8;
+  // Tạo nền kẻ ô (Graph paper effect)
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  .back_link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 14px;
+    &:hover { color: #000; }
+  }
+
+  .header {
+    margin-bottom: 40px;
+
+    .badge {
+      background: #facc15; // Màu vàng
+      padding: 4px 12px;
+      font-weight: bold;
+      border: 2px solid #000;
+      margin-right: 10px;
+    }
+
+    .lesson_count {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .main_title {
+      font-size: 42px;
+      font-weight: 900;
+      margin: 15px 0 5px 0;
+      color: #000;
+    }
+
+    .sub_title {
+      color: #475569;
+      font-size: 16px;
+    }
+  }
+
+  .units_grid {
+    display: grid;
+    // Responsive: 1 cột mobile, 2 cột desktop
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+  }
+
+  .unit_card {
+    background: #fff;
+    border: 2px solid #000;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    // Đổ bóng cứng (Neo-brutalism)
+    box-shadow: 6px 6px 0px 0px #000;
+
+    &:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0px 0px #000;
+    }
+
+    &.locked {
+      background: #f8fafc;
+      opacity: 0.8;
+      cursor: not-allowed;
+      box-shadow: 4px 4px 0px 0px #94a3b8;
+      border-color: #94a3b8;
+    }
+
+    .unit_number {
+      background: #facc15;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 2px solid #000;
+      flex-shrink: 0;
+    }
+
+    .unit_info {
+      h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .unit_sub {
+        margin: 4px 0;
+        color: #475569;
+        font-size: 14px;
+      }
+      .unit_meta {
+        margin: 0;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    }
+  }
+}
+
+// Mobile Responsive
+@media (max-width: 640px) {
+  .vocabulary_detail_wrapper {
+    padding: 20px 15px;
+    
+    .main_title {
+      font-size: 28px;
+    }
+    
+    .units_grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

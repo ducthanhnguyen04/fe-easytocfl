@@ -1,0 +1,261 @@
+// $border-color: #000;
+// $shadow-color: #000;
+// $primary-blue: #3b82f6;
+
+// .home_wrapper {
+//   display: flex;
+//   gap: 25px;
+//   max-width: 1400px;
+//   margin: 0 auto;
+//   padding: 20px;
+
+//   @media (max-width: 1024px) {
+//     flex-direction: column;
+//   }
+// }
+
+// .left_column {
+//   flex: 1.8;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 20px;
+// }
+
+// .right_column {
+//   flex: 1;
+//   min-width: 340px;
+// }
+
+// /* Base Boxes */
+// .info_box, .main_banner, .feedback_container, .feedback_card, .input_section {
+//   background: white;
+//   border: 3px solid $border-color;
+//   border-radius: 4px;
+//   box-shadow: 6px 6px 0px $shadow-color;
+// }
+
+// .info_box {
+//   background: #fef08a;
+//   padding: 15px 20px;
+//   font-weight: 600;
+//   font-size: 0.9rem;
+// }
+
+// .main_banner {
+//   padding: 30px;
+//   h1 { 
+//     font-size: 2.2rem; 
+//     margin-bottom: 20px;
+//     font-weight: 800;
+//   }
+//   p { 
+//     font-size: 1.1rem; 
+//     line-height: 1.6;
+//     margin-bottom: 10px;
+//   }
+// }
+
+// .highlight_blue { color: $primary-blue; font-weight: bold; }
+// .highlight_orange { color: #f97316; font-weight: bold; }
+
+// .book_section {
+//   .book_image {
+//     border: 3px solid $border-color;
+//     box-shadow: 10px 10px 0px $shadow-color;
+//     border-radius: 8px;
+//     transition: transform 0.2s;
+//     &:hover { transform: translate(-3px, -3px); }
+//   }
+// }
+
+// /* Feedback Section */
+// .feedback_container {
+//   padding: 20px;
+//   display: flex;
+//   flex-direction: column;
+//   max-height: 85vh;
+//   position: sticky;
+//   top: 20px;
+
+//   h3 { font-size: 1.3rem; margin-bottom: 5px; }
+//   .sub_title { font-size: 0.8rem; color: #666; margin-bottom: 20px; }
+// }
+
+// .feedback_list {
+//   flex: 1;
+//   overflow-y: auto;
+//   display: flex;
+//   flex-direction: column;
+//   gap: 15px;
+//   padding-right: 8px;
+//   margin-bottom: 15px;
+
+//   &::-webkit-scrollbar { width: 5px; }
+//   &::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+// }
+
+// .feedback_card {
+//   padding: 12px;
+//   box-shadow: 3px 3px 0px $shadow-color;
+//   .user_info {
+//     display: flex;
+//     gap: 10px;
+//     align-items: center;
+//     margin-bottom: 8px;
+//     .avatar { font-size: 1.2rem; }
+//     .user_name { font-weight: bold; font-size: 0.9rem; }
+//     .time { font-size: 0.7rem; color: #888; }
+//   }
+//   .content { font-size: 0.85rem; line-height: 1.4; }
+// }
+
+// /* Input Section */
+// .input_section {
+//   margin-top: auto;
+//   padding: 12px;
+//   background: #f9fafb;
+// }
+
+// .input_wrapper {
+//   display: flex;
+//   align-items: center;
+//   border: 2px solid #000;
+//   background: white;
+//   padding: 4px 8px;
+//   border-radius: 4px;
+
+//   &:focus-within {
+//     box-shadow: 3px 3px 0px #000;
+//   }
+// }
+
+// .feedback_input {
+//   flex: 1;
+//   border: none;
+//   outline: none;
+//   padding: 8px;
+//   font-size: 0.9rem;
+// }
+
+// .send_button {
+//   background: #bfdbfe;
+//   border: 2px solid #000;
+//   width: 32px;
+//   height: 32px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   cursor: pointer;
+//   font-weight: bold;
+//   &:active { transform: translate(1px, 1px); }
+// }
+
+
+$sidebar-width: 260px;
+$black: #000;
+
+/* Layout Wrapper & Main Content */
+.layoutWrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f0f4f8;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: $sidebar-width; // Đẩy nội dung sang phải trên Desktop
+  padding: 40px;
+  transition: margin 0.3s ease;
+
+  @media (max-width: 768px) {
+    margin-left: 0; // Bỏ lề trên Mobile
+    padding: 80px 15px 20px; // Padding top để tránh nút menu
+  }
+}
+
+/* Home Grid Layout */
+.home_wrapper {
+  display: flex;
+  gap: 25px;
+  
+  @media (max-width: 1024px) {
+    flex-direction: column; // Chuyển thành 1 cột trên Mobile/Tablet
+  }
+}
+
+.left_column { flex: 1.5; display: flex; flex-direction: column; gap: 20px; }
+.right_column { flex: 1; }
+
+/* Neo-brutalism Style */
+.info_box, .main_banner, .feedback_container, .feedback_card, .input_section {
+  background: white;
+  border: 3px solid $black;
+  box-shadow: 6px 6px 0px $black;
+  padding: 20px;
+}
+
+.info_box { background: #fef08a; font-weight: bold; }
+.main_banner h1 { font-size: 2.2rem; font-weight: 900; }
+
+.book_image {
+  border: 3px solid $black;
+  box-shadow: 10px 10px 0px $black;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Feedback Section */
+.feedback_container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 85vh;
+  position: sticky;
+  top: 20px;
+}
+
+.feedback_list {
+  flex: 1;
+  overflow-y: auto;
+  margin: 15px 0;
+  padding-right: 5px;
+  
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: $black; }
+}
+
+.feedback_card {
+  margin-bottom: 12px;
+  padding: 10px;
+  box-shadow: 3px 3px 0px $black;
+  .user_info { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; margin-bottom: 5px; }
+}
+
+/* Input Area */
+.input_section { padding: 10px; margin-top: auto; }
+.input_wrapper {
+  display: flex;
+  border: 2px solid $black;
+  background: #fff;
+  input { flex: 1; border: none; padding: 10px; outline: none; }
+  button { 
+    background: #bfdbfe; border-left: 2px solid $black; padding: 0 15px; cursor: pointer;
+    &:active { background: #3b82f6; color: white; }
+  }
+}
+
+/* Mobile Components */
+.mobileMenuBtn {
+  display: none;
+  @media (max-width: 768px) {
+    display: flex; position: fixed; top: 15px; left: 15px; z-index: 1100;
+    width: 45px; height: 45px; background: white; border: 2px solid $black;
+    box-shadow: 3px 3px 0px $black; align-items: center; justify-content: center;
+  }
+}
+
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+}

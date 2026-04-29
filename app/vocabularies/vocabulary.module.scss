@@ -1,0 +1,118 @@
+$black: #000;
+$primary-blue: #3b82f6;
+$bg-grid: #e5eef7;
+
+.vocabularys_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+}
+
+.header_section {
+  text-align: left;
+  
+  h1 {
+    display: inline-block;
+    background: #fef08a; // Màu vàng giống image_977ff7.jpg
+    padding: 5px 15px;
+    border: 3px solid $black;
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 15px;
+    box-shadow: 4px 4px 0px $black;
+  }
+  
+  p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+/* Container chứa danh sách giáo trình */
+.books_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 25px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card giáo trình phong cách Neo-brutalism */
+.book_card {
+  background: white;
+  border: 3px solid $black;
+  padding: 25px;
+  display: flex;
+  gap: 20px;
+  box-shadow: 8px 8px 0px $black; // Đổ bóng cứng đặc trưng
+  transition: transform 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0px $black;
+  }
+
+  .book_icon {
+    flex-shrink: 0;
+    width: 80px;
+    height: 110px;
+    background: $primary-blue;
+    border: 2px solid $black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 5px;
+    box-shadow: 4px 4px 0px $black;
+  }
+
+  .book_info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .tag {
+      align-self: flex-start;
+      background: #facc15;
+      border: 2px solid $black;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    span {
+      font-size: 0.8rem;
+      color: #666;
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #444;
+      margin: 5px 0;
+    }
+
+    .stats {
+      margin-top: auto;
+      font-size: 0.75rem;
+      font-weight: bold;
+      display: flex;
+      gap: 15px;
+    }
+  }
+}

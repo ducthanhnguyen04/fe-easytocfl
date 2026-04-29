@@ -1,0 +1,137 @@
+/* Biến màu sắc & kích thước */
+$black: #000;
+$primary-blue: #3b82f6;
+$error-red: #ef4444; // Màu đỏ cảnh báo
+$bg-grid-color: #fdfae6; // Màu vàng nhạt lưới
+$grid-line-color: #b9d2eb; // Màu đường lưới xanh
+
+.settings_wrapper {
+  /* FIX LỖI RESPONSIVE: Reset margin khi ở trên mobile */
+  flex: 1;
+//   min-height: 100vh;
+  margin-left: 0 !important; // Khắc phục lỗi nội dung bị đẩy sang phải
+  padding: 80px 20px 40px !important; // Chừa khoảng trống cho Hamburger Mobile
+  transition: all 0.3s ease;
+  background-size: 25px 25px; // Kích thước ô lưới
+//   background: red;
+  display: flex;
+  justify-content: center;
+  h1 {
+    display: inline-block;
+    background: #fef08a; // Highlight tiêu đề vàng
+    padding: 5px 15px;
+    border: 3px solid $black;
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 25px;
+    box-shadow: 4px 4px 0px $black; // Đổ bóng cứng đậm
+    width: fit-content;
+  }
+}
+
+.settings_card {
+  background: white;
+  border: 3px solid $black;
+  padding: 30px;
+  box-shadow: 8px 8px 0px $black; // Đổ bóng Neo-brutalism mạnh
+  border-radius: 4px;
+  margin-bottom: 25px; // Khoảng cách giữa các card
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .card_header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #333;
+  }
+}
+
+/* Phần thông tin tài khoản */
+.profile_section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  .avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 3px solid $black;
+    object-fit: cover;
+  }
+
+  .info {
+    h3 { font-size: 1.2rem; font-weight: 900; margin: 0; }
+    p { font-size: 0.9rem; color: #666; margin: 0; }
+  }
+}
+
+/* Phần đổi mật khẩu */
+.password_form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  .sub_note {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .input_field {
+    padding: 12px;
+    border: 2px solid $black;
+    outline: none;
+    font-family: inherit;
+    font-weight: 600;
+    
+    &:focus { border-color: $primary-blue; }
+  }
+}
+
+/* NÚT ĐĂNG XUẤT ĐỎ (giống image_d00da1.jpg trên di động) */
+.logout_btn {
+  width: 100%; // Giãn rộng toàn bộ chiều ngang
+  padding: 15px;
+  background: white;
+  color: $error-red;
+  border: 2px solid #ef4444;
+  font-weight: 800;
+  box-shadow: 0px 4px 0px $error-red; // Bóng đổ đỏ thẳng xuống dưới
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  transition: 0.1s;
+
+  &:hover { background: #fff1f2; }
+  &:active { transform: translateY(2px); box-shadow: 0px 2px 0px $error-red; }
+}
+
+/* Nút Đặt mật khẩu (Neo-brutalism Style) */
+.blue_btn {
+  align-self: flex-start;
+  background: $primary-blue;
+  color: white;
+  border: 2px solid $black;
+  padding: 10px 25px;
+  font-weight: 800;
+  box-shadow: 4px 4px 0px $black;
+  cursor: pointer;
+  margin-top: 10px;
+
+  &:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px $black; }
+}
+
+@media (max-width: 768px) {
+  .settings_card { padding: 20px; gap: 10px; }
+  .profile_section { flex-direction: column; text-align: center; gap: 10px; }
+  .avatar { width: 60px; height: 60px; }
+  .blue_btn { width: 100%; }
+}

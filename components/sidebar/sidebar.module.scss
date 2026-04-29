@@ -1,0 +1,557 @@
+// /* Biến màu sắc & kích thước */
+// $sidebar-width: 260px;
+// $bg-color: #f0f4f8;
+// $primary-blue: #3b82f6;
+// $border-color: #000;
+
+// /* Nút Hamburger Menu cho Mobile */
+// .mobileMenuBtn {
+//   display: none;
+
+//   @media (max-width: 768px) {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     position: fixed;
+//     top: 15px;
+//     left: 15px;
+//     z-index: 1100;
+//     width: 40px;
+//     height: 40px;
+//     padding: 0;
+//     background: white;
+//     border: 2px solid $border-color;
+//     border-radius: 8px;
+//     font-size: 20px;
+//     cursor: pointer;
+//     box-shadow: 2px 2px 0px $border-color;
+//     transition: all 0.1s;
+//     transition: opacity 0.2s, visibility 0.2s;
+
+//     &.hideBtn {
+//     opacity: 0;
+//     visibility: hidden;
+//     pointer-events: none; // Để không bấm nhầm khi nó đã ẩn
+//   }
+//     &:active {
+//       transform: translate(1px, 1px);
+//       box-shadow: 1px 1px 0px $border-color;
+//     }
+//   }
+// }
+
+// /* Lớp phủ màn hình khi mở menu mobile */
+// .overlay {
+//   display: none;
+//   @media (max-width: 768px) {
+//     display: block;
+//     position: fixed;
+//     inset: 0;
+//     background: rgba(0, 0, 0, 0.4);
+//     z-index: 999;
+//     backdrop-filter: blur(2px);
+//   }
+// }
+
+// /* Sidebar */
+// .sidebar {
+//   width: $sidebar-width;
+//   height: 100vh;
+//   position: fixed;
+//   overflow-y: auto;
+//   left: 0;
+//   top: 0;
+//   background: white;
+//   border-right: 2px solid $border-color;
+//   display: flex;
+//   flex-direction: column;
+//   padding: 24px 16px;
+//   z-index: 1000;
+//   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+//   .logo {
+//     font-weight: bold;
+//     font-size: 1.5rem;
+//     margin-bottom: 30px;
+//     color: $border-color;
+//   }
+
+//   .navGroup {
+//     flex: 1;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 12px;
+//     overflow-y: auto;
+
+//     &::-webkit-scrollbar { display: none; }
+
+//     .navItem {
+//       display: flex;
+//       align-items: center;
+//       gap: 12px;
+//       padding: 12px 16px;
+//       border-radius: 12px;
+//       font-size: 0.95rem;
+//       font-weight: 600;
+//       color: #374151;
+//       cursor: pointer;
+//       transition: all 0.2s;
+//       border: 2px solid transparent;
+
+//       &:hover {
+//         background-color: #f3f4f6;
+//         border: 2px solid $border-color;
+//         transform: translate(-2px, -2px);
+//         box-shadow: 4px 4px 0px $border-color;
+//       }
+
+//       &.active {
+//         background-color: $primary-blue;
+//         color: white;
+//         border: 2px solid $border-color;
+//         box-shadow: 4px 4px 0px $border-color;
+//         span { color: white; }
+//       }
+
+//       .icon { font-size: 1.2rem; }
+//     }
+//   }
+
+//   .footerLinks {
+//     margin-top: auto;
+//     padding-top: 20px;
+//     margin-bottom: 50px;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 8px;
+//     .navItem {
+//       display: flex;
+//       align-items: center;
+//       gap: 12px;
+//       padding: 12px 16px;
+//       border-radius: 12px;
+//       font-size: 0.95rem;
+//       font-weight: 600;
+//       color: #374151;
+//       cursor: pointer;
+//       transition: all 0.2s;
+//       border: 2px solid transparent;
+
+//       &:hover {
+//         background-color: #f3f4f6;
+//         border: 2px solid $border-color;
+//         transform: translate(-2px, -2px);
+//         box-shadow: 4px 4px 0px $border-color;
+//       }
+
+//       &.active {
+//         background-color: $primary-blue;
+//         color: white;
+//         border: 2px solid $border-color;
+//         box-shadow: 4px 4px 0px $border-color;
+//         span { color: white; }
+//       }
+
+//       .icon { font-size: 1.2rem; }
+//     }
+//     .loginBtn {
+//       width: 100%;
+//       background: $primary-blue;
+//       color: white;
+//       padding: 12px;
+//       border-radius: 12px;
+//       border: 2px solid $border-color;
+//       font-weight: bold;
+//       cursor: pointer;
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       gap: 10px;
+//       box-shadow: 0px 4px 0px $border-color;
+//       transition: all 0.1s;
+
+//       &:active {
+//         transform: translateY(2px);
+//         box-shadow: 0px 2px 0px $border-color;
+//       }
+//     }
+//   }
+// }
+// .navLink {
+//     text-decoration: none;
+//     color: inherit;
+// }
+// /* Nội dung chính */
+// .mainContent {
+//   flex: 1;
+//   margin-left: $sidebar-width;
+//   padding: 40px;
+//   min-height: 100vh;
+//   transition: margin 0.3s ease;
+// }
+
+
+// /* Overlay phủ toàn màn hình */
+// .overlay {
+//   position: fixed;
+//   inset: 0;
+//   background: rgba(0, 0, 0, 0.5);
+//   z-index: 1500;
+//   backdrop-filter: blur(2px);
+// }
+
+// /* Modal căn giữa màn hình */
+// .loginModal {
+//   position: fixed;
+//   top: 50%;
+//   left: 50%;
+//   transform: translate(-50%, -50%);
+//   z-index: 2000;
+//   width: 90%;
+//   max-width: 420px;
+// }
+
+// .modalContent {
+//   background: white;
+//   border: 3px solid black;
+//   padding: 40px 30px;
+//   box-shadow: 10px 10px 0px black; // Bóng đổ cứng Neo-brutalism
+//   border-radius: 4px;
+//   text-align: center;
+
+//   h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; }
+//   .subText { font-size: 0.9rem; color: #666; margin-bottom: 30px; }
+// }
+
+// /* Style cho các nút bấm */
+// .googleBtn {
+//   width: 100%;
+//   padding: 12px;
+//   background: white;
+//   border: 2px solid black;
+//   font-weight: bold;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 12px;
+//   box-shadow: 4px 4px 0px black;
+//   cursor: pointer;
+//   transition: 0.1s;
+  
+//   img { width: 18px; }
+//   &:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+// }
+
+// .divider {
+//   margin: 25px 0;
+//   border-bottom: 2px solid #ddd;
+//   position: relative;
+//   span {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     background: white;
+//     padding: 0 10px;
+//     font-size: 0.75rem;
+//     font-weight: 800;
+//     color: #888;
+//   }
+// }
+
+// /* Input Fields */
+// .inputField {
+//   display: flex;
+//   align-items: center;
+//   border: 2px solid black;
+//   padding: 12px;
+//   gap: 10px;
+//   margin-bottom: 15px;
+//   background: #fff;
+  
+//   input {
+//     border: none;
+//     outline: none;
+//     width: 100%;
+//     font-size: 0.95rem;
+//     &::placeholder { color: #aaa; }
+//   }
+// }
+
+// .submitBtn {
+//   width: 100%;
+//   padding: 15px;
+//   background: $primary-blue; // Màu xanh đặc trưng
+//   color: white;
+//   border: 2px solid black;
+//   font-weight: 900;
+//   font-size: 1rem;
+//   box-shadow: 4px 4px 0px black;
+//   cursor: pointer;
+//   margin-top: 10px;
+//   &:hover { background: darken($primary-blue, 5%); }
+//   &:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px black; }
+// }
+
+// .note {
+//   margin-top: 20px;
+//   font-size: 0.8rem;
+//   color: #666;
+//   font-weight: 500;
+// }
+
+
+
+// /* Responsive */
+// @media (max-width: 1024px) {
+//   $tablet-width: 240px;
+//   .sidebar { width: $tablet-width; }
+//   .mainContent { margin-left: $tablet-width; }
+// }
+
+// @media (max-width: 768px) {
+//   .sidebar {
+//     transform: translateX(-100%);
+//     &.open {
+//       transform: translateX(0) !important;
+//     }
+//   }
+//   .mainContent {
+//     margin-left: 0;
+//     padding: 80px 20px 20px 20px !important;
+//   }
+// }
+
+
+
+$sidebar-width: 260px;
+$primary-blue: #3b82f6;
+$border-color: #000;
+
+/* Các tầng hiển thị (Z-index) */
+$z-overlay: 1500;
+$z-sidebar: 1600;
+$z-modal: 2000;
+$z-hamburger: 1700;
+
+.mobileMenuBtn {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: $z-hamburger;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border: 2px solid $border-color;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px $border-color;
+    transition: all 0.2s;
+
+    &.hideBtn {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    &:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px $border-color;
+    }
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: $z-overlay;
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+.divider {
+  margin: 10px 0px;
+}
+.sidebar {
+  width: $sidebar-width;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: white;
+  border-right: 2px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  z-index: $z-sidebar; 
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+
+  &.open {
+    transform: translateX(0) !important;
+  }
+
+  @media (max-width: 768px) {
+    transform: translateX(-100%);
+  }
+
+  .logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: $border-color;
+  }
+
+  .navGroup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .navItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+
+    &:hover {
+      background-color: #f3f4f6;
+      border: 2px solid $border-color;
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0px $border-color;
+    }
+
+    &.active {
+      background-color: $primary-blue;
+      color: white;
+      border: 2px solid $border-color;
+      box-shadow: 4px 4px 0px $border-color;
+    }
+
+    .icon { font-size: 1.2rem; }
+  }
+}
+
+.footerLinks {
+  margin-top: auto;
+  padding: 20px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .loginBtn {
+    width: 100%;
+    background: $primary-blue;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid $border-color;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 0px $border-color;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0px 2px 0px $border-color;
+    }
+  }
+}
+.account {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: solid 3px black;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 5px 0px;
+  cursor: pointer;
+
+}
+.userName {
+  p {
+    margin: 5px 0px;
+    font-weight: bold;
+  }
+  span {
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+/* Modal Form */
+.loginModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: $z-modal;
+  width: 90%;
+  max-width: 420px;
+}
+
+.modalContent {
+  background: white;
+  border: 3px solid $border-color;
+  padding: 40px 30px;
+  box-shadow: 10px 10px 0px $border-color;
+  border-radius: 4px;
+  text-align: center;
+
+  h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; }
+  .subText { font-size: 0.9rem; color: #666; margin-bottom: 30px; }
+}
+
+.googleBtn {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border: 2px solid $border-color;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 4px 4px 0px $border-color;
+  cursor: pointer;
+  img { width: 18px; }
+}
+
+.inputField {
+  display: flex;
+  align-items: center;
+  border: 2px solid $border-color;
+  padding: 12px;
+  gap: 10px;
+  margin-bottom: 15px;
+  input { border: none; outline: none; width: 100%; }
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 15px;
+  background: $primary-blue;
+  color: white;
+  border: 2px solid $border-color;
+  font-weight: 900;
+  box-shadow: 4px 4px 0px $border-color;
+  cursor: pointer;
+}
+
+.navLink { text-decoration: none; color: inherit; }
