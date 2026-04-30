@@ -129,6 +129,29 @@ $grid-line-color: #b9d2eb; // Màu đường lưới xanh
   &:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px $black; }
 }
 
+.loading {
+  text-align: center;
+  background: transparent;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: solid 2px red;
+  color: red;
+}
+
+.error {
+  text-align: center;
+  background: transparent;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: solid 2px black;
+  color: black;
+  box-shadow: 6px 6px #000;
+}
+
 @media (max-width: 768px) {
   .settings_card { padding: 20px; gap: 10px; }
   .profile_section { flex-direction: column; text-align: center; gap: 10px; }

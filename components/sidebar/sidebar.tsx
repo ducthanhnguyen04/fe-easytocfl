@@ -1,26 +1,30 @@
 'use client';
 import styles from "./sidebar.module.scss";
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Ma_Shan_Zheng } from 'next/font/google';
 import Link from "next/link";
-import { loadManifestWithRetries } from "next/dist/server/load-components";
+import { useAuth } from "@/app/auth/authContext";
+import beUrl from "../../api-url";
 
 declare global {
   interface Window {
     google: any;
   }
 }
-
 const zhFontTitle = Ma_Shan_Zheng({ weight: '400', subsets: ['latin'] });
 
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    
+    const { user, setUser, loading } = useAuth();
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const router = useRouter();
 
     const closeAll = () => {
         setIsOpen(false);
@@ -29,31 +33,32 @@ export default function Sidebar() {
    
     const handleLogin = async () => {
       try {
-        const response = await axios.post("http://localhost:3008/auth/login", { email, password}, { withCredentials: true });
-        setUser(response.data.data);
+        const response = await axios.post(`${beUrl}/auth/login`, 
+          { email, password }, 
+          { withCredentials: true }
+        );
+        const userData = response.data.data; 
+
+      if (userData) {
+        setUser({ ...userData });   
         closeAll();
         setEmail('');
         setPassword('');
-        console.log("Login successful:", response.data.data);
+      }
       } catch (error) {
         console.error("Login error:", error);
         alert("Đăng nhập thất bại!");
       }
     }
-    
-    const handleLogout = async () => {
-        await fetch('http://localhost:3008/auth/logout', { 
-            method: 'POST',
-            credentials: 'include' 
-        });
-        setUser(null);
-        window.location.reload();
-    };
-                        console.log("User state:", user);
 
     return (
         <div className={styles.sidebar_wrapper}>
-          <button className={`${styles.mobileMenuBtn} ${isOpen ? styles.hideBtn : ''}`} onClick={() => setIsOpen(true)}>☰</button>
+          <button 
+            className={`${styles.mobileMenuBtn} ${isOpen ? styles.hideBtn : ''}`} 
+            onClick={() => setIsOpen(true)}
+          >
+            ☰
+          </button>
 
           {(isOpen || isLoginOpen) && <div className={styles.overlay} onClick={closeAll} />}
 
@@ -64,7 +69,9 @@ export default function Sidebar() {
 
             <nav className={styles.navGroup}>
               <Link href={"/"} className={styles.navLink} onClick={() => setIsOpen(false)}>
-                <div className={`${styles.navItem} ${styles.active}`}><span className={styles.icon}>🏠</span> <span>Trang chủ</span></div>
+                <div className={`${styles.navItem} ${styles.active}`}>
+                  <span className={styles.icon}>🏠</span> <span>Trang chủ</span>
+                </div>
               </Link>
               <div className={styles.navItem}><span className={styles.icon}>🔤</span> <span>Bảng chữ cái</span></div>
               <Link href={"/vocabularies"} className={styles.navLink} onClick={() => setIsOpen(false)}>
@@ -77,21 +84,41 @@ export default function Sidebar() {
 
             <div className={styles.footerLinks}>
               <div className={styles.navItem}><span className={styles.icon}>❓</span> <span>Trợ giúp</span></div>
-              <div className={styles.navItem}><span className={styles.icon}>⚙️</span> <span>Cài đặt</span></div>
               
-              {!user ? (
-                <button className={styles.loginBtn} onClick={() => { setIsLoginOpen(true); setIsOpen(false); }}>➞ Đăng nhập</button>
-              ) : (
-                <div className={styles.account} onClick={handleLogout} style={{cursor: 'pointer'}} title="Click để đăng xuất">
-                  <div className={styles.userIcon}>
-                    <img src={user.avatarUrl} alt="avatar" width={35} height={35} style={{borderRadius: "50%", border: "2px solid #3b82f6"}}/>
+              <Link href="/settings" className={styles.navLink} onClick={() => setIsOpen(false)}>
+                <div className={styles.navItem}><span className={styles.icon}>⚙️</span> <span>Cài đặt</span></div>
+              </Link>
+              
+              <div className={styles.authSection}>
+                {loading ? (
+                  <div className={styles.navItem}>
+                    <span className={styles.icon}>⏳</span> <span>Đang tải...</span>
                   </div>
-                  <div className={styles.userName}>
-                    <p>{user.userName}</p>
-                    <span>{user.email}</span>
+                ) : !user ? (
+                  <button 
+                    className={styles.loginBtn} 
+                    onClick={() => { setIsLoginOpen(true); setIsOpen(false); }}
+                  >
+                    ➞ Đăng nhập
+                  </button>
+                ) : (
+                  <div className={styles.account}>
+                    <div className={styles.userIcon}>
+                      <img 
+                        src={user.avatarUrl || "/default-avatar.png"} 
+                        alt="avatar" 
+                        width={35} 
+                        height={35} 
+                        style={{ borderRadius: "50%", border: "2px solid #3b82f6", objectFit: "cover" }}
+                      />
+                    </div>
+                    <div className={styles.userName}>
+                      <p>{user.name}</p>
+                      <span>{user.email}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </aside>
 
@@ -106,8 +133,14 @@ export default function Sidebar() {
                 <div className={styles.divider}><span>HOẶC</span></div>
 
                 <div className={styles.inputGroup}>
-                  <div className={styles.inputField}><span>📧</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" /></div>
-                  <div className={styles.inputField}><span>🔒</span><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mật khẩu" /></div>
+                  <div className={styles.inputField}>
+                    <span>📧</span>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+                  </div>
+                  <div className={styles.inputField}>
+                    <span>🔒</span>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mật khẩu" />
+                  </div>
                 </div>
                 <button className={styles.submitBtn} onClick={handleLogin}>Đăng nhập</button>
               </div>
@@ -116,11 +149,3 @@ export default function Sidebar() {
         </div>
     );
 }
-
-
-
-
-
-
-
-

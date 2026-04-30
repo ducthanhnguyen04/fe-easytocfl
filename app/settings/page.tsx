@@ -1,10 +1,37 @@
 'use client';
 import styles from "./settings.module.scss";
-import Image from 'next/image';
-import Xinhyeu from "../../assets/images/tanh8.webp";
-
+import axios from "axios";
+import { useAuth } from "../auth/authContext";
+import beUrl from "../../api-url";
 
 export default function Settings() {
+  const { user, setUser, loading } = useAuth();
+  
+ console.log("User in Settings:", user, "Loading:", loading);
+ if (loading) {
+    return <div className={styles.loading}>Đang kiểm tra đăng nhập...</div>;
+  }
+
+  if (!user) {
+    return <div className={styles.error}>Bạn cần đăng nhập để xem trang này.</div>;
+  }
+
+  const handleLogout = async () => {
+    try {
+        await axios.post(
+              `${beUrl}/auth/logout`,
+              {},
+            {
+                withCredentials: true
+            }
+        );
+
+        setUser(null);
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+ };
+
   return (
     <div className={styles.settings_wrapper}>
       <div className={styles.settings_content}>
@@ -15,14 +42,16 @@ export default function Settings() {
           <span>👤</span> Tài khoản
         </div>
         <div className={styles.profile_section}>
-          <Image 
-            src={Xinhyeu} 
+          <img 
+            src={`${beUrl}/avatars/default.png`} 
             alt="Avatar" 
             className={styles.avatar} 
+            width={65}
+            height={65}
           />
           <div className={styles.info}>
-            <h3>Thanh Nguyen Duc</h3>
-            <p>ndt.ducthanh04@gmail.com</p>
+            <h3>{user.name}</h3>
+            <p>{user.email}</p>
           </div>
         </div>
       </div>
@@ -50,7 +79,7 @@ export default function Settings() {
       </div>
 
       <div style={{ marginTop: '20px' }}>
-        <button className={styles.logout_btn} onClick={() => alert('Đăng xuất...')}>
+        <button className={styles.logout_btn} onClick={handleLogout}>
           ➞ Đăng xuất khỏi thiết bị
         </button>
       </div>
