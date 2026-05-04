@@ -18,13 +18,13 @@ const zhFontTitle = Ma_Shan_Zheng({ weight: '400', subsets: ['latin'] });
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const router = useRouter();
     
     const { user, setUser, loading } = useAuth();
     
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const router = useRouter();
 
     const closeAll = () => {
         setIsOpen(false);
@@ -37,14 +37,16 @@ export default function Sidebar() {
           { email, password }, 
           { withCredentials: true }
         );
-        const userData = response.data.data; 
 
-      if (userData) {
-        setUser({ ...userData });   
-        closeAll();
-        setEmail('');
-        setPassword('');
-      }
+        const userData = response.data.data || response.data.user || response.data;
+
+        if (userData) {
+          setUser({ ...userData });
+          closeAll();
+          setEmail('');
+          setPassword('');
+          router.refresh();
+        }
       } catch (error) {
         console.error("Login error:", error);
         alert("Đăng nhập thất bại!");

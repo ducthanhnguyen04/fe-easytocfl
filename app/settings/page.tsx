@@ -13,7 +13,11 @@ export default function Settings() {
   }
 
   if (!user) {
-    return <div className={styles.error}>Bạn cần đăng nhập để xem trang này.</div>;
+    return (
+      <div className={styles.centeredPage}>
+        <div className={styles.error}>Bạn cần đăng nhập để xem trang này.</div>
+      </div>
+    );
   }
 
   const handleLogout = async () => {

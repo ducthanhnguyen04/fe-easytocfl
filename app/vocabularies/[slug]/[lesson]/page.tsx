@@ -53,7 +53,7 @@ const studyModes: { key: StudyMode; name: string; icon: string }[] = [
 
 // --- 2. HÀM CHÍNH (COMPONENT) ---
 export default function LessonStudyPage() {
-  const [currentMode, setCurrentMode] = useState<StudyMode>('quiz'); // Chế độ mặc định
+  const [currentMode, setCurrentMode] = useState<StudyMode>('flashcard'); // Chế độ mặc định
   const [currentIndex, setCurrentIndex] = useState(0); // Từ hiện tại đang học
   
   // State cho chế độ Flashcard

@@ -140,16 +140,30 @@ $grid-line-color: #b9d2eb; // Màu đường lưới xanh
   color: red;
 }
 
-.error {
-  text-align: center;
-  background: transparent;
-  height: 40px;
+.centeredPage {
+  min-height: calc(100vh - 160px);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: solid 2px black;
-  color: black;
-  box-shadow: 6px 6px #000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.error {
+  text-align: center;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 520px;
+  padding: 24px 20px;
+  margin: 0 auto;
+  border: solid 3px $black;
+  color: #111;
+  box-shadow: 8px 8px #000;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {

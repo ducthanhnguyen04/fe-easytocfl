@@ -16,6 +16,7 @@ $sidebar-width: 260px; // Chiều rộng Sidebar của bạn
   min-height: 100vh;
   padding: 40px;
   background-color: #f0f4f8; // Nền lưới của bạn
+  box-sizing: border-box;
   
   @media (max-width: 768px) {
     .contentContainer {
