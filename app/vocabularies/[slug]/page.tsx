@@ -2,7 +2,6 @@ import Link from "next/link";
 import styles from "./vocabDetail.module.scss";
 
 export default function VocabularyDetail() {
-  // Dữ liệu mẫu y hệt trong ảnh
   const units = [
     { id: 1, title: "소개", sub: "Giới thiệu", count: "32 từ vựng", status: "open" },
     { id: 2, title: "이건 뭐예요?", sub: "Đồ vật xung quanh tôi", count: "Sắp ra mắt", status: "locked" },
@@ -14,12 +13,10 @@ export default function VocabularyDetail() {
 
   return (
     <div className={styles.vocabulary_detail_wrapper}>
-      {/* Nút quay lại */}
       <Link href="/vocabularies" className={styles.back_link}>
          &lt; Danh sách sách
       </Link>
 
-      {/* Header Section */}
       <header className={styles.header}>
         <span className={styles.badge}>TOCFL A1</span>
         <span className={styles.lesson_count}>15 bài</span>
@@ -29,7 +26,6 @@ export default function VocabularyDetail() {
         </p>
       </header>
 
-      {/* Grid bài học */}
       <div className={styles.units_grid}>
         {units.map((unit) => (
           <div key={unit.id} className={`${styles.unit_card} ${unit.status === 'locked' ? styles.locked : ''}`}>
