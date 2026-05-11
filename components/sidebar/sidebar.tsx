@@ -76,7 +76,7 @@ export default function Sidebar() {
                 </div>
               </Link>
               <div className={styles.navItem}><span className={styles.icon}>🔤</span> <span>Bảng chữ cái</span></div>
-              <Link href={"/vocabularies"} className={styles.navLink} onClick={() => setIsOpen(false)}>
+              <Link href={"/levels"} className={styles.navLink} onClick={() => setIsOpen(false)}>
                 <div className={styles.navItem}><span className={styles.icon}>📖</span> <span>Từ vựng</span></div>
               </Link>
               <div className={styles.navItem}><span className={styles.icon}>⚖️</span> <span>Ngữ pháp</span></div>

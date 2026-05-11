@@ -15,7 +15,10 @@
     font-size: 14px;
     &:hover { color: #000; }
   }
-
+  .unit_link {
+    text-decoration: none;
+    color: black;
+  }
   .header {
     margin-bottom: 40px;
 

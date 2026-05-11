@@ -30,6 +30,10 @@ $bg-grid: #e5eef7;
   }
 }
 
+.book_link {
+  text-decoration: none;
+  color: black;
+}
 /* Container chứa danh sách giáo trình */
 .books_grid {
   display: grid;

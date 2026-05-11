@@ -1,7 +1,8 @@
 "use client";
-import styles from "./vocabulary.module.scss";
+import styles from "./levels.module.scss";
 import { useState, useEffect } from 'react';
 import levelService from "@/services/levelService";
+import Link from "next/link";
 
 interface LevelData {
   id: number;
@@ -11,7 +12,7 @@ interface LevelData {
   updatedAt: string;
 }
 
-export default function Vocabularys() {
+export default function Levels() {
   const [levels, setLevels] = useState<LevelData[]>([]);
 
   useEffect(() => {
@@ -25,33 +26,6 @@ export default function Vocabularys() {
     }
     fetchLevels();
   }, [])
-  const books = [
-    {
-      id: 1,
-      title: "Tiếng Trung Tổng Hợp",
-      level: "Sơ cấp 1",
-      tag: "TOCFL A1",
-      desc: "Giáo trình chuẩn dành cho người Việt Nam học tiếng Trung — Sơ cấp",
-      stats: "📖 15 bài · 1 đã mở"
-    },
-    {
-      id: 2,
-      title: "Tiếng Trung Tổng Hợp",
-      level: "Sơ cấp 1",
-      tag: "TOCFL A1",
-      desc: "Giáo trình chuẩn dành cho người Việt Nam học tiếng Trung — Sơ cấp",
-      stats: "📖 15 bài · 1 đã mở"
-    },
-    {
-      id: 3,
-      title: "Tiếng Trung Tổng Hợp",
-      level: "Sơ cấp 1",
-      tag: "TOCFL A1",
-      desc: "Giáo trình chuẩn dành cho người Việt Nam học tiếng Trung — Sơ cấp",
-      stats: "📖 15 bài · 1 đã mở"
-    }
-
-  ];
 
   return (
     <div className={styles.vocabularys_wrapper}>
@@ -62,7 +36,8 @@ export default function Vocabularys() {
 
       <div className={styles.books_grid}>
         {levels.map((book) => (
-          <div key={book.id} className={styles.book_card}>
+          <Link href={`/levels/${book.level}?levelId=${book.id}`} key={book.id} className={styles.book_link}>
+            <div key={book.id} className={styles.book_card}>
             <div className={styles.book_icon}>
               TIẾNG TRUNG
             </div>
@@ -75,6 +50,7 @@ export default function Vocabularys() {
               <div className={styles.stats}>📖 15 bài</div>
             </div>
           </div>
+          </Link>
         ))}
       </div>
     </div>
