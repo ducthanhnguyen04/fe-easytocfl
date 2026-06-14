@@ -1,13 +1,13 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Home from '../pages/Home';
-import Roadmap from '../pages/Roadmap';
-import Vocabulary from '../pages/Vocabulary';
-import Grammar from '../pages/Grammar';
-import Exam from '../pages/Exam';
-import Leaderboard from '../pages/Leaderboard';
-import Settings from '../pages/Settings';
-import Admin from '../pages/Admin';
+import Home from '../pages/Home/Home';
+import Roadmap from '../pages/Roadmap/Roadmap';
+import Vocabulary from '../pages/Vocabulary/Vocabulary';
+import Grammar from '../pages/Grammar/Grammar';
+import Exam from '../pages/Exam/Exam';
+import Leaderboard from '../pages/Leaderboard/Leaderboard';
+import Settings from '../pages/Settings/Settings';
+import Admin from '../pages/Admin/Admin';
 import AdminRoute from '../adminRoutes/adminRoute';
 
 const AppRoutes = ({

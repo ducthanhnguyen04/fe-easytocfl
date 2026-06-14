@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import beUrl from '../api-url/api-backend';
+import beUrl from '../../api-url/api-backend';
 import './Settings.css';
-import { AuthContext } from '../context/authContext';
+import { AuthContext } from '../../context/authContext';
 
 const Settings = ({ resetVocabProgress }) => {
   const { user, setUser } = useContext(AuthContext);

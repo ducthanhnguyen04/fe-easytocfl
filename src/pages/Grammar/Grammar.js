@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { textbooks, bookLessons, grammarPoints } from '../data/db';
-import { getAIEvaluationFeedback } from '../utils/feedback';
+import { textbooks, bookLessons, grammarPoints } from '../../data/db';
+import { getAIEvaluationFeedback } from '../../utils/feedback';
 import './Grammar.css';
 
 const Grammar = ({ playAudio }) => {

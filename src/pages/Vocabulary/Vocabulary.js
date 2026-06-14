@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { textbooks, bookLessons } from '../data/db';
+import { textbooks, bookLessons } from '../../data/db';
 import './Vocabulary.css';
 
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {

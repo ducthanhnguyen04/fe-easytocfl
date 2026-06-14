@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../../context/authContext';
 import './Home.css';
 
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {

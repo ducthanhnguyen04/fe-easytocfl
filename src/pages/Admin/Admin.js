@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import beUrl from '../api-url/api-backend';
-import { AuthContext } from '../context/authContext';
+import beUrl from '../../api-url/api-backend';
+import { AuthContext } from '../../context/authContext';
 import './Admin.css';
 
 const Admin = () => {
