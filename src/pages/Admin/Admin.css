@@ -166,6 +166,31 @@
   box-shadow: none;
 }
 
+.edit-action-btn {
+  background-color: #e6fcf5;
+  color: #0ca678;
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.edit-action-btn:hover {
+  background-color: #0ca678;
+  color: var(--color-white);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-thin);
+}
+
+.edit-action-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
 /* Access Denied Card Styling */
 .admin-access-denied {
   display: flex;

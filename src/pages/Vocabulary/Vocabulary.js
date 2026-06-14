@@ -2,12 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons } from '../../data/db';
 import './Vocabulary.css';
+import axios from 'axios';
 
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const { bookId, lessonId } = useParams();
+  const [levels, setLevels] = useState([]);
+
+  useEffect(() => {
+    const fecthLevel = async () => {
+      const response = await axios.get(`http://localhost:3008/levels/get-all`);
+      setLevels(response.data.levels);
+    }
+    fecthLevel();
+  }, [])
+  console.log("level:", levels);
   const navigate = useNavigate();
 
-  // Selected parameters as integers
   const selectedBook = bookId ? parseInt(bookId) : null;
   const selectedLesson = lessonId ? parseInt(lessonId) : null;
 
@@ -161,8 +171,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     if (!dictationInput.trim()) return;
     const activeDictationWord = currentLessonWords[dictationIndex % currentLessonWords.length];
     if (activeDictationWord) {
-      const isCorrect = dictationInput.trim().toLowerCase() === activeDictationWord.word || 
-                        dictationInput.trim().toLowerCase() === activeDictationWord.pinyin.toLowerCase();
+      const isCorrect = dictationInput.trim().toLowerCase() === activeDictationWord.word ||
+        dictationInput.trim().toLowerCase() === activeDictationWord.pinyin.toLowerCase();
       setDictationFeedback(
         isCorrect ? "🎉 Chính xác!" : `❌ Chưa đúng! Từ phát âm là: ${activeDictationWord.word} (${activeDictationWord.pinyin})`
       );
@@ -187,9 +197,9 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     if (word.word === '捷運') return { cn: '在台北搭乘 ___ 非常方便。', vn: 'Đi tàu điện ngầm ___ ở Đài Bắc rất tiện lợi.' };
     if (word.word === '珍珠奶茶') return { cn: '我想喝一杯台灣的 ___。', vn: 'Tôi muốn uống một cốc ___ của Đài Loan.' };
     if (word.word === '夜市') return { cn: '晚上我們去 ___ 吃小吃。', vn: 'Buổi tối chúng tôi đi ___ ăn vặt.' };
-    return { 
-      cn: `這語句是我最喜歡的 ___。`, 
-      vn: `Đây là ___ yêu thích nhất của tôi.` 
+    return {
+      cn: `這語句是我最喜歡的 ___。`,
+      vn: `Đây là ___ yêu thích nhất của tôi.`
     };
   };
 
@@ -197,9 +207,9 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedBook || !selectedLesson) return;
-      
+
       const isInputFocused = document.activeElement.tagName === 'INPUT';
-      
+
       if (vocabMode === 'flashcard') {
         if (e.key === 'ArrowLeft') {
           e.preventDefault();
@@ -264,7 +274,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    selectedBook, selectedLesson, vocabMode, 
+    selectedBook, selectedLesson, vocabMode,
     flashIndex, quizIndex, quizChecked, quizOptions,
     typingIndex, typingFeedback, readingIndex, readingChecked,
     readingOptions, dictationIndex, dictationFeedback, currentLessonWords
@@ -273,9 +283,9 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const filteredVocab = vocabWords.filter(v => {
     const matchesBook = selectedBook === null || v.bookId === selectedBook;
     const matchesLesson = selectedLesson === null || v.lessonId === selectedLesson;
-    const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          v.trans.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.trans.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesBook && matchesLesson && matchesSearch;
   });
 
@@ -295,30 +305,30 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           </div>
 
           <div className="books-grid">
-            {textbooks.map((book) => {
+            {levels.map((book) => {
               const bookWords = vocabWords.filter(v => v.bookId === book.id);
               const learnedCount = bookWords.filter(v => v.learned).length;
-              
+
               return (
-                <div 
-                  key={book.id} 
+                <div
+                  key={book.id}
                   className="neo-card book-select-card"
                   onClick={() => {
                     navigate(`/vocab/${book.id}`);
                   }}
                 >
                   <div className="book-cover" style={{ backgroundColor: book.color }}>
-                    <span className="book-cover-title-traditional">當代中文</span>
-                    <span className="book-cover-vol">{book.id}</span>
+                    <span className="book-cover-title-traditional">時代華語</span>
+                    <span className="book-cover-vol">{book.level}</span>
                   </div>
                   <div className="book-select-info">
-                    <h4 className="book-select-title">{book.viTitle}</h4>
+                    <h4 className="book-select-title">{book.levelName}</h4>
                     <span className="book-select-level">{book.level}</span>
-                    <p className="book-select-desc">{book.desc}</p>
+                    <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
                     <div className="book-select-stats">
-                      <span>📖 {book.lessons}</span>
-                      <span>🔓 {book.status}</span>
-                      <span style={{ color: 'var(--color-secondary)' }}>✓ {learnedCount}/{bookWords.length} từ</span>
+                      <span>📖 {book?.lessons.length} bài học</span>
+                      {/* <span>🔓 {book.status}</span> */}
+                      {/* <span style={{ color: 'var(--color-secondary)' }}>✓ {learnedCount}/{bookWords.length} từ</span> */}
                     </div>
                   </div>
                 </div>
@@ -376,8 +386,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     const isCompleted = lessonWords.length > 0 && lessonWords.every(v => v.learned);
 
                     return (
-                      <div 
-                        key={lesson.id} 
+                      <div
+                        key={lesson.id}
                         className="neo-card lesson-select-card"
                         onClick={() => {
                           navigate(`/vocab/${selectedBook}/${lesson.id}`);
@@ -455,8 +465,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       {(flashIndex % currentLessonWords.length) + 1} / {currentLessonWords.length}
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button 
-                        className="neo-btn" 
+                      <button
+                        className="neo-btn"
                         style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: 'var(--color-bg)' }}
                         onClick={() => setFlashTranslationMode(flashTranslationMode === 'ZH-VI' ? 'VI-ZH' : 'ZH-VI')}
                       >
@@ -466,35 +476,40 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     </div>
                   </div>
 
-                  <div 
-                    className="workspace-card flashcard-green"
+                  <div
+                    className="flashcard-container"
                     onClick={() => setFlashFlipped(!flashFlipped)}
                   >
-                    {!flashFlipped ? (
-                      flashTranslationMode === 'ZH-VI' ? (
-                        <div>
-                          <div className="flashcard-word">{activeFlashWord?.word}</div>
-                          <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
-                        </div>
-                      ) : (
-                        <div className="flashcard-trans">{activeFlashWord?.trans}</div>
-                      )
-                    ) : (
-                      flashTranslationMode === 'ZH-VI' ? (
-                        <div className="flashcard-trans">{activeFlashWord?.trans}</div>
-                      ) : (
-                        <div>
-                          <div className="flashcard-word">{activeFlashWord?.word}</div>
-                          <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
-                        </div>
-                      )
-                    )}
-                    <div className="flashcard-hint">✨ Click hoặc Space để lật thẻ</div>
+                    <div className={`flashcard-inner ${flashFlipped ? 'flipped' : ''}`}>
+                      <div className="flashcard-face flashcard-front">
+                        {flashTranslationMode === 'ZH-VI' ? (
+                          <div>
+                            <div className="flashcard-word">{activeFlashWord?.word}</div>
+                            <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
+                          </div>
+                        ) : (
+                          <div className="flashcard-trans">{activeFlashWord?.trans}</div>
+                        )}
+                        <div className="flashcard-hint">✨ Click hoặc Space để lật thẻ</div>
+                      </div>
+
+                      <div className="flashcard-face flashcard-back">
+                        {flashTranslationMode === 'ZH-VI' ? (
+                          <div className="flashcard-trans">{activeFlashWord?.trans}</div>
+                        ) : (
+                          <div>
+                            <div className="flashcard-word">{activeFlashWord?.word}</div>
+                            <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
+                          </div>
+                        )}
+                        <div className="flashcard-hint">✨ Click hoặc Space để lật thẻ</div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="learning-actions-row">
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       onClick={() => {
                         setFlashIndex((flashIndex - 1 + currentLessonWords.length) % currentLessonWords.length);
                         setFlashFlipped(false);
@@ -502,9 +517,9 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     >
                       ← Trước
                     </button>
-                    
-                    <button 
-                      className="neo-btn" 
+
+                    <button
+                      className="neo-btn"
                       style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
                       onClick={() => {
                         const globalIdx = vocabWords.findIndex(v => v.word === activeFlashWord.word);
@@ -516,8 +531,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       ✘ Chưa thuộc
                     </button>
 
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       style={{ backgroundColor: 'var(--color-secondary)' }}
                       onClick={() => {
                         const globalIdx = vocabWords.findIndex(v => v.word === activeFlashWord.word);
@@ -529,8 +544,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       ✓ Đã thuộc
                     </button>
 
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       onClick={() => {
                         setFlashIndex((flashIndex + 1) % currentLessonWords.length);
                         setFlashFlipped(false);
@@ -548,13 +563,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
             if (vocabMode === 'quiz') {
               const isCompleted = quizIndex >= currentLessonWords.length;
-              
+
               if (isCompleted) {
                 const correctCount = quizScore.correct;
                 const totalCount = currentLessonWords.length;
                 const incorrectCount = totalCount - correctCount;
                 const scorePercent = Math.round((correctCount / totalCount) * 100);
-                
+
                 return (
                   <div className="learning-workspace">
                     <div className="workspace-card quiz-green" style={{ minHeight: '300px' }}>
@@ -565,12 +580,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div>⭐ Tỉ lệ: {scorePercent}%</div>
                       </div>
                       <p style={{ fontSize: '14px', color: '#555', maxWidth: '400px', margin: '0 auto 20px', lineHeight: '1.5' }}>
-                        {scorePercent >= 80 
-                          ? "Tuyệt vời! Bạn đã nắm rất vững từ vựng của bài học này." 
+                        {scorePercent >= 80
+                          ? "Tuyệt vời! Bạn đã nắm rất vững từ vựng của bài học này."
                           : "Khá tốt, hãy luyện tập thêm để ghi nhớ tốt hơn nữa nhé!"}
                       </p>
-                      <button 
-                        className="neo-btn neo-btn-primary" 
+                      <button
+                        className="neo-btn neo-btn-primary"
                         style={{ padding: '10px 20px', fontWeight: '800' }}
                         onClick={() => {
                           setQuizIndex(0);
@@ -616,8 +631,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         }
                       }
                       return (
-                        <button 
-                          key={idx} 
+                        <button
+                          key={idx}
                           className={`option-btn ${btnClass}`}
                           onClick={() => handleQuizChoice(idx)}
                           disabled={quizChecked}
@@ -630,8 +645,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   </div>
 
                   <div className="learning-actions-row">
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       onClick={() => {
                         setQuizIndex(prev => prev + 1);
                       }}
@@ -648,13 +663,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
             if (vocabMode === 'typing') {
               const isCompleted = typingIndex >= currentLessonWords.length;
-              
+
               if (isCompleted) {
                 const correctCount = typingScore.correct;
                 const totalCount = currentLessonWords.length;
                 const incorrectCount = totalCount - correctCount;
                 const scorePercent = Math.round((correctCount / totalCount) * 100);
-                
+
                 return (
                   <div className="learning-workspace">
                     <div className="workspace-card typing-orange" style={{ minHeight: '300px' }}>
@@ -665,12 +680,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div>⭐ Tỉ lệ: {scorePercent}%</div>
                       </div>
                       <p style={{ fontSize: '14px', color: '#555', maxWidth: '400px', margin: '0 auto 20px', lineHeight: '1.5' }}>
-                        {scorePercent >= 80 
-                          ? "Rất giỏi! Bạn viết chữ Hán Phồn thể cực kỳ chuẩn xác." 
+                        {scorePercent >= 80
+                          ? "Rất giỏi! Bạn viết chữ Hán Phồn thể cực kỳ chuẩn xác."
                           : "Hãy kiên trì luyện tập viết thêm để thành thạo mặt chữ nhé!"}
                       </p>
-                      <button 
-                        className="neo-btn neo-btn-primary" 
+                      <button
+                        className="neo-btn neo-btn-primary"
                         style={{ padding: '10px 20px', fontWeight: '800' }}
                         onClick={() => {
                           setTypingIndex(0);
@@ -710,10 +725,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   </div>
 
                   <div className="typing-control-box">
-                    <input 
-                      type="text" 
-                      className="typing-text-input" 
-                      placeholder="Gõ chữ Hán Phồn thể..." 
+                    <input
+                      type="text"
+                      className="typing-text-input"
+                      placeholder="Gõ chữ Hán Phồn thể..."
                       value={typingInput}
                       onChange={(e) => setTypingInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -722,14 +737,14 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       disabled={typingFeedback !== null}
                       autoFocus
                     />
-                    
+
                     {typingFeedback === null ? (
                       <button className="neo-btn neo-btn-primary typing-check-btn" onClick={handleTypingCheck}>
                         Kiểm tra
                       </button>
                     ) : (
-                      <button 
-                        className="neo-btn neo-btn-primary typing-check-btn" 
+                      <button
+                        className="neo-btn neo-btn-primary typing-check-btn"
                         style={{ backgroundColor: 'var(--color-secondary)' }}
                         onClick={() => setTypingIndex(prev => prev + 1)}
                       >
@@ -746,13 +761,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
             if (vocabMode === 'reading') {
               const isCompleted = readingIndex >= currentLessonWords.length;
-              
+
               if (isCompleted) {
                 const correctCount = readingScore.correct;
                 const totalCount = currentLessonWords.length;
                 const incorrectCount = totalCount - correctCount;
                 const scorePercent = Math.round((correctCount / totalCount) * 100);
-                
+
                 return (
                   <div className="learning-workspace">
                     <div className="workspace-card reading-blue" style={{ minHeight: '300px' }}>
@@ -763,12 +778,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div>⭐ Tỉ lệ: {scorePercent}%</div>
                       </div>
                       <p style={{ fontSize: '14px', color: '#555', maxWidth: '400px', margin: '0 auto 20px', lineHeight: '1.5' }}>
-                        {scorePercent >= 80 
-                          ? "Tuyệt vời! Bạn có khả năng hiểu ngữ cảnh rất tốt." 
+                        {scorePercent >= 80
+                          ? "Tuyệt vời! Bạn có khả năng hiểu ngữ cảnh rất tốt."
                           : "Hãy thử lại để cải thiện điểm số đọc hiểu của mình!"}
                       </p>
-                      <button 
-                        className="neo-btn neo-btn-primary" 
+                      <button
+                        className="neo-btn neo-btn-primary"
                         style={{ padding: '10px 20px', fontWeight: '800' }}
                         onClick={() => {
                           setReadingIndex(0);
@@ -818,8 +833,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         }
                       }
                       return (
-                        <button 
-                          key={idx} 
+                        <button
+                          key={idx}
                           className={`option-btn ${btnClass}`}
                           onClick={() => handleReadingChoice(idx)}
                           disabled={readingChecked}
@@ -832,8 +847,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   </div>
 
                   <div className="learning-actions-row">
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       onClick={() => {
                         setReadingIndex(prev => prev + 1);
                       }}
@@ -850,13 +865,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
             if (vocabMode === 'dictation') {
               const isCompleted = dictationIndex >= currentLessonWords.length;
-              
+
               if (isCompleted) {
                 const correctCount = dictationScore.correct;
                 const totalCount = currentLessonWords.length;
                 const incorrectCount = totalCount - correctCount;
                 const scorePercent = Math.round((correctCount / totalCount) * 100);
-                
+
                 return (
                   <div className="learning-workspace">
                     <div className="workspace-card dictation-yellow" style={{ minHeight: '300px' }}>
@@ -867,12 +882,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div>⭐ Tỉ lệ: {scorePercent}%</div>
                       </div>
                       <p style={{ fontSize: '14px', color: '#555', maxWidth: '400px', margin: '0 auto 20px', lineHeight: '1.5' }}>
-                        {scorePercent >= 80 
-                          ? "Kỹ năng nghe của bạn thật xuất sắc! Hãy tiếp tục phát huy." 
+                        {scorePercent >= 80
+                          ? "Kỹ năng nghe của bạn thật xuất sắc! Hãy tiếp tục phát huy."
                           : "Hãy luyện nghe chép lại để nâng cao phản xạ âm thanh nhé!"}
                       </p>
-                      <button 
-                        className="neo-btn neo-btn-primary" 
+                      <button
+                        className="neo-btn neo-btn-primary"
                         style={{ padding: '10px 20px', fontWeight: '800' }}
                         onClick={() => {
                           setDictationIndex(0);
@@ -903,7 +918,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
                   <div className="workspace-card dictation-yellow">
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>Bấm nút nghe rồi gõ lại chữ Hán / Pinyin bạn nghe được</div>
-                    
+
                     <button className="dictation-speaker-btn" onClick={() => playAudio(activeDictationWord?.word)}>
                       🔊 Nghe phát âm
                     </button>
@@ -922,10 +937,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   </div>
 
                   <div className="typing-control-box">
-                    <input 
-                      type="text" 
-                      className="typing-text-input" 
-                      placeholder="Gõ chữ Hán hoặc Pinyin..." 
+                    <input
+                      type="text"
+                      className="typing-text-input"
+                      placeholder="Gõ chữ Hán hoặc Pinyin..."
                       value={dictationInput}
                       onChange={(e) => setDictationInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -934,10 +949,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       disabled={dictationFeedback !== null}
                       autoFocus
                     />
-                    
+
                     <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                      <button 
-                        className="neo-btn" 
+                      <button
+                        className="neo-btn"
                         style={{ flex: 1 }}
                         onClick={() => setShowDictationHint(true)}
                         disabled={showDictationHint}
@@ -949,8 +964,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                           Kiểm tra
                         </button>
                       ) : (
-                        <button 
-                          className="neo-btn neo-btn-primary" 
+                        <button
+                          className="neo-btn neo-btn-primary"
                           style={{ flex: 2, backgroundColor: 'var(--color-secondary)' }}
                           onClick={() => setDictationIndex(prev => prev + 1)}
                         >
@@ -965,7 +980,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                 </div>
               );
             }
-            
+
             return null;
           })()}
 
@@ -973,7 +988,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           <div className="mode-selector-panel">
             <div className="mode-selector-title">Chọn chế độ học</div>
             <div className="modes-grid">
-              <div 
+              <div
                 className={`neo-card mode-card ${vocabMode === 'flashcard' ? 'active-flashcard' : ''}`}
                 onClick={() => setVocabMode('flashcard')}
               >
@@ -982,28 +997,28 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   {vocabWords.filter(v => v.bookId === selectedBook && v.lessonId === selectedLesson && v.learned).length === currentLessonWords.length ? 'Đã thuộc' : 'Đang học'}
                 </div>
               </div>
-              <div 
+              <div
                 className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}
                 onClick={() => setVocabMode('quiz')}
               >
                 <div className="mode-card-title">❓ Trắc nghiệm</div>
                 <div className="mode-card-status">Luyện tập</div>
               </div>
-              <div 
+              <div
                 className={`neo-card mode-card ${vocabMode === 'typing' ? 'active-typing' : ''}`}
                 onClick={() => setVocabMode('typing')}
               >
                 <div className="mode-card-title">⌨️ Gõ từ vựng</div>
                 <div className="mode-card-status">Luyện viết</div>
               </div>
-              <div 
+              <div
                 className={`neo-card mode-card ${vocabMode === 'reading' ? 'active-reading' : ''}`}
                 onClick={() => setVocabMode('reading')}
               >
                 <div className="mode-card-title">📖 Đọc hiểu</div>
                 <div className="mode-card-status">Ngữ cảnh</div>
               </div>
-              <div 
+              <div
                 className={`neo-card mode-card ${vocabMode === 'dictation' ? 'active-dictation' : ''}`}
                 onClick={() => setVocabMode('dictation')}
               >
@@ -1015,10 +1030,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
           {/* Search and filter */}
           <div className="vocab-search-bar">
-            <input 
-              type="text" 
-              className="vocab-input" 
-              placeholder="Tìm kiếm từ vựng trong danh sách dưới đây..." 
+            <input
+              type="text"
+              className="vocab-input"
+              placeholder="Tìm kiếm từ vựng trong danh sách dưới đây..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -1045,7 +1060,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       <span className="neo-badge" style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: 'var(--color-blue-light)' }}>
                         {item.tag}
                       </span>
-                      <button 
+                      <button
                         className={`neo-btn ${item.learned ? 'neo-btn-primary' : ''}`}
                         style={{ padding: '4px 10px', fontSize: '10px', borderRadius: '6px', cursor: 'pointer' }}
                         onClick={() => toggleVocabLearned(globalIndex)}

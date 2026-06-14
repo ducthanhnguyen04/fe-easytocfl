@@ -117,6 +117,7 @@
 }
 
 .book-cover {
+  background: green;
   width: 90px;
   height: 130px;
   border-radius: var(--radius-sm);
@@ -139,7 +140,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
   pointer-events: none;
 }
 
@@ -153,7 +154,7 @@
   margin: 0 auto;
   letter-spacing: 2px;
   line-height: 1.1;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
 .book-cover-vol {
@@ -162,7 +163,7 @@
   font-weight: 800;
   text-align: right;
   line-height: 1;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
 .book-select-info {
@@ -367,21 +368,25 @@
   border-color: var(--color-blue) !important;
   transform: translateY(-2px);
 }
+
 .mode-card.active-quiz {
   background-color: #e8f5e9 !important;
   border-color: var(--color-secondary) !important;
   transform: translateY(-2px);
 }
+
 .mode-card.active-typing {
   background-color: #fff3e0 !important;
   border-color: var(--color-accent) !important;
   transform: translateY(-2px);
 }
+
 .mode-card.active-reading {
   background-color: #e0f7fa !important;
   border-color: #26c6da !important;
   transform: translateY(-2px);
 }
+
 .mode-card.active-dictation {
   background-color: #fffde7 !important;
   border-color: var(--color-yellow) !important;
@@ -411,8 +416,51 @@
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.workspace-card.flashcard-green {
+/* 3D Flashcard Flip Effect */
+.flashcard-container {
+  width: 100%;
+  height: 280px;
+  perspective: 1200px;
+  cursor: pointer;
+  margin-bottom: 25px;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+}
+
+.flashcard-front {
   background-color: #a8e6cf;
+  transform: rotateY(0deg);
+}
+
+.flashcard-back {
+  background-color: #ffd3b6;
+  transform: rotateY(180deg);
 }
 
 .workspace-card.quiz-green {
@@ -593,12 +641,15 @@
   .books-grid {
     grid-template-columns: 1fr;
   }
+
   .lessons-grid {
     grid-template-columns: 1fr;
   }
+
   .modes-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
   .options-grid {
     grid-template-columns: 1fr;
   }
@@ -608,6 +659,7 @@
   .vocab-list {
     grid-template-columns: 1fr;
   }
+
   .modes-grid {
     grid-template-columns: repeat(2, 1fr);
   }

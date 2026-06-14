@@ -21,6 +21,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [actionSuccess, setActionSuccess] = useState('');
   const [actionError, setActionError] = useState('');
+  const [editId, setEditId] = useState(null);
 
   // Form states
   // 1. Level form
@@ -87,89 +88,137 @@ const Admin = () => {
     setTimeout(() => setActionError(''), 4000);
   };
 
-  // Submit Handlers
-  const handleAddLevel = async (e) => {
+  // Form Reset Helper
+  const resetForm = () => {
+    setEditId(null);
+    setLevelName('');
+    setLevelCode('');
+    setLessonName('');
+    setLessonTitle('');
+    setLessonSlug('');
+    setLessonLevelId('');
+    setLessonIsPremium(false);
+    setGrammarName('');
+    setGrammarStructure('');
+    setGrammarUsage('');
+    setGrammarNote('');
+    setGrammarLessonId('');
+    setExampleText('');
+    setExampleMeaning('');
+    setExamplePinyin('');
+    setExampleAudioUrl('');
+    setExampleGrammarId('');
+    setExampleVocabId('');
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    resetForm();
+  };
+
+  // Submit & Edit Handlers
+  const handleSaveLevel = async (e) => {
     e.preventDefault();
     if (!levelName || !levelCode) {
       showError('Vui lòng nhập đầy đủ tên và mã cấp độ!');
       return;
     }
     try {
-      const res = await axios.post(
-        `${beUrl}/levels/create`,
-        { levelName, level: levelCode },
-        { withCredentials: true }
-      );
-      showSuccess('Thêm giáo trình (cấp độ) mới thành công!');
-      setLevelName('');
-      setLevelCode('');
+      if (editId) {
+        await axios.put(
+          `${beUrl}/levels/update/${editId}`,
+          { levelName, level: levelCode },
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật giáo trình thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/levels/create`,
+          { levelName, level: levelCode },
+          { withCredentials: true }
+        );
+        showSuccess('Thêm giáo trình mới thành công!');
+      }
+      resetForm();
       fetchData();
     } catch (error) {
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi tạo giáo trình.');
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu giáo trình.');
     }
   };
 
-  const handleAddLesson = async (e) => {
+  const handleSaveLesson = async (e) => {
     e.preventDefault();
     if (!lessonName || !lessonTitle || !lessonSlug || !lessonLevelId) {
       showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
-      await axios.post(
-        `${beUrl}/lessons/create`,
-        {
-          lessonName,
-          title: lessonTitle,
-          slug: lessonSlug,
-          levelId: parseInt(lessonLevelId),
-          isPremium: lessonIsPremium,
-        },
-        { withCredentials: true }
-      );
-      showSuccess('Thêm bài học mới thành công!');
-      setLessonName('');
-      setLessonTitle('');
-      setLessonSlug('');
-      setLessonLevelId('');
-      setLessonIsPremium(false);
+      const payload = {
+        lessonName,
+        title: lessonTitle,
+        slug: lessonSlug,
+        levelId: parseInt(lessonLevelId),
+        isPremium: lessonIsPremium,
+      };
+      if (editId) {
+        await axios.put(
+          `${beUrl}/lessons/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật bài học thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/lessons/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm bài học mới thành công!');
+      }
+      resetForm();
       fetchData();
     } catch (error) {
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi tạo bài học.');
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu bài học.');
     }
   };
 
-  const handleAddGrammar = async (e) => {
+  const handleSaveGrammar = async (e) => {
     e.preventDefault();
     if (!grammarName || !grammarStructure || !grammarUsage || !grammarLessonId) {
       showError('Vui lòng điền đầy đủ thông tin cấu trúc ngữ pháp!');
       return;
     }
     try {
-      await axios.post(
-        `${beUrl}/grammars/create`,
-        {
-          grammar: grammarName,
-          structure: grammarStructure,
-          usage: grammarUsage,
-          note: grammarNote,
-          lessonId: parseInt(grammarLessonId),
-        },
-        { withCredentials: true }
-      );
-      showSuccess('Thêm mẫu ngữ pháp mới thành công!');
-      setGrammarName('');
-      setGrammarStructure('');
-      setGrammarUsage('');
-      setGrammarNote('');
-      setGrammarLessonId('');
+      const payload = {
+        grammar: grammarName,
+        structure: grammarStructure,
+        usage: grammarUsage,
+        note: grammarNote,
+        lessonId: parseInt(grammarLessonId),
+      };
+      if (editId) {
+        await axios.put(
+          `${beUrl}/grammars/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật ngữ pháp thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/grammars/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm mẫu ngữ pháp mới thành công!');
+      }
+      resetForm();
       fetchData();
     } catch (error) {
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi tạo ngữ pháp.');
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu ngữ pháp.');
     }
   };
 
-  const handleAddExample = async (e) => {
+  const handleSaveExample = async (e) => {
     e.preventDefault();
     if (!exampleText || !exampleMeaning || !examplePinyin) {
       showError('Vui lòng điền đầy đủ thông tin ví dụ mẫu!');
@@ -184,17 +233,52 @@ const Admin = () => {
         grammarId: exampleGrammarId ? parseInt(exampleGrammarId) : null,
         vocabularyId: exampleVocabId ? parseInt(exampleVocabId) : null,
       };
-      await axios.post(`${beUrl}/examples/create`, payload, { withCredentials: true });
-      showSuccess('Thêm ví dụ mẫu thành công!');
-      setExampleText('');
-      setExampleMeaning('');
-      setExamplePinyin('');
-      setExampleAudioUrl('');
-      setExampleGrammarId('');
-      setExampleVocabId('');
+      if (editId) {
+        await axios.put(
+          `${beUrl}/examples/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật câu ví dụ thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/examples/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm ví dụ mẫu thành công!');
+      }
+      resetForm();
       fetchData();
     } catch (error) {
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi tạo câu ví dụ.');
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu câu ví dụ.');
+    }
+  };
+
+  const handleEditClick = (item) => {
+    setEditId(item.id);
+    if (activeTab === 'levels') {
+      setLevelName(item.levelName);
+      setLevelCode(item.level);
+    } else if (activeTab === 'lessons') {
+      setLessonName(item.lessonName);
+      setLessonTitle(item.title);
+      setLessonSlug(item.slug);
+      setLessonLevelId(item.levelId);
+      setLessonIsPremium(item.isPremium);
+    } else if (activeTab === 'grammars') {
+      setGrammarName(item.grammar);
+      setGrammarStructure(item.structure);
+      setGrammarUsage(item.usage);
+      setGrammarNote(item.note || '');
+      setGrammarLessonId(item.lessonId);
+    } else if (activeTab === 'examples') {
+      setExampleText(item.example);
+      setExampleMeaning(item.meaning);
+      setExamplePinyin(item.pinyin);
+      setExampleAudioUrl(item.audioUrl || '');
+      setExampleGrammarId(item.grammarId || '');
+      setExampleVocabId(item.vocabularyId || '');
     }
   };
 
@@ -206,6 +290,9 @@ const Admin = () => {
     try {
       await axios.delete(`${beUrl}/${route}/delete/${id}`, { withCredentials: true });
       showSuccess('Xóa mục thành công!');
+      if (editId === id) {
+        resetForm();
+      }
       fetchData();
     } catch (error) {
       showError(error.response?.data?.message || 'Có lỗi xảy ra khi xóa mục.');
@@ -229,29 +316,28 @@ const Admin = () => {
       {actionSuccess && <div className="settings-alert-success" style={{ marginBottom: '25px' }}>✓ {actionSuccess}</div>}
       {actionError && <div className="settings-alert-error" style={{ marginBottom: '25px' }}>⚠ {actionError}</div>}
 
-      {/* Admin Tab Navigation */}
       <div className="admin-tabs" style={{ display: 'flex', gap: '15px', marginBottom: '30px', flexWrap: 'wrap' }}>
         <button
           className={`neo-btn tab-btn ${activeTab === 'levels' ? 'active' : ''}`}
-          onClick={() => setActiveTab('levels')}
+          onClick={() => handleTabChange('levels')}
         >
           📚 Giáo Trình (Levels) <span className="tab-count-badge">{levels.length}</span>
         </button>
         <button
           className={`neo-btn tab-btn ${activeTab === 'lessons' ? 'active' : ''}`}
-          onClick={() => setActiveTab('lessons')}
+          onClick={() => handleTabChange('lessons')}
         >
           📖 Bài Học (Lessons) <span className="tab-count-badge">{lessons.length}</span>
         </button>
         <button
           className={`neo-btn tab-btn ${activeTab === 'grammars' ? 'active' : ''}`}
-          onClick={() => setActiveTab('grammars')}
+          onClick={() => handleTabChange('grammars')}
         >
           📝 Ngữ Pháp (Grammars) <span className="tab-count-badge">{grammars.length}</span>
         </button>
         <button
           className={`neo-btn tab-btn ${activeTab === 'examples' ? 'active' : ''}`}
-          onClick={() => setActiveTab('examples')}
+          onClick={() => handleTabChange('examples')}
         >
           💡 Ví Dụ Mẫu (Examples) <span className="tab-count-badge">{examples.length}</span>
         </button>
@@ -261,8 +347,10 @@ const Admin = () => {
         {/* Left: Input Form Card */}
         <div className="neo-card admin-form-card" style={{ padding: '25px' }}>
           {activeTab === 'levels' && (
-            <form onSubmit={handleAddLevel} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3 className="form-section-title">📚 Thêm Giáo Trình (Level)</h3>
+            <form onSubmit={handleSaveLevel} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Giáo Trình (ID: ${editId})` : '📚 Thêm Giáo Trình (Level)'}
+              </h3>
               <div className="settings-input-group">
                 <label className="settings-label">Tên giáo trình</label>
                 <input
@@ -285,15 +373,24 @@ const Admin = () => {
                   required
                 />
               </div>
-              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 25px' }}>
-                Lưu giáo trình
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu giáo trình'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
             </form>
           )}
 
           {activeTab === 'lessons' && (
-            <form onSubmit={handleAddLesson} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3 className="form-section-title">📖 Thêm Bài Học Mới</h3>
+            <form onSubmit={handleSaveLesson} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Bài Học (ID: ${editId})` : '📖 Thêm Bài Học Mới'}
+              </h3>
               <div className="settings-input-group">
                 <label className="settings-label">Thuộc Giáo Trình</label>
                 <select
@@ -355,15 +452,24 @@ const Admin = () => {
                   🔑 Bài học Premium (Yêu cầu tài khoản trả phí)
                 </label>
               </div>
-              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 25px' }}>
-                Lưu bài học
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu bài học'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
             </form>
           )}
 
           {activeTab === 'grammars' && (
-            <form onSubmit={handleAddGrammar} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3 className="form-section-title">📝 Thêm Cấu Trúc Ngữ Pháp</h3>
+            <form onSubmit={handleSaveGrammar} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Ngữ Pháp (ID: ${editId})` : '📝 Thêm Cấu Trúc Ngữ Pháp'}
+              </h3>
               <div className="settings-input-group">
                 <label className="settings-label">Thuộc Bài Học (Lesson)</label>
                 <select
@@ -423,15 +529,24 @@ const Admin = () => {
                   onChange={(e) => setGrammarNote(e.target.value)}
                 />
               </div>
-              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 25px' }}>
-                Lưu ngữ pháp
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu ngữ pháp'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
             </form>
           )}
 
           {activeTab === 'examples' && (
-            <form onSubmit={handleAddExample} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3 className="form-section-title">💡 Thêm Ví Dụ Minh Họa</h3>
+            <form onSubmit={handleSaveExample} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Ví Dụ (ID: ${editId})` : '💡 Thêm Ví Dụ Minh Họa'}
+              </h3>
               <div className="settings-input-group">
                 <label className="settings-label">Liên kết tới Ngữ pháp (Tùy chọn)</label>
                 <select
@@ -505,9 +620,16 @@ const Admin = () => {
                   onChange={(e) => setExampleAudioUrl(e.target.value)}
                 />
               </div>
-              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '12px 25px' }}>
-                Lưu ví dụ
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu ví dụ'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
             </form>
           )}
         </div>
@@ -534,7 +656,7 @@ const Admin = () => {
                       <th>ID</th>
                       <th>Tên Giáo Trình</th>
                       <th>Mã Cấp Độ</th>
-                      <th style={{ width: '80px' }}>Hành động</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -549,12 +671,20 @@ const Admin = () => {
                           <td style={{ fontWeight: '800' }}>{lvl.levelName}</td>
                           <td><span className="level-code-badge">{lvl.level}</span></td>
                           <td>
-                            <button
-                              className="delete-action-btn"
-                              onClick={() => handleDeleteItem('levels', lvl.id)}
-                            >
-                              🗑️ Xóa
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                className="edit-action-btn"
+                                onClick={() => handleEditClick(lvl)}
+                              >
+                                ✏️ Sửa
+                              </button>
+                              <button
+                                className="delete-action-btn"
+                                onClick={() => handleDeleteItem('levels', lvl.id)}
+                              >
+                                🗑️ Xóa
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -572,7 +702,7 @@ const Admin = () => {
                       <th>Tiêu đề bài học</th>
                       <th>Giáo trình</th>
                       <th>Premium</th>
-                      <th>Hành động</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -591,12 +721,20 @@ const Admin = () => {
                             <td>{lvl ? lvl.levelName : `ID: ${ls.levelId}`}</td>
                             <td>{ls.isPremium ? '🔒 Có' : '🔓 Không'}</td>
                             <td>
-                              <button
-                                className="delete-action-btn"
-                                onClick={() => handleDeleteItem('lessons', ls.id)}
-                              >
-                                🗑️ Xóa
-                              </button>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  className="edit-action-btn"
+                                  onClick={() => handleEditClick(ls)}
+                                >
+                                  ✏️ Sửa
+                                </button>
+                                <button
+                                  className="delete-action-btn"
+                                  onClick={() => handleDeleteItem('lessons', ls.id)}
+                                >
+                                  🗑️ Xóa
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -614,7 +752,7 @@ const Admin = () => {
                       <th>Ngữ pháp</th>
                       <th>Cấu trúc công thức</th>
                       <th>Bài học</th>
-                      <th>Hành động</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -632,12 +770,20 @@ const Admin = () => {
                             <td><code>{gm.structure}</code></td>
                             <td>{ls ? `${ls.lessonName} - ${ls.title}` : `ID: ${gm.lessonId}`}</td>
                             <td>
-                              <button
-                                className="delete-action-btn"
-                                onClick={() => handleDeleteItem('grammars', gm.id)}
-                              >
-                                🗑️ Xóa
-                              </button>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  className="edit-action-btn"
+                                  onClick={() => handleEditClick(gm)}
+                                >
+                                  ✏️ Sửa
+                                </button>
+                                <button
+                                  className="delete-action-btn"
+                                  onClick={() => handleDeleteItem('grammars', gm.id)}
+                                >
+                                  🗑️ Xóa
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -654,7 +800,7 @@ const Admin = () => {
                       <th>Câu Ví dụ</th>
                       <th>Dịch nghĩa</th>
                       <th>Liên kết ngữ pháp</th>
-                      <th style={{ width: '80px' }}>Hành động</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -674,12 +820,20 @@ const Admin = () => {
                             <td>{ex.meaning}</td>
                             <td>{gm ? gm.grammar : 'Không'}</td>
                             <td>
-                              <button
-                                className="delete-action-btn"
-                                onClick={() => handleDeleteItem('examples', ex.id)}
-                              >
-                                🗑️ Xóa
-                              </button>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  className="edit-action-btn"
+                                  onClick={() => handleEditClick(ex)}
+                                >
+                                  ✏️ Sửa
+                                </button>
+                                <button
+                                  className="delete-action-btn"
+                                  onClick={() => handleDeleteItem('examples', ex.id)}
+                                >
+                                  🗑️ Xóa
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
