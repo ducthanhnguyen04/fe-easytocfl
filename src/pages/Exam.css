@@ -1,0 +1,47 @@
+/* Exam Page Styling */
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+}
+
+.exam-card {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+}
+
+.exam-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.exam-details {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.exam-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+/* Responsive Media Queries for Exam */
+@media (max-width: 1200px) {
+  .exam-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .exam-grid {
+    grid-template-columns: 1fr;
+  }
+}

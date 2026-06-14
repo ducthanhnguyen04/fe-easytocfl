@@ -1,0 +1,239 @@
+/* Sidebar Styling */
+.sidebar {
+  width: 280px;
+  background-color: var(--color-white);
+  border-right: var(--border-thick);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 30px 20px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo-icon {
+  width: 45px;
+  height: 45px;
+  background-color: var(--color-primary);
+  border: var(--border-thick);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  color: var(--color-white);
+  font-size: 22px;
+  box-shadow: var(--shadow-thin);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: -2px;
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 15px 0 10px 10px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.sidebar-item {
+  width: 100%;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-black);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  border: 3px solid transparent;
+  background: none;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.sidebar-link svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--color-black);
+  fill: none;
+  stroke-width: 2.5px;
+  transition: stroke 0.15s ease;
+}
+
+.sidebar-link:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-black);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-thin);
+}
+
+.sidebar-link.active {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-thin);
+}
+
+.sidebar-link.active svg {
+  stroke: var(--color-white);
+}
+
+.sidebar-link.active:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: none;
+  box-shadow: var(--shadow-thin);
+}
+
+.sidebar-link .demo-badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--color-yellow);
+  color: var(--color-black);
+  padding: 2px 6px;
+  font-size: 9px;
+  font-weight: 800;
+  border: var(--border-medium);
+  border-radius: 4px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: var(--border-medium);
+  padding-top: 20px;
+}
+
+.user-profile-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: var(--color-yellow-light);
+  border: var(--border-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-profile-widget:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: var(--border-medium);
+  background-color: var(--color-primary);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-black);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.user-email {
+  font-size: 10px;
+  color: #666;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: var(--border-thick);
+    padding: 20px;
+  }
+  .sidebar-logo {
+    margin-bottom: 20px;
+  }
+  .sidebar-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+  .sidebar-link {
+    white-space: nowrap;
+  }
+  .sidebar-footer {
+    display: none;
+  }
+}

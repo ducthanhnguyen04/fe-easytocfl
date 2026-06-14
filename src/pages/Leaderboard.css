@@ -1,0 +1,37 @@
+/* Leaderboard Page Styling */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 15px 24px;
+}
+
+.rank-number {
+  width: 40px;
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rank-1 { color: #ffd700; }
+.rank-2 { color: #c0c0c0; }
+.rank-3 { color: #cd7f32; }
+
+.leaderboard-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-grow: 1;
+}
+
+.leaderboard-score {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+}

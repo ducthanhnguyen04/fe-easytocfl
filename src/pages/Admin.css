@@ -1,0 +1,181 @@
+/* Admin Dashboard Styling */
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background-color: var(--color-white) !important;
+  color: var(--color-black) !important;
+  border: var(--border-thick) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+  transition: all 0.1s ease !important;
+}
+
+.tab-btn:hover {
+  background-color: var(--color-primary-light) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-medium) !important;
+}
+
+.tab-btn.active {
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
+  box-shadow: var(--shadow-medium) !important;
+  transform: translate(-2px, -2px);
+}
+
+.tab-btn.active .tab-count-badge {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border-color: var(--color-white);
+}
+
+.tab-count-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: var(--color-primary-light);
+  color: var(--color-black);
+  border: 1px solid var(--color-black);
+  margin-left: 6px;
+}
+
+.admin-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+}
+
+@media (max-width: 1000px) {
+  .admin-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-form-card, .admin-list-card {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+}
+
+.admin-form-card:hover, .admin-list-card:hover {
+  /* Prevent large translate transforms so they remain static dashboard panels */
+  transform: none !important;
+  box-shadow: var(--shadow-thick) !important;
+}
+
+.form-section-title {
+  font-size: 18px;
+  font-weight: 900;
+  border-bottom: 3px solid var(--color-black);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* Data Table Styling */
+.data-table-container {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.admin-table th {
+  background-color: var(--color-yellow-light);
+  border: var(--border-medium);
+  padding: 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--color-black);
+}
+
+.admin-table td {
+  border: var(--border-medium);
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-black);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+  background-color: var(--color-primary-light);
+}
+
+.empty-table-row {
+  text-align: center;
+  padding: 30px !important;
+  color: #666;
+  font-style: italic;
+}
+
+.level-code-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: var(--color-secondary-light);
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-sm);
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  color: var(--color-secondary);
+}
+
+.delete-action-btn {
+  background-color: #ffe5e0;
+  color: var(--color-primary);
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.delete-action-btn:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-thin);
+}
+
+.delete-action-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+/* Access Denied Card Styling */
+.admin-access-denied {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.admin-access-denied .error-card {
+  border: 3px solid var(--color-primary) !important;
+  box-shadow: 6px 6px 0px var(--color-primary) !important;
+  background-color: #fffaf9;
+}

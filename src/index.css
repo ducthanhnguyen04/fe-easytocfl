@@ -1,13 +1,216 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
+:root {
+  --bg-primary: #fcf9f5;
+  --bg-grid: #faf4eb;
+  --grid-line: rgba(229, 91, 68, 0.08);
+  
+  --color-black: #1a1a1a;
+  --color-white: #ffffff;
+  
+  --color-primary: #e55b44; /* Terracotta / Taiwan Red */
+  --color-primary-light: #ffedea;
+  --color-secondary: #2a9d8f; /* Jade Green */
+  --color-secondary-light: #e6f6f4;
+  --color-accent: #f4a261; /* Amber Orange */
+  --color-accent-light: #fef4ec;
+  --color-blue: #3d84b8; /* Taiwan Ocean Blue */
+  --color-blue-light: #ebf3f9;
+  --color-yellow: #e9c46a; /* Jiufen Gold Lantern */
+  --color-yellow-light: #fef9eb;
+  
+  --border-thick: 3px solid var(--color-black);
+  --border-medium: 2px solid var(--color-black);
+  --shadow-thick: 5px 5px 0px var(--color-black);
+  --shadow-medium: 4px 4px 0px var(--color-black);
+  --shadow-thin: 2px 2px 0px var(--color-black);
+  --shadow-hover: 8px 8px 0px var(--color-black);
+  
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--color-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  color: var(--color-black);
+  line-height: 1.2;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-left: var(--border-thick);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 6px;
+  border: 3px solid var(--bg-primary);
+}
+
+/* Base utility classes for Neo-Brutalism */
+.neo-card {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.neo-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 24px;
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-medium);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+  text-decoration: none;
+  color: var(--color-black);
+}
+
+.neo-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-thick);
+}
+
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-thin);
+}
+
+.neo-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.neo-btn-primary:hover {
+  background-color: #df4d35;
+  color: var(--color-white);
+}
+
+.neo-badge {
+  display: inline-block;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 10px;
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  box-shadow: var(--shadow-thin);
+}
+
+/* Color Themes */
+body.theme-terracotta {
+  /* Default variables */
+}
+
+body.theme-ocean {
+  --color-primary: #3d84b8;
+  --color-primary-light: #ebf3f9;
+  --color-secondary: #2a9d8f;
+  --color-secondary-light: #e6f6f4;
+  --color-accent: #f4a261;
+  --color-accent-light: #fef4ec;
+  --bg-primary: #f2f7fa;
+  --bg-grid: #ebf3f7;
+  --grid-line: rgba(61, 132, 184, 0.08);
+}
+
+body.theme-gold {
+  --color-primary: #e9c46a;
+  --color-primary-light: #fef9eb;
+  --color-secondary: #2a9d8f;
+  --color-secondary-light: #e6f6f4;
+  --color-accent: #e55b44;
+  --color-accent-light: #ffedea;
+  --bg-primary: #fdfaf4;
+  --bg-grid: #fcf6e9;
+  --grid-line: rgba(233, 196, 106, 0.12);
+}
+
+body.theme-mint {
+  --color-primary: #2a9d8f;
+  --color-primary-light: #e6f6f4;
+  --color-secondary: #e55b44;
+  --color-secondary-light: #ffedea;
+  --color-accent: #3d84b8;
+  --color-accent-light: #ebf3f9;
+  --bg-primary: #f4faf8;
+  --bg-grid: #eef7f4;
+  --grid-line: rgba(42, 157, 143, 0.08);
+}
+
+body.theme-cyber {
+  --bg-primary: #121214;
+  --bg-grid: #18181c;
+  --grid-line: rgba(255, 255, 255, 0.05);
+  
+  --color-black: #ffffff;
+  --color-white: #1e1e24;
+  
+  --color-primary: #f43f5e; /* Cyber Pink */
+  --color-primary-light: #3c1420;
+  --color-secondary: #06b6d4; /* Neon Cyan */
+  --color-secondary-light: #07343e;
+  --color-accent: #facc15; /* Neon Yellow */
+  --color-accent-light: #3e380e;
+  --color-blue: #3b82f6;
+  --color-blue-light: #0e203e;
+  --color-yellow: #eab308;
+  --color-yellow-light: #3c320d;
+
+  --border-thick: 3px solid #ffffff;
+  --border-medium: 2px solid #ffffff;
+  --shadow-thick: 5px 5px 0px #ffffff;
+  --shadow-medium: 4px 4px 0px #ffffff;
+  --shadow-thin: 2px 2px 0px #ffffff;
+  --shadow-hover: 8px 8px 0px #ffffff;
+}
+
+body.theme-cyber ::-webkit-scrollbar-track {
+  background: #121214;
+}
+
+body.theme-cyber ::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border: 3px solid #121214;
+}
+
+body.theme-cyber hr {
+  border-top-color: #ffffff !important;
 }

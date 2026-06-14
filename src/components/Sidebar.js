@@ -1,0 +1,398 @@
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import Icon from './Icon';
+import './Sidebar.css';
+import { useAuth } from '../context/authContext';
+import beUrl from '../api-url/api-backend';
+
+const Sidebar = () => {
+  const { user, setUser, loading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const isActive = (path) => {
+    if (path === '/') {
+      return location.pathname === '/' || location.pathname === '/home';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const getInitials = (name) => {
+    if (!name) return 'UN';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault();
+    try {
+      const response = await axios.post(`${beUrl}/auth/login`, {
+        email: loginEmail,
+        password: loginPassword
+      },
+        {
+          withCredentials: true
+        }
+      );
+      const userData = response.data.data || response.data.user || response.data;
+      if (userData) {
+        setUser({ ...userData });
+        setShowLoginModal(false);
+        setLoginEmail('');
+        setLoginPassword('');
+        setLoginError('');
+        alert('Đăng nhập thành công!');
+        console.log(user);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError(error.response?.data?.message || error.message || 'Đăng nhập thất bại');
+      alert("Đăng nhập thất bại. Vui lòng thử lại.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${beUrl}/auth/logout`,
+        {},
+        {
+          withCredentials: true
+        }
+      );
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  return (
+    <>
+      <aside className="sidebar">
+        <div className="sidebar-logo" onClick={() => navigate('/')}>
+          <div className="logo-icon">台</div>
+          <div className="logo-text">
+            <span className="logo-title">EASY TOCFL <span style={{ color: 'var(--color-primary)' }}>輕鬆學</span></span>
+            <span className="logo-subtitle">Tiếng Trung Phồn Thể</span>
+          </div>
+        </div>
+
+        <span className="sidebar-section-title">Học tập chính</span>
+        <ul className="sidebar-menu">
+          <li className="sidebar-item">
+            <Link
+              to="/"
+              className={`sidebar-link ${isActive('/') ? 'active' : ''}`}
+            >
+              <Icon name="home" /> Trang chủ
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/roadmap"
+              className={`sidebar-link ${isActive('/roadmap') ? 'active' : ''}`}
+            >
+              <Icon name="route" /> Lộ trình
+              <span className="demo-badge">Hot</span>
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/vocab"
+              className={`sidebar-link ${isActive('/vocab') ? 'active' : ''}`}
+            >
+              <Icon name="vocab" /> Từ vựng
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/grammar"
+              className={`sidebar-link ${isActive('/grammar') ? 'active' : ''}`}
+            >
+              <Icon name="grammar" /> Ngữ pháp
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/exam"
+              className={`sidebar-link ${isActive('/exam') ? 'active' : ''}`}
+            >
+              <Icon name="exam" /> Đề thi thử
+              <span className="demo-badge">TOCFL</span>
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/leaderboard"
+              className={`sidebar-link ${isActive('/leaderboard') ? 'active' : ''}`}
+            >
+              <Icon name="leaderboard" /> Bảng xếp hạng
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
+              to="/settings"
+              className={`sidebar-link ${isActive('/settings') ? 'active' : ''}`}
+            >
+              <Icon name="settings" /> Cài đặt
+            </Link>
+          </li>
+          {user?.role === 'admin' && (
+            <li className="sidebar-item">
+              <Link
+                to="/admin"
+                className={`sidebar-link ${isActive('/admin') ? 'active' : ''}`}
+              >
+                <Icon name="admin" /> Quản trị (Admin)
+              </Link>
+            </li>
+          )}
+        </ul>
+
+        <div className="sidebar-footer">
+          {user ? (
+            <div className="user-profile-widget" onClick={() => setShowUserModal(true)}>
+              <div className="user-avatar">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  getInitials(user.name)
+                )}
+              </div>
+              <div className="user-info">
+                <span className="user-name">{user.name}</span>
+                <span className="user-email">{user.email}</span>
+              </div>
+            </div>
+          ) : (
+            <button
+              className="neo-btn neo-btn-primary"
+              style={{ width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px' }}
+              onClick={() => setShowLoginModal(true)}
+            >
+              🔑 Đăng nhập
+            </button>
+          )}
+        </div>
+      </aside>
+
+      {/* User Account Options Modal */}
+      {showUserModal && user && (
+        <div className="quiz-overlay" onClick={() => setShowUserModal(false)}>
+          <div className="neo-card" style={{ width: '350px', backgroundColor: 'var(--color-white)', border: '3px solid #000', borderRadius: 'var(--radius-md)', padding: '25px', boxShadow: '8px 8px 0px #000', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+            <button
+              style={{ position: 'absolute', top: '10px', right: '15px', background: 'none', border: 'none', fontSize: '20px', fontWeight: 'bold', cursor: 'pointer' }}
+              onClick={() => setShowUserModal(false)}
+            >
+              ✕
+            </button>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '3px solid #000', backgroundColor: 'var(--color-primary-light)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '900', margin: '0 auto 10px auto', boxShadow: '3px 3px 0px #000', overflow: 'hidden' }}>
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  getInitials(user.name)
+                )}
+              </div>
+              <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: '900' }}>{user.name}</h3>
+              <p style={{ margin: 0, fontSize: '12px', color: '#666', fontWeight: '700' }}>{user.email}</p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {user?.role === 'admin' && (
+                <button
+                  className="neo-btn"
+                  style={{ width: '100%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', backgroundColor: 'var(--color-primary-light)' }}
+                  onClick={() => {
+                    navigate('/admin');
+                    setShowUserModal(false);
+                  }}
+                >
+                  🛡️ Quản trị (Admin)
+                </button>
+              )}
+              <button
+                className="neo-btn"
+                style={{ width: '100%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px' }}
+                onClick={() => {
+                  navigate('/settings');
+                  setShowUserModal(false);
+                }}
+              >
+                ⚙️ Cài đặt tài khoản
+              </button>
+              <button
+                className="neo-btn"
+                style={{ width: '100%', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px', backgroundColor: 'var(--color-primary)', color: 'white' }}
+                onClick={async () => {
+                  await handleLogout();
+                  setShowUserModal(false);
+                  alert('Đăng xuất thành công!');
+                }} logout
+              >
+                🚪 Đăng xuất
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="quiz-overlay" onClick={() => setShowLoginModal(false)}>
+          <div
+            className="neo-card"
+            style={{
+              width: '400px',
+              maxWidth: '90%',
+              backgroundColor: 'var(--color-white)',
+              border: '3px solid #000',
+              borderRadius: 'var(--radius-md)',
+              padding: '30px',
+              boxShadow: '8px 8px 0px #000',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '18px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                color: 'var(--color-black)'
+              }}
+              onClick={() => setShowLoginModal(false)}
+            >
+              ✕
+            </button>
+
+            <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '20px', textAlign: 'center' }}>
+              🔑 Đăng Nhập
+            </h3>
+
+            {loginError && (
+              <div
+                style={{
+                  backgroundColor: 'var(--color-primary-light)',
+                  border: '2px solid var(--color-primary)',
+                  color: '#721c24',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '10px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  marginBottom: '15px'
+                }}
+              >
+                ⚠ {loginError}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                  Email
+                </label>
+                <input
+                  type="email"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #000',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    outline: 'none',
+                    backgroundColor: 'white',
+                    color: 'black'
+                  }}
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                  Mật khẩu
+                </label>
+                <input
+                  type="password"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #000',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    outline: 'none',
+                    backgroundColor: 'white',
+                    color: 'black'
+                  }}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="neo-btn neo-btn-primary"
+                style={{ width: '100%', padding: '12px', marginTop: '5px', fontSize: '14px' }}
+              >
+                Đăng nhập bằng Email
+              </button>
+            </form>
+
+            <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', gap: '10px' }}>
+              <div style={{ flex: 1, height: '2px', backgroundColor: '#000' }}></div>
+              <span style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', color: '#666' }}>Hoặc</span>
+              <div style={{ flex: 1, height: '2px', backgroundColor: '#000' }}></div>
+            </div>
+
+            <button
+              className="neo-btn"
+              style={{
+                width: '100%',
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                backgroundColor: 'var(--color-white)',
+                fontSize: '14px',
+                color: 'var(--color-black)'
+              }}
+              onClick={""}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.47 15 0 12 0 7.35 0 3.39 2.67 1.45 6.57l3.86 3C6.22 6.57 8.92 5.04 12 5.04z" />
+                <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.44h6.44c-.28 1.47-1.11 2.72-2.36 3.56l3.66 2.84c2.14-1.98 3.38-4.89 3.38-8.5z" />
+                <path fill="#FBBC05" d="M5.31 14.43c-.23-.69-.36-1.43-.36-2.18s.13-1.49.36-2.18l-3.86-3C.55 8.78 0 10.33 0 12s.55 3.22 1.45 4.75l3.86-3z" />
+                <path fill="#34A853" d="M12 24c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.08 0-5.78-1.53-6.69-4.53l-3.86 3C3.39 21.33 7.35 24 12 24z" />
+              </svg>
+              Đăng nhập với Google
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default Sidebar;
