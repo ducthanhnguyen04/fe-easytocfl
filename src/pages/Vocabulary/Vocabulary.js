@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons } from '../../data/db';
+import beUrl from '../../api-url/api-backend';
 import './Vocabulary.css';
 import axios from 'axios';
 
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const { bookId, lessonId } = useParams();
   const [levels, setLevels] = useState([]);
-
   useEffect(() => {
     const fecthLevel = async () => {
-      const response = await axios.get(`http://localhost:3008/levels/get-all`);
+      const response = await axios.get(`${beUrl}/levels/get-all`);
       setLevels(response.data.levels);
     }
     fecthLevel();
@@ -318,7 +318,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   }}
                 >
                   <div className="book-cover" style={{ backgroundColor: book.color }}>
-                    <span className="book-cover-title-traditional">時代華語</span>
+                    <span className="book-cover-title-traditional">{book.levelName}</span>
                     <span className="book-cover-vol">{book.level}</span>
                   </div>
                   <div className="book-select-info">

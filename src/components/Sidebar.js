@@ -12,9 +12,28 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [showUserModal, setShowUserModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [registerName, setRegisterName] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+  const [registerError, setRegisterError] = useState('');
+
+  const openLoginModal = () => {
+    setIsLoginMode(true);
+    setLoginEmail('');
+    setLoginPassword('');
+    setLoginError('');
+    setRegisterName('');
+    setRegisterEmail('');
+    setRegisterPassword('');
+    setRegisterConfirmPassword('');
+    setRegisterError('');
+    setShowLoginModal(true);
+  };
 
   const isActive = (path) => {
     if (path === '/') {
@@ -57,6 +76,49 @@ const Sidebar = () => {
       console.error("Login error:", error);
       setLoginError(error.response?.data?.message || error.message || 'Đăng nhập thất bại');
       alert("Đăng nhập thất bại. Vui lòng thử lại.");
+    }
+  };
+
+  const handleRegister = async (e) => {
+    if (e) e.preventDefault();
+    if (registerPassword !== registerConfirmPassword) {
+      setRegisterError('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    try {
+      const response = await axios.post(`${beUrl}/auth/register`, {
+        userName: registerName,
+        email: registerEmail,
+        password: registerPassword
+      });
+      if (response.data.success) {
+        alert('Đăng ký thành công! Đang tự động đăng nhập...');
+        const loginResponse = await axios.post(`${beUrl}/auth/login`, {
+          email: registerEmail,
+          password: registerPassword
+        },
+          {
+            withCredentials: true
+          }
+        );
+        const userData = loginResponse.data.data || loginResponse.data.user || loginResponse.data;
+        if (userData) {
+          setUser({ ...userData });
+          setShowLoginModal(false);
+          setRegisterName('');
+          setRegisterEmail('');
+          setRegisterPassword('');
+          setRegisterConfirmPassword('');
+          setRegisterError('');
+          setLoginEmail('');
+          setLoginPassword('');
+          setLoginError('');
+        }
+      }
+    } catch (error) {
+      console.error("Register error:", error);
+      setRegisterError(error.response?.data?.message || error.message || 'Đăng ký thất bại');
+      alert(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     }
   };
 
@@ -177,9 +239,9 @@ const Sidebar = () => {
             <button
               className="neo-btn neo-btn-primary"
               style={{ width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '14px' }}
-              onClick={() => setShowLoginModal(true)}
+              onClick={openLoginModal}
             >
-              🔑 Đăng nhập
+              🔑 Đăng nhập / Đăng ký
             </button>
           )}
         </div>
@@ -246,7 +308,7 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Login Modal */}
+      {/* Login / Register Modal */}
       {showLoginModal && (
         <div className="quiz-overlay" onClick={() => setShowLoginModal(false)}>
           <div
@@ -280,84 +342,267 @@ const Sidebar = () => {
               ✕
             </button>
 
-            <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '20px', textAlign: 'center' }}>
-              🔑 Đăng Nhập
-            </h3>
+            {isLoginMode ? (
+              <>
+                <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '20px', textAlign: 'center' }}>
+                  🔑 Đăng Nhập
+                </h3>
 
-            {loginError && (
-              <div
-                style={{
-                  backgroundColor: 'var(--color-primary-light)',
-                  border: '2px solid var(--color-primary)',
-                  color: '#721c24',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '10px',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  marginBottom: '15px'
-                }}
-              >
-                ⚠ {loginError}
-              </div>
+                {loginError && (
+                  <div
+                    style={{
+                      backgroundColor: 'var(--color-primary-light)',
+                      border: '2px solid var(--color-primary)',
+                      color: '#721c24',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '10px',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      marginBottom: '15px'
+                    }}
+                  >
+                    ⚠ {loginError}
+                  </div>
+                )}
+
+                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Mật khẩu
+                    </label>
+                    <input
+                      type="password"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="neo-btn neo-btn-primary"
+                    style={{ width: '100%', padding: '12px', marginTop: '5px', fontSize: '14px' }}
+                  >
+                    Đăng nhập bằng Email
+                  </button>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: '15px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-black)' }}>
+                    Chưa có tài khoản?{' '}
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-primary)',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        padding: 0,
+                        fontSize: '13px'
+                      }}
+                      onClick={() => {
+                        setIsLoginMode(false);
+                        setRegisterError('');
+                      }}
+                    >
+                      Đăng ký ngay
+                    </button>
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 style={{ fontSize: '22px', fontWeight: '900', marginBottom: '20px', textAlign: 'center' }}>
+                  📝 Đăng Ký Tài Khoản
+                </h3>
+
+                {registerError && (
+                  <div
+                    style={{
+                      backgroundColor: 'var(--color-primary-light)',
+                      border: '2px solid var(--color-primary)',
+                      color: '#721c24',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '10px',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      marginBottom: '15px'
+                    }}
+                  >
+                    ⚠ {registerError}
+                  </div>
+                )}
+
+                <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Tên hiển thị
+                    </label>
+                    <input
+                      type="text"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={registerName}
+                      onChange={(e) => setRegisterName(e.target.value)}
+                      placeholder="Nguyễn Văn A"
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={registerEmail}
+                      onChange={(e) => setRegisterEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Mật khẩu
+                    </label>
+                    <input
+                      type="password"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
+                      Xác nhận mật khẩu
+                    </label>
+                    <input
+                      type="password"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: '2px solid #000',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '14px',
+                        fontWeight: '700',
+                        outline: 'none',
+                        backgroundColor: 'white',
+                        color: 'black'
+                      }}
+                      value={registerConfirmPassword}
+                      onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="neo-btn neo-btn-primary"
+                    style={{ width: '100%', padding: '12px', marginTop: '5px', fontSize: '14px' }}
+                  >
+                    Tạo tài khoản mới
+                  </button>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: '15px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-black)' }}>
+                    Đã có tài khoản?{' '}
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-primary)',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        padding: 0,
+                        fontSize: '13px'
+                      }}
+                      onClick={() => {
+                        setIsLoginMode(true);
+                        setRegisterError('');
+                      }}
+                    >
+                      Đăng nhập
+                    </button>
+                  </span>
+                </div>
+              </>
             )}
-
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
-                  Email
-                </label>
-                <input
-                  type="email"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '2px solid #000',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '14px',
-                    fontWeight: '700',
-                    outline: 'none',
-                    backgroundColor: 'white',
-                    color: 'black'
-                  }}
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  required
-                />
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-black)' }}>
-                  Mật khẩu
-                </label>
-                <input
-                  type="password"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '2px solid #000',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '14px',
-                    fontWeight: '700',
-                    outline: 'none',
-                    backgroundColor: 'white',
-                    color: 'black'
-                  }}
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="neo-btn neo-btn-primary"
-                style={{ width: '100%', padding: '12px', marginTop: '5px', fontSize: '14px' }}
-              >
-                Đăng nhập bằng Email
-              </button>
-            </form>
 
             <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0', gap: '10px' }}>
               <div style={{ flex: 1, height: '2px', backgroundColor: '#000' }}></div>
