@@ -91,7 +91,7 @@ const Settings = ({ resetVocabProgress }) => {
 
     try {
       const response = await axios.put(
-        `${beUrl}/users/profile`,
+        `${beUrl}/users/change-profile`,
         {
           userName: name,
           email: email,
@@ -114,7 +114,7 @@ const Settings = ({ resetVocabProgress }) => {
     }
   };
 
-  const handleUpdatePassword = (e) => {
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setPasswordError('');
     setPasswordSuccess(false);
@@ -134,12 +134,20 @@ const Settings = ({ resetVocabProgress }) => {
       return;
     }
 
-    // Success simulation
-    setPasswordSuccess(true);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setTimeout(() => setPasswordSuccess(false), 3000);
+    try {
+      await axios.put(
+        `${beUrl}/users/change-password`,
+        { currentPassword, newPassword },
+        { withCredentials: true }
+      );
+      setPasswordSuccess(true);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setPasswordSuccess(false), 4000);
+    } catch (error) {
+      setPasswordError(error.response?.data?.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại!');
+    }
   };
 
   return (

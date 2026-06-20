@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
 import { initialVocabWords, quizzes } from './data/db';
+import axios from 'axios';
+import beUrl from './api-url/api-backend';
 import './App.css';
 
 function App() {
@@ -12,6 +14,49 @@ function App() {
     const savedTheme = localStorage.getItem('theme') || 'terracotta';
     document.body.className = '';
     document.body.classList.add(`theme-${savedTheme}`);
+  }, []);
+
+  useEffect(() => {
+    const fetchBackendData = async () => {
+      try {
+        const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
+        const dbLevels = levelsRes.data.levels || [];
+
+        const vocabRes = await axios.get(`${beUrl}/vocabularies/get-all`);
+        const dbVocabs = vocabRes.data.vocabularies || [];
+
+        const mappedVocabs = dbVocabs.map(v => {
+          let bookId = null;
+          for (const lvl of dbLevels) {
+            if (lvl.lessons && lvl.lessons.some(l => l.id === v.lessonId)) {
+              bookId = lvl.id;
+              break;
+            }
+          }
+
+          return {
+            word: v.vocabulary,
+            pinyin: v.pinyin,
+            trans: v.meaning,
+            learned: false,
+            tag: 'Học tập',
+            bookId: bookId,
+            lessonId: v.lessonId,
+            id: v.id
+          };
+        });
+
+        const combinedMap = new Map();
+        initialVocabWords.forEach(v => combinedMap.set(v.word, v));
+        mappedVocabs.forEach(v => combinedMap.set(v.word, v));
+
+        setVocabWords(Array.from(combinedMap.values()));
+      } catch (err) {
+        console.error("Error loading backend vocabularies:", err);
+      }
+    };
+
+    fetchBackendData();
   }, []);
 
   // Daily Challenge state

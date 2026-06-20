@@ -5,6 +5,18 @@ import beUrl from '../../api-url/api-backend';
 import './Vocabulary.css';
 import axios from 'axios';
 
+const getBookColor = (bookId) => {
+  const colors = {
+    1: '#e55b44',
+    2: '#2a9d8f',
+    3: '#f4a261',
+    4: '#3d84b8',
+    5: '#9b5de5',
+    6: '#f15bb5'
+  };
+  return colors[bookId] || '#4f46e5';
+};
+
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const { bookId, lessonId } = useParams();
   const [levels, setLevels] = useState([]);
@@ -23,6 +35,36 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
   const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'reading', 'dictation'
   const [searchQuery, setSearchQuery] = useState('');
+  const [localLessonVocabs, setLocalLessonVocabs] = useState([]);
+  const [vocabLoading, setVocabLoading] = useState(false);
+
+  // Fetch vocabularies for current lesson directly from backend
+  useEffect(() => {
+    if (!selectedLesson) {
+      setLocalLessonVocabs([]);
+      return;
+    }
+    setVocabLoading(true);
+    axios.get(`${beUrl}/vocabularies/get-vocabulary-by-lesson-id`, {
+      params: { lessonId: selectedLesson }
+    }).then(res => {
+      const dbVocabs = res.data.vocabularies || [];
+      const mapped = dbVocabs.map(v => ({
+        word: v.vocabulary,
+        pinyin: v.pinyin,
+        trans: v.meaning,
+        learned: false,
+        tag: 'Học tập',
+        bookId: selectedBook,
+        lessonId: v.lessonId,
+        id: v.id
+      }));
+      setLocalLessonVocabs(mapped);
+    }).catch(err => {
+      console.error('Error fetching lesson vocabularies:', err);
+      setLocalLessonVocabs([]);
+    }).finally(() => setVocabLoading(false));
+  }, [selectedLesson, selectedBook]);
 
   // Flashcard states
   const [flashIndex, setFlashIndex] = useState(0);
@@ -56,8 +98,18 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [dictationScore, setDictationScore] = useState({ correct: 0, total: 0 });
   const [showDictationHint, setShowDictationHint] = useState(false);
 
-  // Filter vocabulary words for active book and lesson
-  const currentLessonWords = vocabWords.filter(v => v.bookId === selectedBook && v.lessonId === selectedLesson);
+  // DB-first: nếu DB trả về từ vựng → dùng DB, ngược lại fallback sang mock data
+  const currentLessonWords = (() => {
+    if (localLessonVocabs.length > 0) {
+      // DB có dữ liệu → chỉ dùng DB (đảm bảo learned state được giữ nếu trùng từ)
+      return localLessonVocabs.map(dbVocab => {
+        const propMatch = vocabWords.find(v => v.word === dbVocab.word);
+        return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
+      });
+    }
+    // Fallback: dùng mock data khi DB chưa có từ vựng cho bài này
+    return vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(selectedLesson));
+  })();
 
   // Generate quiz options on quizIndex change
   useEffect(() => {
@@ -280,9 +332,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     readingOptions, dictationIndex, dictationFeedback, currentLessonWords
   ]);
 
-  const filteredVocab = vocabWords.filter(v => {
-    const matchesBook = selectedBook === null || v.bookId === selectedBook;
-    const matchesLesson = selectedLesson === null || v.lessonId === selectedLesson;
+  // Nguồn dữ liệu cho danh sách từ vựng cuối trang: ưu tiên DB
+  const baseVocabList = selectedLesson && localLessonVocabs.length > 0
+    ? localLessonVocabs.map(dbVocab => {
+        const propMatch = vocabWords.find(v => v.word === dbVocab.word);
+        return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
+      })
+    : vocabWords;
+
+  const filteredVocab = baseVocabList.filter(v => {
+    const matchesBook = selectedBook === null || parseInt(v.bookId) === parseInt(selectedBook);
+    const matchesLesson = selectedLesson === null || parseInt(v.lessonId) === parseInt(selectedLesson);
     const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.trans.toLowerCase().includes(searchQuery.toLowerCase());
@@ -306,7 +366,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
           <div className="books-grid">
             {levels.map((book) => {
-              const bookWords = vocabWords.filter(v => v.bookId === book.id);
+              const bookWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(book.id));
               const learnedCount = bookWords.filter(v => v.learned).length;
 
               return (
@@ -346,20 +406,21 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           </div>
 
           {(() => {
-            const currentBook = textbooks.find(b => b.id === selectedBook);
-            const lessonsList = bookLessons[selectedBook] || [];
+            const currentBook = levels.find(b => b.id === selectedBook) || textbooks.find(b => b.id === selectedBook);
+            const lessonsList = currentBook?.lessons || bookLessons[selectedBook] || [];
             const totalLessons = lessonsList.length;
             const completedLessonsCount = lessonsList.filter(lesson => {
-              const lessonWords = vocabWords.filter(v => v.bookId === selectedBook && v.lessonId === lesson.id);
+              const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
               return lessonWords.length > 0 && lessonWords.every(v => v.learned);
             }).length;
             const completionPercentage = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
+            const bookColor = currentBook?.color || getBookColor(selectedBook);
 
             return (
               <div>
-                <div className="page-title-banner" style={{ borderLeft: `10px solid ${currentBook?.color || '#000'}` }}>
+                <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
                   <div>
-                    <h2>{currentBook?.viTitle} ({currentBook?.title})</h2>
+                    <h2>{currentBook?.viTitle || currentBook?.levelName} ({currentBook?.title || currentBook?.level})</h2>
                     <p>{currentBook?.level} — {totalLessons} bài học chính thức</p>
                   </div>
                 </div>
@@ -371,7 +432,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     <span>{completedLessonsCount} / {totalLessons} bài</span>
                   </div>
                   <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${completionPercentage}%`, backgroundColor: currentBook?.color || '#000' }}></div>
+                    <div className="progress-fill" style={{ width: `${completionPercentage}%`, backgroundColor: bookColor }}></div>
                   </div>
                   <div style={{ marginTop: '8px', fontSize: '11px', fontWeight: 'bold', color: '#666', textAlign: 'right' }}>
                     {completionPercentage}% hoàn thành
@@ -381,9 +442,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                 {/* Lessons Grid */}
                 <div className="lessons-grid">
                   {lessonsList.map((lesson) => {
-                    const lessonWords = vocabWords.filter(v => v.bookId === selectedBook && v.lessonId === lesson.id);
+                    const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
                     const learnedInLesson = lessonWords.filter(v => v.learned).length;
                     const isCompleted = lessonWords.length > 0 && lessonWords.every(v => v.learned);
+                    const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
+                    const displayTranslation = lesson.trans || '';
+                    const isPremium = lesson.isPremium || lesson.premium;
 
                     return (
                       <div
@@ -393,14 +457,14 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                           navigate(`/vocab/${selectedBook}/${lesson.id}`);
                         }}
                       >
-                        <div className="lesson-number-box" style={{ backgroundColor: isCompleted ? 'var(--color-secondary)' : (currentBook?.color || '#000') }}>
+                        <div className="lesson-number-box" style={{ backgroundColor: isCompleted ? 'var(--color-secondary)' : bookColor }}>
                           {lesson.id}
                         </div>
                         <div className="lesson-select-info">
                           <h4 className="lesson-select-title">
-                            {lesson.title} {lesson.premium && <span className="premium-badge">👑 Premium</span>}
+                            {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
                           </h4>
-                          <span className="lesson-select-translation">{lesson.trans}</span>
+                          {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
                           <div className="lesson-select-meta">
                             <span>📖 {lessonWords.length} từ vựng</span>
                             <span>✓ Đã thuộc {learnedInLesson}/{lessonWords.length}</span>
@@ -424,18 +488,21 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           </div>
 
           {(() => {
-            const currentBook = textbooks.find(b => b.id === selectedBook);
-            const lessonsList = bookLessons[selectedBook] || [];
+            const currentBook = levels.find(b => b.id === selectedBook) || textbooks.find(b => b.id === selectedBook);
+            const lessonsList = currentBook?.lessons || bookLessons[selectedBook] || [];
             const currentLessonObj = lessonsList.find(l => l.id === selectedLesson);
             const currentLearned = currentLessonWords.filter(v => v.learned).length;
+            const bookColor = currentBook?.color || getBookColor(selectedBook);
+            const lessonTitleText = currentLessonObj ? (currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`) : `Bài ${selectedLesson}`;
+            const lessonSubTitleText = currentLessonObj?.trans || '';
 
             return (
-              <div className="page-title-banner" style={{ borderLeft: `10px solid ${currentBook?.color || '#000'}` }}>
+              <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
                 <div>
-                  <h2>Bài {selectedLesson}: {currentLessonObj?.title}</h2>
-                  <p>{currentBook?.viTitle} — {currentLessonObj?.trans}</p>
+                  <h2>{lessonTitleText}</h2>
+                  <p>{currentBook?.viTitle || currentBook?.levelName} {lessonSubTitleText ? `— ${lessonSubTitleText}` : ''}</p>
                 </div>
-                <div className="neo-badge" style={{ backgroundColor: currentBook?.color || '#000', color: 'white' }}>
+                <div className="neo-badge" style={{ backgroundColor: bookColor, color: 'white' }}>
                   Đã học: {currentLearned} / {currentLessonWords.length} Từ
                 </div>
               </div>
@@ -444,6 +511,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
           {/* Learning workspace based on active mode */}
           {(() => {
+            if (vocabLoading) {
+              return (
+                <div className="neo-card" style={{ padding: '40px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0', color: '#666' }}>
+                  🔄 Đang tải từ vựng...
+                </div>
+              );
+            }
             if (currentLessonWords.length === 0) {
               return (
                 <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0' }}>

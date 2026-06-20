@@ -50,6 +50,13 @@ const Admin = () => {
   const [exampleGrammarId, setExampleGrammarId] = useState('');
   const [exampleVocabId, setExampleVocabId] = useState('');
 
+  // 5. Vocabulary form
+  const [vocabText, setVocabText] = useState('');
+  const [vocabMeaning, setVocabMeaning] = useState('');
+  const [vocabPinyin, setVocabPinyin] = useState('');
+  const [vocabAudioUrl, setVocabAudioUrl] = useState('');
+  const [vocabLessonId, setVocabLessonId] = useState('');
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -109,6 +116,11 @@ const Admin = () => {
     setExampleAudioUrl('');
     setExampleGrammarId('');
     setExampleVocabId('');
+    setVocabText('');
+    setVocabMeaning('');
+    setVocabPinyin('');
+    setVocabAudioUrl('');
+    setVocabLessonId('');
   };
 
   const handleTabChange = (tab) => {
@@ -255,6 +267,42 @@ const Admin = () => {
     }
   };
 
+  const handleSaveVocabulary = async (e) => {
+    e.preventDefault();
+    if (!vocabText || !vocabMeaning || !vocabPinyin || !vocabLessonId) {
+      showError('Vui lòng điền đầy đủ các trường bắt buộc cho từ vựng!');
+      return;
+    }
+    try {
+      const payload = {
+        vocabulary: vocabText,
+        meaning: vocabMeaning,
+        pinyin: vocabPinyin,
+        audioUrl: vocabAudioUrl || null,
+        lessonId: parseInt(vocabLessonId),
+      };
+      if (editId) {
+        await axios.put(
+          `${beUrl}/vocabularies/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật từ vựng thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/vocabularies/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm từ vựng mới thành công!');
+      }
+      resetForm();
+      fetchData();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu từ vựng.');
+    }
+  };
+
   const handleEditClick = (item) => {
     setEditId(item.id);
     if (activeTab === 'levels') {
@@ -279,6 +327,12 @@ const Admin = () => {
       setExampleAudioUrl(item.audioUrl || '');
       setExampleGrammarId(item.grammarId || '');
       setExampleVocabId(item.vocabularyId || '');
+    } else if (activeTab === 'vocabularies') {
+      setVocabText(item.vocabulary);
+      setVocabMeaning(item.meaning);
+      setVocabPinyin(item.pinyin);
+      setVocabAudioUrl(item.audioUrl || '');
+      setVocabLessonId(item.lessonId);
     }
   };
 
@@ -328,6 +382,12 @@ const Admin = () => {
           onClick={() => handleTabChange('lessons')}
         >
           📖 Bài Học (Lessons) <span className="tab-count-badge">{lessons.length}</span>
+        </button>
+        <button
+          className={`neo-btn tab-btn ${activeTab === 'vocabularies' ? 'active' : ''}`}
+          onClick={() => handleTabChange('vocabularies')}
+        >
+          🔤 Từ Vựng (Vocabularies) <span className="tab-count-badge">{vocabularies.length}</span>
         </button>
         <button
           className={`neo-btn tab-btn ${activeTab === 'grammars' ? 'active' : ''}`}
@@ -632,6 +692,83 @@ const Admin = () => {
               </div>
             </form>
           )}
+
+          {activeTab === 'vocabularies' && (
+            <form onSubmit={handleSaveVocabulary} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Từ Vựng (ID: ${editId})` : '🔤 Thêm Từ Vựng Mới'}
+              </h3>
+              <div className="settings-input-group">
+                <label className="settings-label">Thuộc Bài Học (Lesson)</label>
+                <select
+                  className="settings-input"
+                  value={vocabLessonId}
+                  onChange={(e) => setVocabLessonId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Chọn bài học --</option>
+                  {lessons.map((ls) => (
+                    <option key={ls.id} value={ls.id}>
+                      {ls.lessonName} - {ls.title} ({levels.find(l => l.id === ls.levelId)?.levelName || `Level ID: ${ls.levelId}`})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Từ vựng (Chữ Hán)</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: 飛機"
+                  value={vocabText}
+                  onChange={(e) => setVocabText(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Phiên âm Pinyin</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: fēijī"
+                  value={vocabPinyin}
+                  onChange={(e) => setVocabPinyin(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Giải nghĩa tiếng Việt</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: máy bay"
+                  value={vocabMeaning}
+                  onChange={(e) => setVocabMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Đường dẫn phát âm (Audio URL - Tùy chọn)</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: /audios/vocab/feiji.mp3"
+                  value={vocabAudioUrl}
+                  onChange={(e) => setVocabAudioUrl(e.target.value)}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu từ vựng'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Right: Data List View Card */}
@@ -639,7 +776,7 @@ const Admin = () => {
           <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span> Danh Sách Hiện Tại</span>
             <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-              Tổng cộng: {activeTab === 'levels' ? levels.length : activeTab === 'lessons' ? lessons.length : activeTab === 'grammars' ? grammars.length : examples.length}
+              Tổng cộng: {activeTab === 'levels' ? levels.length : activeTab === 'lessons' ? lessons.length : activeTab === 'vocabularies' ? vocabularies.length : activeTab === 'grammars' ? grammars.length : examples.length}
             </span>
           </h3>
 
@@ -780,6 +917,58 @@ const Admin = () => {
                                 <button
                                   className="delete-action-btn"
                                   onClick={() => handleDeleteItem('grammars', gm.id)}
+                                >
+                                  🗑️ Xóa
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              )}
+
+              {activeTab === 'vocabularies' && (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Từ vựng</th>
+                      <th>Giải nghĩa</th>
+                      <th>Bài học</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vocabularies.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="empty-table-row">Chưa có từ vựng nào</td>
+                      </tr>
+                    ) : (
+                      vocabularies.map((vc) => {
+                        const ls = lessons.find((l) => l.id === vc.lessonId);
+                        return (
+                          <tr key={vc.id}>
+                            <td>{vc.id}</td>
+                            <td>
+                              <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--color-primary)' }}>{vc.vocabulary}</div>
+                              <div style={{ color: '#666', fontSize: '12px', fontStyle: 'italic' }}>{vc.pinyin}</div>
+                            </td>
+                            <td>{vc.meaning}</td>
+                            <td>{ls ? `${ls.lessonName} - ${ls.title}` : `ID: ${vc.lessonId}`}</td>
+                            <td>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  className="edit-action-btn"
+                                  onClick={() => handleEditClick(vc)}
+                                >
+                                  ✏️ Sửa
+                                </button>
+                                <button
+                                  className="delete-action-btn"
+                                  onClick={() => handleDeleteItem('vocabularies', vc.id)}
                                 >
                                   🗑️ Xóa
                                 </button>
