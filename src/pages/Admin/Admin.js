@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
@@ -56,6 +56,8 @@ const Admin = () => {
   const [vocabPinyin, setVocabPinyin] = useState('');
   const [vocabAudioUrl, setVocabAudioUrl] = useState('');
   const [vocabLessonId, setVocabLessonId] = useState('');
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -303,6 +305,47 @@ const Admin = () => {
     }
   };
 
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+      showError('Chỉ chấp nhận file Excel (.xlsx, .xls)!');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (vocabLessonId) {
+      formData.append('lessonId', vocabLessonId);
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(`${beUrl}/vocabularies/import`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      showSuccess(`Nhập thành công ${response.data.count || response.data.vocabularies?.length || 0} từ vựng từ Excel!`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      fetchData();
+    } catch (error) {
+      console.error('Import excel error:', error);
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi nhập file Excel.');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditClick = (item) => {
     setEditId(item.id);
     if (activeTab === 'levels') {
@@ -313,7 +356,7 @@ const Admin = () => {
       setLessonTitle(item.title);
       setLessonSlug(item.slug);
       setLessonLevelId(item.levelId);
-      setLessonIsPremium(item.isPremium);
+      setLessonIsPremium(!!item.isPremium);
     } else if (activeTab === 'grammars') {
       setGrammarName(item.grammar);
       setGrammarStructure(item.structure);
@@ -698,6 +741,31 @@ const Admin = () => {
               <h3 className="form-section-title">
                 {editId ? `✏️ Sửa Từ Vựng (ID: ${editId})` : '🔤 Thêm Từ Vựng Mới'}
               </h3>
+              {!editId && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderBottom: '1px dashed #e2e8f0', paddingBottom: '15px', marginBottom: '10px' }}>
+                  <label className="settings-label" style={{ marginBottom: 0 }}>Nhập từ file Excel (.xlsx, .xls)</label>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      className="neo-btn"
+                      style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px', backgroundColor: '#edf2f7' }}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      📥 Chọn file Excel & Nhập
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImportExcel}
+                      accept=".xlsx,.xls"
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                  <span style={{ fontSize: '11px', color: '#718096' }}>
+                    * Tự động liên kết bài học đang chọn bên dưới nếu dòng trong file Excel không chứa ID bài học.
+                  </span>
+                </div>
+              )}
               <div className="settings-input-group">
                 <label className="settings-label">Thuộc Bài Học (Lesson)</label>
                 <select
