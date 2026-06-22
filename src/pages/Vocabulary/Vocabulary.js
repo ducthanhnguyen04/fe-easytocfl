@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons } from '../../data/db';
 import beUrl from '../../api-url/api-backend';
 import './Vocabulary.css';
 import axios from 'axios';
+import { useAuth } from '../../context/authContext';
 
 const getBookColor = (bookId) => {
   const colors = {
@@ -33,6 +34,43 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const selectedBook = bookId ? parseInt(bookId) : null;
   const selectedLesson = lessonId ? parseInt(lessonId) : null;
 
+  const { user } = useAuth();
+  const hasPremiumAccess = useMemo(() => {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    return user.isPremium === true || 
+           user.isPremium === 1 || 
+           user.isPremium === '1' || 
+           String(user.isPremium).toLowerCase() === 'true';
+  }, [user]);
+
+  const currentBook = useMemo(() => {
+    return levels.find(b => Number(b.id) === Number(selectedBook)) || textbooks.find(b => Number(b.id) === Number(selectedBook));
+  }, [levels, selectedBook]);
+
+  const lessonsList = useMemo(() => {
+    return Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedBook] || []);
+  }, [currentBook, selectedBook]);
+
+  const currentLessonObj = useMemo(() => {
+    return lessonsList.find(l => Number(l.id) === Number(selectedLesson));
+  }, [lessonsList, selectedLesson]);
+
+  const isLessonPremium = useMemo(() => {
+    if (!currentLessonObj) return false;
+    const premiumVal = currentLessonObj.isPremium !== undefined ? currentLessonObj.isPremium : currentLessonObj.premium;
+    return premiumVal === true || 
+           premiumVal === 1 || 
+           premiumVal === '1' || 
+           String(premiumVal).toLowerCase() === 'true';
+  }, [currentLessonObj]);
+
+  console.log("=== Debug Premium ===");
+  console.log("User:", user);
+  console.log("hasPremiumAccess:", hasPremiumAccess);
+  console.log("currentLessonObj:", currentLessonObj);
+  console.log("isLessonPremium:", isLessonPremium);
+
   const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'reading', 'dictation'
   const [searchQuery, setSearchQuery] = useState('');
   const [localLessonVocabs, setLocalLessonVocabs] = useState([]);
@@ -57,7 +95,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
         tag: 'Học tập',
         bookId: selectedBook,
         lessonId: v.lessonId,
-        id: v.id
+        id: v.id,
+        audioUrl: v.audioUrl
       }));
       setLocalLessonVocabs(mapped);
     }).catch(err => {
@@ -70,6 +109,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
   const [flashTranslationMode, setFlashTranslationMode] = useState('ZH-VI'); // 'ZH-VI' or 'VI-ZH'
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
 
   // Quiz states
   const [quizIndex, setQuizIndex] = useState(0);
@@ -99,7 +139,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [showDictationHint, setShowDictationHint] = useState(false);
 
   // DB-first: nếu DB trả về từ vựng → dùng DB, ngược lại fallback sang mock data
-  const currentLessonWords = (() => {
+  const currentLessonWords = useMemo(() => {
     if (localLessonVocabs.length > 0) {
       // DB có dữ liệu → chỉ dùng DB (đảm bảo learned state được giữ nếu trùng từ)
       return localLessonVocabs.map(dbVocab => {
@@ -109,7 +149,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }
     // Fallback: dùng mock data khi DB chưa có từ vựng cho bài này
     return vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(selectedLesson));
-  })();
+  }, [localLessonVocabs, vocabWords, selectedBook, selectedLesson]);
 
   // Generate quiz options on quizIndex change
   useEffect(() => {
@@ -174,6 +214,48 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     setDictationIndex(0);
     setDictationScore({ correct: 0, total: 0 });
   }, [vocabMode, selectedLesson, selectedBook]);
+
+  const handlePlayAudio = (wordOrObj) => {
+    let vocabObj = null;
+    if (typeof wordOrObj === 'string') {
+      vocabObj = currentLessonWords.find(v => v.word === wordOrObj) || vocabWords.find(v => v.word === wordOrObj);
+    } else {
+      vocabObj = wordOrObj;
+    }
+
+    if (vocabObj && vocabObj.audioUrl) {
+      const audioUrl = vocabObj.audioUrl.startsWith('http')
+        ? vocabObj.audioUrl
+        : `${beUrl}${vocabObj.audioUrl.startsWith('/') ? '' : '/'}${vocabObj.audioUrl}`;
+      const audio = new Audio(audioUrl);
+      audio.play().catch(err => {
+        console.error("Error playing audio from db:", err);
+        playAudio(vocabObj.word);
+      });
+    } else {
+      playAudio(vocabObj ? vocabObj.word : wordOrObj);
+    }
+  };
+
+  // Autoplay vocabulary audio when card changes in Flashcard mode
+  useEffect(() => {
+    if (vocabMode === 'flashcard' && isAutoPlay && currentLessonWords.length > 0) {
+      const activeWord = currentLessonWords[flashIndex % currentLessonWords.length];
+      if (activeWord) {
+        handlePlayAudio(activeWord);
+      }
+    }
+  }, [flashIndex, vocabMode, isAutoPlay, currentLessonWords]);
+
+  // Autoplay vocabulary audio when dictation word changes
+  useEffect(() => {
+    if (vocabMode === 'dictation' && currentLessonWords.length > 0) {
+      const activeWord = currentLessonWords[dictationIndex % currentLessonWords.length];
+      if (activeWord) {
+        handlePlayAudio(activeWord);
+      }
+    }
+  }, [dictationIndex, vocabMode, currentLessonWords]);
 
   const handleQuizChoice = (idx) => {
     if (quizChecked) return;
@@ -277,7 +359,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
         } else if (e.key.toLowerCase() === 'a') {
           e.preventDefault();
           const activeWord = currentLessonWords[flashIndex % currentLessonWords.length];
-          if (activeWord) playAudio(activeWord.word);
+          if (activeWord) handlePlayAudio(activeWord);
+        } else if (e.key.toLowerCase() === 'p') {
+          e.preventDefault();
+          setIsAutoPlay(prev => !prev);
         }
       } else if (vocabMode === 'quiz') {
         if (['1', '2', '3', '4'].includes(e.key)) {
@@ -329,15 +414,15 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     selectedBook, selectedLesson, vocabMode,
     flashIndex, quizIndex, quizChecked, quizOptions,
     typingIndex, typingFeedback, readingIndex, readingChecked,
-    readingOptions, dictationIndex, dictationFeedback, currentLessonWords
+    readingOptions, dictationIndex, dictationFeedback, currentLessonWords, isAutoPlay
   ]);
 
   // Nguồn dữ liệu cho danh sách từ vựng cuối trang: ưu tiên DB
   const baseVocabList = selectedLesson && localLessonVocabs.length > 0
     ? localLessonVocabs.map(dbVocab => {
-        const propMatch = vocabWords.find(v => v.word === dbVocab.word);
-        return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
-      })
+      const propMatch = vocabWords.find(v => v.word === dbVocab.word);
+      return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
+    })
     : vocabWords;
 
   const filteredVocab = baseVocabList.filter(v => {
@@ -406,8 +491,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           </div>
 
           {(() => {
-            const currentBook = levels.find(b => b.id === selectedBook) || textbooks.find(b => b.id === selectedBook);
-            const lessonsList = currentBook?.lessons || bookLessons[selectedBook] || [];
             const totalLessons = lessonsList.length;
             const completedLessonsCount = lessonsList.filter(lesson => {
               const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
@@ -454,7 +537,12 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         key={lesson.id}
                         className="neo-card lesson-select-card"
                         onClick={() => {
-                          navigate(`/vocab/${selectedBook}/${lesson.id}`);
+                          if (isPremium && !hasPremiumAccess) {
+                            alert("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!");
+                            navigate('/settings');
+                          } else {
+                            navigate(`/vocab/${selectedBook}/${lesson.id}`);
+                          }
                         }}
                       >
                         <div className="lesson-number-box" style={{ backgroundColor: isCompleted ? 'var(--color-secondary)' : bookColor }}>
@@ -487,27 +575,38 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             </button>
           </div>
 
-          {(() => {
-            const currentBook = levels.find(b => b.id === selectedBook) || textbooks.find(b => b.id === selectedBook);
-            const lessonsList = currentBook?.lessons || bookLessons[selectedBook] || [];
-            const currentLessonObj = lessonsList.find(l => l.id === selectedLesson);
-            const currentLearned = currentLessonWords.filter(v => v.learned).length;
-            const bookColor = currentBook?.color || getBookColor(selectedBook);
-            const lessonTitleText = currentLessonObj ? (currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`) : `Bài ${selectedLesson}`;
-            const lessonSubTitleText = currentLessonObj?.trans || '';
+          {isLessonPremium && !hasPremiumAccess ? (
+            <div className="neo-card premium-upgrade-card" style={{ padding: '40px', textAlign: 'center', marginTop: '20px', border: '2px dashed var(--color-primary)' }}>
+              <span style={{ fontSize: '50px' }}>👑</span>
+              <h3 style={{ margin: '15px 0', color: 'var(--color-primary)' }}>Nâng cấp tài khoản Premium</h3>
+              <p style={{ fontSize: '15px', color: '#555', maxWidth: '500px', margin: '0 auto 25px', lineHeight: '1.6' }}>
+                Bài học này chứa các nội dung nâng cao chuyên sâu chỉ dành cho tài khoản <strong>Premium</strong>. 
+                Vui lòng nâng cấp tài khoản của bạn để truy cập toàn bộ từ vựng, ngữ pháp và bài tập thực hành.
+              </p>
+              <button className="neo-btn neo-btn-primary" onClick={() => navigate('/settings')}>
+                Nâng cấp ngay
+              </button>
+            </div>
+          ) : (
+            <>
+              {(() => {
+                const currentLearned = currentLessonWords.filter(v => v.learned).length;
+                const bookColor = currentBook?.color || getBookColor(selectedBook);
+                const lessonTitleText = currentLessonObj ? (currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`) : `Bài ${selectedLesson}`;
+                const lessonSubTitleText = currentLessonObj?.trans || '';
 
-            return (
-              <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
-                <div>
-                  <h2>{lessonTitleText}</h2>
-                  <p>{currentBook?.viTitle || currentBook?.levelName} {lessonSubTitleText ? `— ${lessonSubTitleText}` : ''}</p>
-                </div>
-                <div className="neo-badge" style={{ backgroundColor: bookColor, color: 'white' }}>
-                  Đã học: {currentLearned} / {currentLessonWords.length} Từ
-                </div>
-              </div>
-            );
-          })()}
+                return (
+                  <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
+                    <div>
+                      <h2>{lessonTitleText}</h2>
+                      <p>{currentBook?.viTitle || currentBook?.levelName} {lessonSubTitleText ? `— ${lessonSubTitleText}` : ''}</p>
+                    </div>
+                    <div className="neo-badge" style={{ backgroundColor: bookColor, color: 'white' }}>
+                      Đã học: {currentLearned} / {currentLessonWords.length} Từ
+                    </div>
+                  </div>
+                );
+              })()}
 
           {/* Learning workspace based on active mode */}
           {(() => {
@@ -546,7 +645,19 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       >
                         {flashTranslationMode === 'ZH-VI' ? 'ZH → VI' : 'VI → ZH'}
                       </button>
-                      <button className="neo-btn" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => playAudio(activeFlashWord?.word)}>Tự động phát</button>
+                      <button
+                        className={`neo-btn ${isAutoPlay ? 'active' : ''}`}
+                        style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: isAutoPlay ? 'var(--color-secondary)' : '' }}
+                        onClick={() => {
+                          setIsAutoPlay(!isAutoPlay);
+                          if (!isAutoPlay) {
+                            const activeWord = currentLessonWords[flashIndex % currentLessonWords.length];
+                            if (activeWord) handlePlayAudio(activeWord);
+                          }
+                        }}
+                      >
+                        Tự động phát: {isAutoPlay ? 'BẬT' : 'TẮT'}
+                      </button>
                     </div>
                   </div>
 
@@ -993,8 +1104,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   <div className="workspace-card dictation-yellow">
                     <div style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>Bấm nút nghe rồi gõ lại chữ Hán / Pinyin bạn nghe được</div>
 
-                    <button className="dictation-speaker-btn" onClick={() => playAudio(activeDictationWord?.word)}>
-                      🔊 Nghe phát âm
+                    <button className="dictation-speaker-btn" onClick={() => handlePlayAudio(activeDictationWord)}>
+                      🔊
                     </button>
 
                     {showDictationHint && (
@@ -1048,7 +1159,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       )}
                     </div>
                   </div>
-                  <div className="hotkey-guide-text">
+                  <div className="hotkey-guide-text" style={{ marginTop: '15px' }}>
                     Nhấn Enter để kiểm tra, Space hoặc click nút Tiếp tục để chuyển câu
                   </div>
                 </div>
@@ -1127,7 +1238,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     <div className="vocab-headword">
                       <span className="vocab-word">{item.word}</span>
                       <span className="vocab-pinyin">({item.pinyin})</span>
-                      <button className="audio-play-btn" onClick={() => playAudio(item.word)}>🔊</button>
+                      <button className="audio-play-btn" onClick={() => handlePlayAudio(item)}>🔊</button>
                     </div>
                     <p className="vocab-translation">{item.trans}</p>
                     <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -1152,6 +1263,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
               </div>
             )}
           </div>
+            </>
+          )}
         </div>
       )}
     </div>

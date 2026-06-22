@@ -5,7 +5,7 @@ import './Home.css';
 
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   console.log("user:", user);
 
   const love = {
@@ -27,7 +27,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
       {/* Header / Welcome widget */}
       <header className="dashboard-header">
         <div>
-          <h1 className="welcome-title">Chào, {user?.name || 'bạn'} 👋</h1>
+          <h1 className="welcome-title">Chào, {loading ? '...' : (user?.name || 'bạn')} 👋</h1>
           <p className="welcome-subtitle">Chúc bạn một ngày học tập đầy hứng khởi! Cùng chinh phục TOCFL nào.</p>
         </div>
         <button className="neo-btn neo-btn-primary" onClick={() => navigate('/roadmap')}>

@@ -221,7 +221,11 @@ const Sidebar = () => {
         </ul>
 
         <div className="sidebar-footer">
-          {user ? (
+          {loading ? (
+            <div className="user-profile-widget-loading" style={{ height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '800', color: '#666', border: '2px dashed #ccc', borderRadius: 'var(--radius-sm)' }}>
+              🔄 Đang xác thực...
+            </div>
+          ) : user ? (
             <div className="user-profile-widget" onClick={() => setShowUserModal(true)}>
               <div className="user-avatar">
                 {user.avatarUrl ? (

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons, grammarPoints } from '../../data/db';
 import { getAIEvaluationFeedback } from '../../utils/feedback';
 import './Grammar.css';
+import { useAuth } from '../../context/authContext';
 
 const Grammar = ({ playAudio }) => {
   const { bookId, lessonId, grammarPointId } = useParams();
@@ -11,6 +12,33 @@ const Grammar = ({ playAudio }) => {
   const selectedGrammarBook = bookId ? parseInt(bookId) : null;
   const selectedGrammarLesson = lessonId ? parseInt(lessonId) : null;
   const selectedGrammarPointId = grammarPointId ? parseInt(grammarPointId) : null;
+
+  const { user } = useAuth();
+  const hasPremiumAccess = useMemo(() => {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    return user.isPremium === true || 
+           user.isPremium === 1 || 
+           user.isPremium === '1' || 
+           String(user.isPremium).toLowerCase() === 'true';
+  }, [user]);
+
+  const currentLesson = useMemo(() => {
+    if (selectedGrammarBook !== null && selectedGrammarLesson !== null) {
+      const lessonList = bookLessons[selectedGrammarBook] || [];
+      return lessonList.find(l => Number(l.id) === Number(selectedGrammarLesson));
+    }
+    return null;
+  }, [selectedGrammarBook, selectedGrammarLesson]);
+
+  const isLessonPremium = useMemo(() => {
+    if (!currentLesson) return false;
+    const premiumVal = currentLesson.isPremium !== undefined ? currentLesson.isPremium : currentLesson.premium;
+    return premiumVal === true || 
+           premiumVal === 1 || 
+           premiumVal === '1' || 
+           String(premiumVal).toLowerCase() === 'true';
+  }, [currentLesson]);
 
   const [grammarExerciseType, setGrammarExerciseType] = useState('zhToVi'); // 'zhToVi' or 'viToZh'
   const [grammarExercisesInput, setGrammarExercisesInput] = useState({});
@@ -97,7 +125,13 @@ const Grammar = ({ playAudio }) => {
                     key={lesson.id} 
                     className="neo-card lesson-select-card"
                     onClick={() => {
-                      navigate(`/grammar/${selectedGrammarBook}/${lesson.id}`);
+                      const isPremium = lesson.isPremium || lesson.premium;
+                      if (isPremium && !hasPremiumAccess) {
+                        alert("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!");
+                        navigate('/settings');
+                      } else {
+                        navigate(`/grammar/${selectedGrammarBook}/${lesson.id}`);
+                      }
                     }}
                   >
                     <div className="lesson-number-box" style={{ backgroundColor: currentBook?.color || '#000' }}>
@@ -120,8 +154,34 @@ const Grammar = ({ playAudio }) => {
         );
       })()}
 
+      {/* Premium Check for Lesson Detail Views */}
+      {selectedGrammarBook !== null && selectedGrammarLesson !== null && isLessonPremium && !hasPremiumAccess && (
+        <div>
+          <div style={{ marginBottom: '15px' }}>
+            <button 
+              className="neo-btn" 
+              onClick={() => navigate(`/grammar/${selectedGrammarBook}`)}
+            >
+              ← Danh sách bài học
+            </button>
+          </div>
+
+          <div className="neo-card premium-upgrade-card" style={{ padding: '40px', textAlign: 'center', marginTop: '20px', border: '2px dashed var(--color-primary)' }}>
+            <span style={{ fontSize: '50px' }}>👑</span>
+            <h3 style={{ margin: '15px 0', color: 'var(--color-primary)' }}>Nâng cấp tài khoản Premium</h3>
+            <p style={{ fontSize: '15px', color: '#555', maxWidth: '500px', margin: '0 auto 25px', lineHeight: '1.6' }}>
+              Bài học này chứa các cấu trúc ngữ pháp nâng cao chuyên sâu chỉ dành cho tài khoản <strong>Premium</strong>. 
+              Vui lòng nâng cấp tài khoản của bạn để truy cập đầy đủ bài học ngữ pháp và luyện tập dịch thuật cùng AI.
+            </p>
+            <button className="neo-btn neo-btn-primary" onClick={() => navigate('/settings')}>
+              Nâng cấp ngay
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Case 3: Select Grammar Point */}
-      {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId === null && (() => {
+      {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId === null && (!isLessonPremium || hasPremiumAccess) && (() => {
         const currentBook = textbooks.find(b => b.id === selectedGrammarBook);
         const lessonList = bookLessons[selectedGrammarBook] || [];
         const currentLesson = lessonList.find(l => l.id === selectedGrammarLesson);
@@ -183,7 +243,7 @@ const Grammar = ({ playAudio }) => {
       })()}
 
       {/* Case 4: Grammar Detail View */}
-      {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId !== null && (() => {
+      {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId !== null && (!isLessonPremium || hasPremiumAccess) && (() => {
         const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === selectedGrammarLesson);
         const gp = lessonGrammarPoints.find(g => g.id === selectedGrammarPointId);
         

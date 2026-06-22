@@ -42,7 +42,8 @@ function App() {
             tag: 'Học tập',
             bookId: bookId,
             lessonId: v.lessonId,
-            id: v.id
+            id: v.id,
+            audioUrl: v.audioUrl
           };
         });
 
