@@ -53,6 +53,7 @@ const Admin = () => {
   // 5. Vocabulary form
   const [vocabText, setVocabText] = useState('');
   const [vocabMeaning, setVocabMeaning] = useState('');
+  const [vocabEnglishMeaning, setVocabEnglishMeaning] = useState('');
   const [vocabPinyin, setVocabPinyin] = useState('');
   const [vocabAudioUrl, setVocabAudioUrl] = useState('');
   const [vocabLessonId, setVocabLessonId] = useState('');
@@ -120,6 +121,7 @@ const Admin = () => {
     setExampleVocabId('');
     setVocabText('');
     setVocabMeaning('');
+    setVocabEnglishMeaning('');
     setVocabPinyin('');
     setVocabAudioUrl('');
     setVocabLessonId('');
@@ -271,7 +273,7 @@ const Admin = () => {
 
   const handleSaveVocabulary = async (e) => {
     e.preventDefault();
-    if (!vocabText || !vocabMeaning || !vocabPinyin || !vocabLessonId) {
+    if (!vocabText || !vocabMeaning || !vocabEnglishMeaning || !vocabPinyin || !vocabLessonId) {
       showError('Vui lòng điền đầy đủ các trường bắt buộc cho từ vựng!');
       return;
     }
@@ -279,6 +281,7 @@ const Admin = () => {
       const payload = {
         vocabulary: vocabText,
         meaning: vocabMeaning,
+        englishMeaning: vocabEnglishMeaning,
         pinyin: vocabPinyin,
         audioUrl: vocabAudioUrl || null,
         lessonId: parseInt(vocabLessonId),
@@ -373,6 +376,7 @@ const Admin = () => {
     } else if (activeTab === 'vocabularies') {
       setVocabText(item.vocabulary);
       setVocabMeaning(item.meaning);
+      setVocabEnglishMeaning(item.englishMeaning || '');
       setVocabPinyin(item.pinyin);
       setVocabAudioUrl(item.audioUrl || '');
       setVocabLessonId(item.lessonId);
@@ -812,6 +816,17 @@ const Admin = () => {
                   placeholder="Ví dụ: máy bay"
                   value={vocabMeaning}
                   onChange={(e) => setVocabMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Giải nghĩa tiếng Anh</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: airplane"
+                  value={vocabEnglishMeaning}
+                  onChange={(e) => setVocabEnglishMeaning(e.target.value)}
                   required
                 />
               </div>

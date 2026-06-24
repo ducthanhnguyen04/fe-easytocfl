@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { showToast } from "../utils/toast";
 
 export const AuthContext = createContext();
 
@@ -22,6 +23,7 @@ export function AuthProvider({ children }) {
             } catch (error) {
                 console.error("Auth error:", error);
                 setUser(null);
+                showToast("Mất kết nối tới server. Vui lòng kiểm tra kết nối mạng hoặc đảm bảo server backend đang chạy.", "error");
             } finally {
                 setLoading(false);
             }

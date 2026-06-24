@@ -23,8 +23,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [levels, setLevels] = useState([]);
   useEffect(() => {
     const fecthLevel = async () => {
-      const response = await axios.get(`${beUrl}/levels/get-all`);
-      setLevels(response.data.levels);
+      try {
+        const response = await axios.get(`${beUrl}/levels/get-all`);
+        setLevels(response.data.levels || []);
+      } catch (err) {
+        console.error("Error fetching levels in Vocabulary page:", err);
+        setLevels([]);
+      }
     }
     fecthLevel();
   }, [])
@@ -84,13 +89,15 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }
     setVocabLoading(true);
     axios.get(`${beUrl}/vocabularies/get-vocabulary-by-lesson-id`, {
-      params: { lessonId: selectedLesson }
+      params: { lessonId: selectedLesson },
+      withCredentials: true
     }).then(res => {
       const dbVocabs = res.data.vocabularies || [];
       const mapped = dbVocabs.map(v => ({
         word: v.vocabulary,
         pinyin: v.pinyin,
         trans: v.meaning,
+        englishMeaning: v.englishMeaning,
         learned: false,
         tag: 'Học tập',
         bookId: selectedBook,
@@ -138,29 +145,27 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [dictationScore, setDictationScore] = useState({ correct: 0, total: 0 });
   const [showDictationHint, setShowDictationHint] = useState(false);
 
-  // DB-first: nếu DB trả về từ vựng → dùng DB, ngược lại fallback sang mock data
+  // Chỉ hiển thị từ vựng từ DB
   const currentLessonWords = useMemo(() => {
-    if (localLessonVocabs.length > 0) {
-      // DB có dữ liệu → chỉ dùng DB (đảm bảo learned state được giữ nếu trùng từ)
-      return localLessonVocabs.map(dbVocab => {
-        const propMatch = vocabWords.find(v => v.word === dbVocab.word);
-        return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
-      });
-    }
-    // Fallback: dùng mock data khi DB chưa có từ vựng cho bài này
-    return vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(selectedLesson));
-  }, [localLessonVocabs, vocabWords, selectedBook, selectedLesson]);
+    return localLessonVocabs.map(dbVocab => {
+      const propMatch = vocabWords.find(v => v.word === dbVocab.word);
+      return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
+    });
+  }, [localLessonVocabs, vocabWords]);
 
   // Generate quiz options on quizIndex change
   useEffect(() => {
     if (vocabMode === 'quiz' && currentLessonWords.length > 0) {
       const correctWord = currentLessonWords[quizIndex % currentLessonWords.length];
       const correctOption = correctWord.trans;
-      const fallbacks = ['Chào buổi sáng', 'Tạm biệt', 'Thành phố Đài Bắc', 'Ăn cơm', 'Uống trà', 'Vé tàu cao tốc', 'Trà Ô Long', 'Trực tiếp'];
-      const pool = Array.from(new Set([
-        ...currentLessonWords.filter(w => w.word !== correctWord.word).map(w => w.trans),
-        ...fallbacks
-      ]));
+      const dbTranslations = vocabWords
+        .filter(w => w.word !== correctWord.word && w.trans && w.trans !== correctWord.trans)
+        .map(w => w.trans);
+      let pool = dbTranslations;
+      if (pool.length < 3) {
+        const fallbacks = ['Chào buổi sáng', 'Tạm biệt', 'Thành phố Đài Bắc', 'Ăn cơm', 'Uống trà', 'Vé tàu cao tốc', 'Trà Ô Long', 'Trực tiếp'];
+        pool = Array.from(new Set([...dbTranslations, ...fallbacks]));
+      }
       const shuffledPool = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
       const options = [correctOption, ...shuffledPool].sort(() => 0.5 - Math.random());
       setQuizOptions(options);
@@ -168,18 +173,21 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       setQuizChecked(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizIndex, vocabMode, selectedLesson, selectedBook]);
+  }, [quizIndex, vocabMode, selectedLesson, selectedBook, vocabWords]);
 
   // Generate reading options on readingIndex change
   useEffect(() => {
     if (vocabMode === 'reading' && currentLessonWords.length > 0) {
       const correctWord = currentLessonWords[readingIndex % currentLessonWords.length];
       const correctOption = correctWord.word;
-      const fallbacks = ['學習', '臺灣', '謝謝', '捷運', '學生', '夜市', '習慣', '民主'];
-      const pool = Array.from(new Set([
-        ...currentLessonWords.filter(w => w.word !== correctWord.word).map(w => w.word),
-        ...fallbacks
-      ]));
+      const dbWords = vocabWords
+        .filter(w => w.word !== correctWord.word)
+        .map(w => w.word);
+      let pool = dbWords;
+      if (pool.length < 3) {
+        const fallbacks = ['學習', '臺灣', '謝謝', '捷運', '學生', '夜市', '習慣', '民主'];
+        pool = Array.from(new Set([...dbWords, ...fallbacks]));
+      }
       const shuffledPool = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
       const options = [correctOption, ...shuffledPool].sort(() => 0.5 - Math.random());
       setReadingOptions(options);
@@ -187,7 +195,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       setReadingChecked(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readingIndex, vocabMode, selectedLesson, selectedBook]);
+  }, [readingIndex, vocabMode, selectedLesson, selectedBook, vocabWords]);
 
   // Reset spelling & dictation states on index change
   useEffect(() => {
@@ -417,22 +425,15 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     readingOptions, dictationIndex, dictationFeedback, currentLessonWords, isAutoPlay
   ]);
 
-  // Nguồn dữ liệu cho danh sách từ vựng cuối trang: ưu tiên DB
-  const baseVocabList = selectedLesson && localLessonVocabs.length > 0
-    ? localLessonVocabs.map(dbVocab => {
-      const propMatch = vocabWords.find(v => v.word === dbVocab.word);
-      return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
-    })
-    : vocabWords;
-
-  const filteredVocab = baseVocabList.filter(v => {
-    const matchesBook = selectedBook === null || parseInt(v.bookId) === parseInt(selectedBook);
-    const matchesLesson = selectedLesson === null || parseInt(v.lessonId) === parseInt(selectedLesson);
-    const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.trans.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesBook && matchesLesson && matchesSearch;
-  });
+  // Danh sách từ vựng được lọc tìm kiếm
+  const filteredVocab = useMemo(() => {
+    return currentLessonWords.filter(v => {
+      const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.trans.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
+    });
+  }, [currentLessonWords, searchQuery]);
 
   return (
     <div>
@@ -620,7 +621,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             if (currentLessonWords.length === 0) {
               return (
                 <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0' }}>
-                  Bài học này hiện chưa có từ vựng mẫu. Vui lòng chọn bài khác!
+                  Chưa có từ vựng nào
                 </div>
               );
             }
@@ -673,14 +674,24 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                             <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
                           </div>
                         ) : (
-                          <div className="flashcard-trans">{activeFlashWord?.trans}</div>
+                          <div className="flashcard-trans">
+                            <div>{activeFlashWord?.trans}</div>
+                            {activeFlashWord?.englishMeaning && (
+                              <div className="flashcard-english">{activeFlashWord.englishMeaning}</div>
+                            )}
+                          </div>
                         )}
                         <div className="flashcard-hint">✨ Click hoặc Space để lật thẻ</div>
                       </div>
 
                       <div className="flashcard-face flashcard-back">
                         {flashTranslationMode === 'ZH-VI' ? (
-                          <div className="flashcard-trans">{activeFlashWord?.trans}</div>
+                          <div className="flashcard-trans">
+                            <div>{activeFlashWord?.trans}</div>
+                            {activeFlashWord?.englishMeaning && (
+                              <div className="flashcard-english">{activeFlashWord.englishMeaning}</div>
+                            )}
+                          </div>
                         ) : (
                           <div>
                             <div className="flashcard-word">{activeFlashWord?.word}</div>
@@ -901,7 +912,14 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
                   <div className="workspace-card typing-orange">
                     <div style={{ fontSize: '15px', color: '#666' }}>Gõ chữ Hán Phồn thể có nghĩa là:</div>
-                    <div style={{ fontSize: '28px', fontWeight: '800', margin: '20px 0', color: 'var(--color-primary)' }}>{activeTypingWord?.trans}</div>
+                    <div style={{ fontSize: '28px', fontWeight: '800', margin: '20px 0', color: 'var(--color-primary)' }}>
+                      <div>{activeTypingWord?.trans}</div>
+                      {activeTypingWord?.englishMeaning && (
+                        <div style={{ fontSize: '16px', color: '#555', marginTop: '8px', fontWeight: 'normal', fontStyle: 'italic' }}>
+                          ({activeTypingWord.englishMeaning})
+                        </div>
+                      )}
+                    </div>
                     {typingFeedback && (
                       <div className={`typing-feedback ${typingFeedback.success ? 'success' : 'error'}`} style={{ color: typingFeedback.success ? 'var(--color-secondary)' : 'var(--color-primary)' }}>
                         {typingFeedback.msg}
@@ -1169,100 +1187,107 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             return null;
           })()}
 
-          {/* Mode Selector Panel */}
-          <div className="mode-selector-panel">
-            <div className="mode-selector-title">Chọn chế độ học</div>
-            <div className="modes-grid">
-              <div
-                className={`neo-card mode-card ${vocabMode === 'flashcard' ? 'active-flashcard' : ''}`}
-                onClick={() => setVocabMode('flashcard')}
-              >
-                <div className="mode-card-title">🗂️ Flashcard</div>
-                <div className="mode-card-status">
-                  {vocabWords.filter(v => v.bookId === selectedBook && v.lessonId === selectedLesson && v.learned).length === currentLessonWords.length ? 'Đã thuộc' : 'Đang học'}
-                </div>
-              </div>
-              <div
-                className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}
-                onClick={() => setVocabMode('quiz')}
-              >
-                <div className="mode-card-title">❓ Trắc nghiệm</div>
-                <div className="mode-card-status">Luyện tập</div>
-              </div>
-              <div
-                className={`neo-card mode-card ${vocabMode === 'typing' ? 'active-typing' : ''}`}
-                onClick={() => setVocabMode('typing')}
-              >
-                <div className="mode-card-title">⌨️ Gõ từ vựng</div>
-                <div className="mode-card-status">Luyện viết</div>
-              </div>
-              <div
-                className={`neo-card mode-card ${vocabMode === 'reading' ? 'active-reading' : ''}`}
-                onClick={() => setVocabMode('reading')}
-              >
-                <div className="mode-card-title">📖 Đọc hiểu</div>
-                <div className="mode-card-status">Ngữ cảnh</div>
-              </div>
-              <div
-                className={`neo-card mode-card ${vocabMode === 'dictation' ? 'active-dictation' : ''}`}
-                onClick={() => setVocabMode('dictation')}
-              >
-                <div className="mode-card-title">🎧 Nghe chép</div>
-                <div className="mode-card-status">Nghe nói</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and filter */}
-          <div className="vocab-search-bar">
-            <input
-              type="text"
-              className="vocab-input"
-              placeholder="Tìm kiếm từ vựng trong danh sách dưới đây..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button className="neo-btn neo-btn-primary" onClick={() => setSearchQuery('')}>Xoá lọc</button>
-          </div>
-
-          {/* Vocab list grid */}
-          <div className="vocab-list">
-            {filteredVocab.map((item, index) => {
-              const globalIndex = vocabWords.findIndex(v => v.word === item.word);
-              return (
-                <div key={index} className="neo-card vocab-card">
-                  <div className="vocab-symbol">
-                    {item.word.substring(0, 1)}
-                  </div>
-                  <div className="vocab-info">
-                    <div className="vocab-headword">
-                      <span className="vocab-word">{item.word}</span>
-                      <span className="vocab-pinyin">({item.pinyin})</span>
-                      <button className="audio-play-btn" onClick={() => handlePlayAudio(item)}>🔊</button>
-                    </div>
-                    <p className="vocab-translation">{item.trans}</p>
-                    <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <span className="neo-badge" style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: 'var(--color-blue-light)' }}>
-                        {item.tag}
-                      </span>
-                      <button
-                        className={`neo-btn ${item.learned ? 'neo-btn-primary' : ''}`}
-                        style={{ padding: '4px 10px', fontSize: '10px', borderRadius: '6px', cursor: 'pointer' }}
-                        onClick={() => toggleVocabLearned(globalIndex)}
-                      >
-                        {item.learned ? '✓ Đã thuộc' : 'Chưa thuộc'}
-                      </button>
+          {currentLessonWords.length > 0 && (
+            <>
+              {/* Mode Selector Panel */}
+              <div className="mode-selector-panel">
+                <div className="mode-selector-title">Chọn chế độ học</div>
+                <div className="modes-grid">
+                  <div
+                    className={`neo-card mode-card ${vocabMode === 'flashcard' ? 'active-flashcard' : ''}`}
+                    onClick={() => setVocabMode('flashcard')}
+                  >
+                    <div className="mode-card-title">🗂️ Flashcard</div>
+                    <div className="mode-card-status">
+                      {currentLessonWords.every(v => v.learned) ? 'Đã thuộc' : 'Đang học'}
                     </div>
                   </div>
+                  <div
+                    className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}
+                    onClick={() => setVocabMode('quiz')}
+                  >
+                    <div className="mode-card-title">❓ Trắc nghiệm</div>
+                    <div className="mode-card-status">Luyện tập</div>
+                  </div>
+                  <div
+                    className={`neo-card mode-card ${vocabMode === 'typing' ? 'active-typing' : ''}`}
+                    onClick={() => setVocabMode('typing')}
+                  >
+                    <div className="mode-card-title">⌨️ Gõ từ vựng</div>
+                    <div className="mode-card-status">Luyện viết</div>
+                  </div>
+                  <div
+                    className={`neo-card mode-card ${vocabMode === 'reading' ? 'active-reading' : ''}`}
+                    onClick={() => setVocabMode('reading')}
+                  >
+                    <div className="mode-card-title">📖 Đọc hiểu</div>
+                    <div className="mode-card-status">Ngữ cảnh</div>
+                  </div>
+                  <div
+                    className={`neo-card mode-card ${vocabMode === 'dictation' ? 'active-dictation' : ''}`}
+                    onClick={() => setVocabMode('dictation')}
+                  >
+                    <div className="mode-card-title">🎧 Nghe chép</div>
+                    <div className="mode-card-status">Nghe nói</div>
+                  </div>
                 </div>
-              );
-            })}
-            {filteredVocab.length === 0 && (
-              <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px', fontWeight: 'bold' }}>
-                Không tìm thấy từ vựng nào phù hợp trong danh sách này.
               </div>
-            )}
-          </div>
+
+              {/* Search and filter */}
+              <div className="vocab-search-bar">
+                <input
+                  type="text"
+                  className="vocab-input"
+                  placeholder="Tìm kiếm từ vựng trong danh sách dưới đây..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button className="neo-btn neo-btn-primary" onClick={() => setSearchQuery('')}>Xoá lọc</button>
+              </div>
+
+              {/* Vocab list grid */}
+              <div className="vocab-list">
+                {filteredVocab.map((item, index) => {
+                  const globalIndex = vocabWords.findIndex(v => v.word === item.word);
+                  return (
+                    <div key={index} className="neo-card vocab-card">
+                      <div className="vocab-symbol">
+                        {item.word.substring(0, 1)}
+                      </div>
+                      <div className="vocab-info">
+                        <div className="vocab-headword">
+                          <span className="vocab-word">{item.word}</span>
+                          <span className="vocab-pinyin">({item.pinyin})</span>
+                          <button className="audio-play-btn" onClick={() => handlePlayAudio(item)}>🔊</button>
+                        </div>
+                        <p className="vocab-translation">{item.trans}</p>
+                        {item.englishMeaning && (
+                          <p className="vocab-translation-en">{item.englishMeaning}</p>
+                        )}
+                        <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span className="neo-badge" style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: 'var(--color-blue-light)' }}>
+                            {item.tag}
+                          </span>
+                          <button
+                            className={`neo-btn ${item.learned ? 'neo-btn-primary' : ''}`}
+                            style={{ padding: '4px 10px', fontSize: '10px', borderRadius: '6px', cursor: 'pointer' }}
+                            onClick={() => toggleVocabLearned(globalIndex)}
+                          >
+                            {item.learned ? '✓ Đã thuộc' : 'Chưa thuộc'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {filteredVocab.length === 0 && (
+                  <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px', fontWeight: 'bold' }}>
+                    Không tìm thấy từ vựng nào phù hợp trong danh sách này.
+                  </div>
+                )}
+              </div>
+            </>
+          )}
             </>
           )}
         </div>

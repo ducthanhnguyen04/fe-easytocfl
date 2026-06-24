@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
-import { initialVocabWords, quizzes } from './data/db';
+import { quizzes } from './data/db';
 import axios from 'axios';
 import beUrl from './api-url/api-backend';
 import './App.css';
 
 function App() {
-  const [vocabWords, setVocabWords] = useState(initialVocabWords);
+  const [vocabWords, setVocabWords] = useState([]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'terracotta';
@@ -38,6 +38,7 @@ function App() {
             word: v.vocabulary,
             pinyin: v.pinyin,
             trans: v.meaning,
+            englishMeaning: v.englishMeaning,
             learned: false,
             tag: 'Học tập',
             bookId: bookId,
@@ -47,11 +48,7 @@ function App() {
           };
         });
 
-        const combinedMap = new Map();
-        initialVocabWords.forEach(v => combinedMap.set(v.word, v));
-        mappedVocabs.forEach(v => combinedMap.set(v.word, v));
-
-        setVocabWords(Array.from(combinedMap.values()));
+        setVocabWords(mappedVocabs);
       } catch (err) {
         console.error("Error loading backend vocabularies:", err);
       }
