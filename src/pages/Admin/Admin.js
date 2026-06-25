@@ -39,6 +39,7 @@ const Admin = () => {
   const [grammarName, setGrammarName] = useState('');
   const [grammarStructure, setGrammarStructure] = useState('');
   const [grammarUsage, setGrammarUsage] = useState('');
+  const [grammarDefinition, setGrammarDefinition] = useState('');
   const [grammarNote, setGrammarNote] = useState('');
   const [grammarLessonId, setGrammarLessonId] = useState('');
 
@@ -111,6 +112,7 @@ const Admin = () => {
     setGrammarName('');
     setGrammarStructure('');
     setGrammarUsage('');
+    setGrammarDefinition('');
     setGrammarNote('');
     setGrammarLessonId('');
     setExampleText('');
@@ -200,7 +202,7 @@ const Admin = () => {
 
   const handleSaveGrammar = async (e) => {
     e.preventDefault();
-    if (!grammarName || !grammarStructure || !grammarUsage || !grammarLessonId) {
+    if (!grammarName || !grammarStructure || !grammarUsage || !grammarDefinition || !grammarLessonId) {
       showError('Vui lòng điền đầy đủ thông tin cấu trúc ngữ pháp!');
       return;
     }
@@ -209,6 +211,7 @@ const Admin = () => {
         grammar: grammarName,
         structure: grammarStructure,
         usage: grammarUsage,
+        definition: grammarDefinition,
         note: grammarNote,
         lessonId: parseInt(grammarLessonId),
       };
@@ -364,6 +367,7 @@ const Admin = () => {
       setGrammarName(item.grammar);
       setGrammarStructure(item.structure);
       setGrammarUsage(item.usage);
+      setGrammarDefinition(item.definition || '');
       setGrammarNote(item.note || '');
       setGrammarLessonId(item.lessonId);
     } else if (activeTab === 'examples') {
@@ -601,6 +605,17 @@ const Admin = () => {
                   placeholder="Ví dụ: 是...được"
                   value={grammarName}
                   onChange={(e) => setGrammarName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Định nghĩa (Definition)</label>
+                <textarea
+                  className="settings-input"
+                  placeholder="Ví dụ: Từ 「是」 dùng để biểu thị hai sự vật, hiện tượng là một..."
+                  style={{ minHeight: '60px', fontFamily: 'inherit' }}
+                  value={grammarDefinition}
+                  onChange={(e) => setGrammarDefinition(e.target.value)}
                   required
                 />
               </div>
