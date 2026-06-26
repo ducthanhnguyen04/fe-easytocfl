@@ -5,6 +5,7 @@ import Icon from './Icon';
 import './Sidebar.css';
 import { useAuth } from '../context/authContext';
 import beUrl from '../api-url/api-backend';
+import { showToast } from '../utils/toast';
 
 const Sidebar = () => {
   const { user, setUser, loading } = useAuth();
@@ -69,7 +70,7 @@ const Sidebar = () => {
         setLoginEmail('');
         setLoginPassword('');
         setLoginError('');
-        alert('Đăng nhập thành công!');
+        showToast('Đăng nhập thành công!', 'success');
         console.log(user);
       }
     } catch (error) {
@@ -92,7 +93,7 @@ const Sidebar = () => {
         password: registerPassword
       });
       if (response.data.success) {
-        alert('Đăng ký thành công! Đang tự động đăng nhập...');
+        showToast('Đăng ký thành công! Đang tự động đăng nhập...', 'success');
         const loginResponse = await axios.post(`${beUrl}/auth/login`, {
           email: registerEmail,
           password: registerPassword
@@ -302,7 +303,7 @@ const Sidebar = () => {
                 onClick={async () => {
                   await handleLogout();
                   setShowUserModal(false);
-                  alert('Đăng xuất thành công!');
+                  showToast('Đăng xuất thành công!', 'success');
                 }} logout
               >
                 🚪 Đăng xuất

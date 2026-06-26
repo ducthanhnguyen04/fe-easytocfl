@@ -150,6 +150,30 @@ const Settings = ({ resetVocabProgress }) => {
     }
   };
 
+  if (!user) {
+    return (
+      <div>
+        <div className="page-title-banner">
+          <div>
+            <h2>Cài Đặt Hệ Thống</h2>
+            <p>Tuỳ chỉnh tài khoản, đổi mật khẩu và thiết lập học tập của bạn</p>
+          </div>
+        </div>
+
+        <div className="neo-card" style={{ padding: '40px', textAlign: 'center', marginTop: '20px', border: '2px dashed var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '50px', marginBottom: '15px' }}>🔒</span>
+          <h3 style={{ margin: '10px 0', color: 'var(--color-primary)', fontWeight: '900' }}>Yêu cầu đăng nhập</h3>
+          <p style={{ fontSize: '15px', color: '#555', maxWidth: '500px', margin: '0 auto 15px', lineHeight: '1.6', fontWeight: '600' }}>
+            Vui lòng đăng nhập hoặc đăng ký tài khoản để truy cập trang cài đặt hệ thống và lưu trữ tiến trình học tập của bạn.
+          </p>
+          <div style={{ fontSize: '13px', color: '#666', fontStyle: 'italic', fontWeight: 'bold' }}>
+            💡 Mẹo: Bấm nút "Đăng nhập / Đăng ký" ở góc dưới bên trái menu để tiếp tục.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="page-title-banner">

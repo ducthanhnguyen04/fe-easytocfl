@@ -2,11 +2,39 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons, grammarPoints } from '../../data/db';
 import { getAIEvaluationFeedback } from '../../utils/feedback';
+import axios from 'axios';
+import beUrl from '../../api-url/api-backend';
 import './Grammar.css';
 import { useAuth } from '../../context/authContext';
 
+const getBookColor = (bookId) => {
+  const colors = {
+    1: '#e55b44',
+    2: '#2a9d8f',
+    3: '#f4a261',
+    4: '#3d84b8',
+    5: '#9b5de5',
+    6: '#f15bb5'
+  };
+  return colors[bookId] || '#4f46e5';
+};
+
 const Grammar = ({ playAudio }) => {
   const { bookId, lessonId, grammarPointId } = useParams();
+  const [levels, setLevels] = useState([]);
+  useEffect(() => {
+    const fecthLevel = async () => {
+      try {
+        const response = await axios.get(`${beUrl}/levels/get-all`);
+        setLevels(response.data.levels || []);
+      } catch (err) {
+        console.error("Error fetching levels in Vocabulary page:", err);
+        setLevels([]);
+      }
+    }
+    fecthLevel();
+  }, [])
+  console.log("level:", levels);
   const navigate = useNavigate();
 
   const selectedGrammarBook = bookId ? parseInt(bookId) : null;
@@ -17,27 +45,31 @@ const Grammar = ({ playAudio }) => {
   const hasPremiumAccess = useMemo(() => {
     if (!user) return false;
     if (user.role === 'admin') return true;
-    return user.isPremium === true || 
-           user.isPremium === 1 || 
-           user.isPremium === '1' || 
-           String(user.isPremium).toLowerCase() === 'true';
+    return user.isPremium === true ||
+      user.isPremium === 1 ||
+      user.isPremium === '1' ||
+      String(user.isPremium).toLowerCase() === 'true';
   }, [user]);
 
+  const currentBook = useMemo(() => {
+    return levels.find(b => Number(b.id) === Number(selectedGrammarBook)) || textbooks.find(b => Number(b.id) === Number(selectedGrammarBook));
+  }, [levels, selectedGrammarBook]);
+
+  const lessonsList = useMemo(() => {
+    return Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedGrammarBook] || []);
+  }, [currentBook, selectedGrammarBook]);
+
   const currentLesson = useMemo(() => {
-    if (selectedGrammarBook !== null && selectedGrammarLesson !== null) {
-      const lessonList = bookLessons[selectedGrammarBook] || [];
-      return lessonList.find(l => Number(l.id) === Number(selectedGrammarLesson));
-    }
-    return null;
-  }, [selectedGrammarBook, selectedGrammarLesson]);
+    return lessonsList.find(l => Number(l.id) === Number(selectedGrammarLesson));
+  }, [lessonsList, selectedGrammarLesson]);
 
   const isLessonPremium = useMemo(() => {
     if (!currentLesson) return false;
     const premiumVal = currentLesson.isPremium !== undefined ? currentLesson.isPremium : currentLesson.premium;
-    return premiumVal === true || 
-           premiumVal === 1 || 
-           premiumVal === '1' || 
-           String(premiumVal).toLowerCase() === 'true';
+    return premiumVal === true ||
+      premiumVal === 1 ||
+      premiumVal === '1' ||
+      String(premiumVal).toLowerCase() === 'true';
   }, [currentLesson]);
 
   const [grammarExerciseType, setGrammarExerciseType] = useState('zhToVi'); // 'zhToVi' or 'viToZh'
@@ -66,42 +98,39 @@ const Grammar = ({ playAudio }) => {
           </div>
 
           <div className="books-grid">
-            {textbooks.map((book) => {
-              const bookGrammarPoints = grammarPoints.filter(g => g.bookId === book.id);
-              return (
-                <div 
-                  key={book.id} 
-                  className="neo-card book-select-card"
-                  onClick={() => {
-                    navigate(`/grammar/${book.id}`);
-                  }}
-                >
-                  <div className="book-cover" style={{ backgroundColor: book.color }}>
-                    <span className="book-cover-title-traditional">當代中文</span>
-                    <span className="book-cover-vol">{book.id}</span>
-                  </div>
-                  <div className="book-select-info">
-                    <h4 className="book-select-title">{book.viTitle}</h4>
-                    <span className="book-select-level">{book.level}</span>
-                    <p className="book-select-desc">{book.desc}</p>
-                    <div className="book-select-stats">
-                      <span>📖 {book.lessons}</span>
-                      <span>🔓 {book.status}</span>
-                      <span style={{ color: 'var(--color-primary)' }}>💡 {bookGrammarPoints.length} cấu trúc</span>
-                    </div>
+            {levels.map((book) => /* const bookGrammarPoints = grammarPoints.filter(g => g.bookId === book.id);*/(
+              <div
+                key={book.id}
+                className="neo-card book-select-card"
+                onClick={() => {
+                  navigate(`/grammar/${book.id}`);
+                }}
+              >
+                <div className="book-cover">
+                  <span className="book-cover-title-traditional">{book.levelName}</span>
+                  <span className="book-cover-vol">{book.id}</span>
+                </div>
+                <div className="book-select-info">
+                  <h4 className="book-select-title">{book.levelName}</h4>
+                  <span className="book-select-level">{book.level}</span>
+                  <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
+                  <div className="book-select-stats">
+                    <span>📖 {book?.lessons.length} bài học</span>
+                    {/* <span>📖 {book.lessons}</span> */}
+                    {/* <span>🔓 {book.status}</span> */}
+                    {/* <span style={{ color: 'var(--color-primary)' }}>💡 {bookGrammarPoints.length} cấu trúc</span> */}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {/* Case 2: Select Lesson */}
       {selectedGrammarBook !== null && selectedGrammarLesson === null && (() => {
-        const currentBook = textbooks.find(b => b.id === selectedGrammarBook);
-        const lessons = bookLessons[selectedGrammarBook] || [];
-        const totalLessons = lessons.length;
+        const totalLessons = lessonsList.length;
+        const bookColor = currentBook?.color || getBookColor(selectedGrammarBook);
         return (
           <div>
             <div className="back-btn-container">
@@ -110,22 +139,24 @@ const Grammar = ({ playAudio }) => {
               </button>
             </div>
 
-            <div className="page-title-banner" style={{ borderLeft: `10px solid ${currentBook?.color || '#000'}` }}>
+            <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
               <div>
-                <h2>{currentBook?.viTitle} ({currentBook?.title})</h2>
+                <h2>{currentBook?.viTitle || currentBook?.levelName} ({currentBook?.title || currentBook?.level})</h2>
                 <p>{currentBook?.level} — {totalLessons} bài học chính thức</p>
               </div>
             </div>
 
             <div className="lessons-grid">
-              {lessons.map((lesson) => {
+              {lessonsList.map((lesson) => {
                 const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === lesson.id);
+                const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
+                const displayTranslation = lesson.trans || '';
+                const isPremium = lesson.isPremium || lesson.premium;
                 return (
-                  <div 
-                    key={lesson.id} 
+                  <div
+                    key={lesson.id}
                     className="neo-card lesson-select-card"
                     onClick={() => {
-                      const isPremium = lesson.isPremium || lesson.premium;
                       if (isPremium && !hasPremiumAccess) {
                         alert("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!");
                         navigate('/settings');
@@ -134,14 +165,14 @@ const Grammar = ({ playAudio }) => {
                       }
                     }}
                   >
-                    <div className="lesson-number-box" style={{ backgroundColor: currentBook?.color || '#000' }}>
+                    <div className="lesson-number-box" style={{ backgroundColor: bookColor }}>
                       {lesson.id}
                     </div>
                     <div className="lesson-select-info">
                       <h4 className="lesson-select-title">
-                        {lesson.title} {lesson.premium && <span className="premium-badge">👑 Premium</span>}
+                        {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
                       </h4>
-                      <span className="lesson-select-translation">{lesson.trans}</span>
+                      {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
                       <div className="lesson-select-meta">
                         <span>📖 {lessonGrammarPoints.length} cấu trúc ngữ pháp</span>
                       </div>
@@ -158,8 +189,8 @@ const Grammar = ({ playAudio }) => {
       {selectedGrammarBook !== null && selectedGrammarLesson !== null && isLessonPremium && !hasPremiumAccess && (
         <div>
           <div style={{ marginBottom: '15px' }}>
-            <button 
-              className="neo-btn" 
+            <button
+              className="neo-btn"
               onClick={() => navigate(`/grammar/${selectedGrammarBook}`)}
             >
               ← Danh sách bài học
@@ -170,7 +201,7 @@ const Grammar = ({ playAudio }) => {
             <span style={{ fontSize: '50px' }}>👑</span>
             <h3 style={{ margin: '15px 0', color: 'var(--color-primary)' }}>Nâng cấp tài khoản Premium</h3>
             <p style={{ fontSize: '15px', color: '#555', maxWidth: '500px', margin: '0 auto 25px', lineHeight: '1.6' }}>
-              Bài học này chứa các cấu trúc ngữ pháp nâng cao chuyên sâu chỉ dành cho tài khoản <strong>Premium</strong>. 
+              Bài học này chứa các cấu trúc ngữ pháp nâng cao chuyên sâu chỉ dành cho tài khoản <strong>Premium</strong>.
               Vui lòng nâng cấp tài khoản của bạn để truy cập đầy đủ bài học ngữ pháp và luyện tập dịch thuật cùng AI.
             </p>
             <button className="neo-btn neo-btn-primary" onClick={() => navigate('/settings')}>
@@ -182,28 +213,26 @@ const Grammar = ({ playAudio }) => {
 
       {/* Case 3: Select Grammar Point */}
       {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId === null && (!isLessonPremium || hasPremiumAccess) && (() => {
-        const currentBook = textbooks.find(b => b.id === selectedGrammarBook);
-        const lessonList = bookLessons[selectedGrammarBook] || [];
-        const currentLesson = lessonList.find(l => l.id === selectedGrammarLesson);
+        const bookColor = currentBook?.color || getBookColor(selectedGrammarBook);
         const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === selectedGrammarLesson);
-        
+
         return (
           <div>
             <div style={{ marginBottom: '15px' }}>
-              <button 
-                className="neo-btn" 
+              <button
+                className="neo-btn"
                 onClick={() => navigate(`/grammar/${selectedGrammarBook}`)}
               >
                 ← Danh sách bài học
               </button>
             </div>
 
-            <div className="page-title-banner" style={{ borderLeft: `8px solid ${currentBook?.color || '#000'}` }}>
+            <div className="page-title-banner" style={{ borderLeft: `8px solid ${bookColor}` }}>
               <div>
                 <h2>{currentLesson?.title}</h2>
                 <p>{currentLesson?.trans} • Ngữ pháp cốt lõi</p>
               </div>
-              <div className="neo-badge" style={{ backgroundColor: currentBook?.color || '#000', color: 'white' }}>
+              <div className="neo-badge" style={{ backgroundColor: bookColor, color: 'white' }}>
                 {lessonGrammarPoints.length} cấu trúc
               </div>
             </div>
@@ -215,9 +244,9 @@ const Grammar = ({ playAudio }) => {
             ) : (
               <div className="grammar-container">
                 {lessonGrammarPoints.map((gp) => (
-                  <div 
-                    key={gp.id} 
-                    className="neo-card grammar-card" 
+                  <div
+                    key={gp.id}
+                    className="neo-card grammar-card"
                     style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                     onClick={() => {
                       navigate(`/grammar/${selectedGrammarBook}/${selectedGrammarLesson}/${gp.id}`);
@@ -225,8 +254,8 @@ const Grammar = ({ playAudio }) => {
                   >
                     <div className="grammar-header">
                       <span className="grammar-structure">{gp.title}</span>
-                      <span className="neo-badge" style={{ backgroundColor: currentBook?.color || '#000', color: 'white' }}>
-                        {currentBook?.level.split(' • ')[1]}
+                      <span className="neo-badge" style={{ backgroundColor: bookColor, color: 'white' }}>
+                        {currentBook?.level?.split(' • ')[1]}
                       </span>
                     </div>
                     <h4 className="grammar-title">Công thức: {gp.pattern}</h4>
@@ -246,7 +275,7 @@ const Grammar = ({ playAudio }) => {
       {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId !== null && (!isLessonPremium || hasPremiumAccess) && (() => {
         const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === selectedGrammarLesson);
         const gp = lessonGrammarPoints.find(g => g.id === selectedGrammarPointId);
-        
+
         if (!gp) {
           return (
             <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold' }}>
@@ -256,15 +285,14 @@ const Grammar = ({ playAudio }) => {
           );
         }
 
-        const currentBook = textbooks.find(b => b.id === selectedGrammarBook);
         const modelIdx = lessonGrammarPoints.findIndex(g => g.id === gp.id) + 1;
 
         return (
           <div style={{ paddingBottom: '40px' }}>
             {/* Back button */}
             <div style={{ marginBottom: '15px' }}>
-              <button 
-                className="neo-btn" 
+              <button
+                className="neo-btn"
                 onClick={() => navigate(`/grammar/${selectedGrammarBook}/${selectedGrammarLesson}`)}
               >
                 ← Quay lại danh sách cấu trúc
@@ -350,8 +378,8 @@ const Grammar = ({ playAudio }) => {
                         → {ex.vn}
                       </div>
                     </div>
-                    <button 
-                      className="grammar-audio-btn" 
+                    <button
+                      className="grammar-audio-btn"
                       onClick={() => playAudio(ex.cn)}
                       title="Nghe phát âm"
                     >
@@ -370,14 +398,14 @@ const Grammar = ({ playAudio }) => {
                 </h2>
                 {/* Exercise direction toggle */}
                 <div className="neo-btn-group">
-                  <button 
+                  <button
                     className={`neo-btn ${grammarExerciseType === 'zhToVi' ? 'active' : ''}`}
                     onClick={() => setGrammarExerciseType('zhToVi')}
                     style={{ padding: '6px 12px', fontSize: '13px' }}
                   >
                     Trung → Việt
                   </button>
-                  <button 
+                  <button
                     className={`neo-btn ${grammarExerciseType === 'viToZh' ? 'active' : ''}`}
                     onClick={() => setGrammarExerciseType('viToZh')}
                     style={{ padding: '6px 12px', fontSize: '13px' }}
@@ -388,7 +416,7 @@ const Grammar = ({ playAudio }) => {
               </div>
 
               <div style={{ background: '#eef2f3', border: '3px solid #000', padding: '15px', borderRadius: 'var(--radius-sm)', marginBottom: '20px', fontWeight: '700', fontSize: '13px' }}>
-                {grammarExerciseType === 'zhToVi' 
+                {grammarExerciseType === 'zhToVi'
                   ? 'Đọc câu tiếng Trung Phồn thể dưới đây, gõ bản dịch tiếng Việt tương ứng vào ô. Bấm "Kiểm tra" hoặc "AI đánh giá" để nhận phản hồi.'
                   : 'Đọc câu tiếng Việt dưới đây, gõ câu dịch tiếng Trung Phồn thể tương ứng vào ô. Bấm "Kiểm tra" hoặc "AI đánh giá" để nhận phản hồi.'
                 }
@@ -410,8 +438,8 @@ const Grammar = ({ playAudio }) => {
                         {questionText}
                       </div>
                       {grammarExerciseType === 'zhToVi' && (
-                        <button 
-                          className="grammar-audio-btn" 
+                        <button
+                          className="grammar-audio-btn"
                           style={{ width: '32px', height: '32px', fontSize: '12px' }}
                           onClick={() => playAudio(exe.cn)}
                         >
@@ -430,10 +458,10 @@ const Grammar = ({ playAudio }) => {
                           setGrammarExercisesInput(prev => ({ ...prev, [exe.id]: e.target.value }));
                         }}
                       />
-                      
+
                       <div className="grammar-exercise-actions">
-                        <button 
-                          className="neo-btn" 
+                        <button
+                          className="neo-btn"
                           style={{ padding: '8px 16px', fontSize: '13px' }}
                           onClick={() => {
                             setGrammarExercisesFeedback(prev => ({
@@ -444,9 +472,9 @@ const Grammar = ({ playAudio }) => {
                         >
                           👁️ Kiểm tra
                         </button>
-                        
-                        <button 
-                          className="neo-btn neo-btn-primary" 
+
+                        <button
+                          className="neo-btn neo-btn-primary"
                           style={{ padding: '8px 16px', fontSize: '13px', backgroundColor: 'var(--color-accent)' }}
                           onClick={() => {
                             const aiFeedback = getAIEvaluationFeedback(userVal, exe.cn, exe.vn, grammarExerciseType);
@@ -462,13 +490,13 @@ const Grammar = ({ playAudio }) => {
                     </div>
 
                     {feedback && (
-                      <div 
+                      <div
                         className="grammar-exercise-feedback"
-                        style={{ 
+                        style={{
                           backgroundColor: feedback.includes('(10/10)') || feedback.includes('(9/10)') || feedback.includes('(7/10)')
-                            ? '#e8f5e9' 
-                            : feedback.startsWith('💡') 
-                              ? '#e3f2fd' 
+                            ? '#e8f5e9'
+                            : feedback.startsWith('💡')
+                              ? '#e3f2fd'
                               : '#fff8e1',
                           borderLeft: feedback.includes('(10/10)') || feedback.includes('(9/10)') || feedback.includes('(7/10)')
                             ? '5px solid #4caf50'
