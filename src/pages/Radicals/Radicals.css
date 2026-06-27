@@ -1,0 +1,184 @@
+/* Radicals Page Styles */
+.radicals-page {
+  padding-bottom: 50px;
+}
+
+.filter-container {
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  box-shadow: 5px 5px 0px #000;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .filter-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.search-box-wrapper {
+  flex: 1;
+}
+
+.filter-label {
+  display: block;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 3px solid #000;
+  border-radius: var(--radius-sm);
+  outline: none;
+  background-color: #fff;
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.15s ease;
+}
+
+.search-input:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.stroke-filter-wrapper {
+  flex-shrink: 0;
+}
+
+.stroke-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stroke-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0px #000;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.stroke-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000;
+  background-color: var(--color-primary-light);
+}
+
+.stroke-btn.active {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-color: #000;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.radicals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.radical-card {
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  box-shadow: 5px 5px 0px #000;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.radical-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 9px 9px 0px #000;
+}
+
+.radical-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+}
+
+.radical-glyph {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--color-black);
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.stroke-badge {
+  background-color: var(--color-yellow-light);
+  color: #000;
+  font-weight: 800;
+  border: 2px solid #000;
+}
+
+.radical-pinyin {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+
+.radical-meaning {
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.radical-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.radical-examples {
+  background-color: #f7f9fa;
+  border: 2px solid #000;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.radical-examples strong {
+  display: block;
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.examples-list {
+  font-weight: 700;
+  color: #000;
+  font-family: 'Noto Sans TC', sans-serif;
+  letter-spacing: 0.5px;
+}

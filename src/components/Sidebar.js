@@ -13,6 +13,15 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [showUserModal, setShowUserModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [vocabExpanded, setVocabExpanded] = useState(
+    location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals')
+  );
+
+  React.useEffect(() => {
+    if (location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals')) {
+      setVocabExpanded(true);
+    }
+  }, [location.pathname]);
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -169,12 +178,47 @@ const Sidebar = () => {
             </Link>
           </li>
           <li className="sidebar-item">
-            <Link
-              to="/vocab"
-              className={`sidebar-link ${isActive('/vocab') ? 'active' : ''}`}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setVocabExpanded(!vocabExpanded);
+              }}
+              className={`sidebar-link ${isActive('/vocab') || isActive('/radicals') ? 'active' : ''}`}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
             >
-              <Icon name="vocab" /> Từ vựng
-            </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Icon name="vocab" /> Từ vựng
+              </div>
+              <span style={{ 
+                fontSize: '10px', 
+                transition: 'transform 0.2s', 
+                transform: vocabExpanded ? 'rotate(90deg)' : 'none',
+                display: 'inline-block'
+              }}>
+                ▶
+              </span>
+            </button>
+
+            {vocabExpanded && (
+              <ul className="sidebar-submenu">
+                <li className="sidebar-subitem">
+                  <Link
+                    to="/vocab"
+                    className={`sidebar-sublink ${location.pathname.startsWith('/vocab') ? 'active' : ''}`}
+                  >
+                    📖 Từ vựng chính khóa
+                  </Link>
+                </li>
+                <li className="sidebar-subitem">
+                  <Link
+                    to="/radicals"
+                    className={`sidebar-sublink ${location.pathname.startsWith('/radicals') ? 'active' : ''}`}
+                  >
+                    🧩 Học bộ thủ chữ Hán
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
           <li className="sidebar-item">
             <Link

@@ -72,6 +72,48 @@ const Grammar = ({ playAudio }) => {
       String(premiumVal).toLowerCase() === 'true';
   }, [currentLesson]);
 
+  const [localLessonGrammars, setLocalLessonGrammars] = useState([]);
+  const [grammarLoading, setGrammarLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedGrammarLesson) {
+      setLocalLessonGrammars([]);
+      return;
+    }
+    setGrammarLoading(true);
+    axios.get(`${beUrl}/grammars/get-grammar-by-lesson-id`, {
+      params: { lessonId: selectedGrammarLesson },
+      withCredentials: true
+    }).then(res => {
+      const dbGrammars = res.data.grammars || [];
+      const mapped = dbGrammars.map(v => {
+        const staticMatch = grammarPoints.find(g => 
+          g.structure.toLowerCase() === v.structure.toLowerCase() || 
+          g.title.toLowerCase().includes(v.grammar.toLowerCase())
+        );
+        return {
+          id: v.id,
+          bookId: selectedGrammarBook,
+          lessonId: v.lessonId,
+          title: v.grammar,
+          pattern: v.structure,
+          structure: v.grammar,
+          definition: v.definition || (staticMatch ? staticMatch.definition : ''),
+          scope: v.usage || (staticMatch ? staticMatch.scope : ''),
+          note: v.note || (staticMatch ? staticMatch.note : ''),
+          examples: (v.examples && v.examples.length > 0)
+            ? v.examples.map(ex => ({ id: ex.id, cn: ex.example, vn: ex.meaning }))
+            : (staticMatch ? staticMatch.examples : []),
+          exercises: staticMatch ? staticMatch.exercises : []
+        };
+      });
+      setLocalLessonGrammars(mapped);
+    }).catch(err => {
+      console.error('Error fetching lesson grammars:', err);
+      setLocalLessonGrammars([]);
+    }).finally(() => setGrammarLoading(false));
+  }, [selectedGrammarLesson, selectedGrammarBook]);
+
   const [grammarExerciseType, setGrammarExerciseType] = useState('zhToVi'); // 'zhToVi' or 'viToZh'
   const [grammarExercisesInput, setGrammarExercisesInput] = useState({});
   const [grammarExercisesFeedback, setGrammarExercisesFeedback] = useState({});
@@ -214,7 +256,15 @@ const Grammar = ({ playAudio }) => {
       {/* Case 3: Select Grammar Point */}
       {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId === null && (!isLessonPremium || hasPremiumAccess) && (() => {
         const bookColor = currentBook?.color || getBookColor(selectedGrammarBook);
-        const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === selectedGrammarLesson);
+        const lessonGrammarPoints = localLessonGrammars;
+
+        if (grammarLoading) {
+          return (
+            <div className="neo-card" style={{ padding: '40px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0', color: '#666' }}>
+              🔄 Đang tải ngữ pháp...
+            </div>
+          );
+        }
 
         return (
           <div>
@@ -273,8 +323,8 @@ const Grammar = ({ playAudio }) => {
 
       {/* Case 4: Grammar Detail View */}
       {selectedGrammarBook !== null && selectedGrammarLesson !== null && selectedGrammarPointId !== null && (!isLessonPremium || hasPremiumAccess) && (() => {
-        const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === selectedGrammarLesson);
-        const gp = lessonGrammarPoints.find(g => g.id === selectedGrammarPointId);
+        const lessonGrammarPoints = localLessonGrammars;
+        const gp = lessonGrammarPoints.find(g => Number(g.id) === Number(selectedGrammarPointId));
 
         if (!gp) {
           return (

@@ -9,6 +9,7 @@ import Leaderboard from '../pages/Leaderboard/Leaderboard';
 import Settings from '../pages/Settings/Settings';
 import Admin from '../pages/Admin/Admin';
 import AdminRoute from '../adminRoutes/adminRoute';
+import Radicals from '../pages/Radicals/Radicals';
 
 const AppRoutes = ({
   dailyWord,
@@ -70,6 +71,11 @@ const AppRoutes = ({
             playAudio={playAudio}
           />
         }
+      />
+
+      <Route
+        path="/radicals"
+        element={<Radicals />}
       />
 
       {/* Grammar Module Subroutes */}
