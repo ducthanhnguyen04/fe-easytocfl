@@ -104,7 +104,9 @@ const Grammar = ({ playAudio }) => {
           examples: (v.examples && v.examples.length > 0)
             ? v.examples.map(ex => ({ id: ex.id, cn: ex.example, vn: ex.meaning }))
             : (staticMatch ? staticMatch.examples : []),
-          exercises: staticMatch ? staticMatch.exercises : []
+          exercises: (v.excersises && v.excersises.length > 0)
+            ? v.excersises.map(ex => ({ id: ex.id, cn: ex.title, vn: ex.meaning }))
+            : (staticMatch ? staticMatch.exercises : [])
         };
       });
       setLocalLessonGrammars(mapped);

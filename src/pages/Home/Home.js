@@ -1,12 +1,54 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
+import axios from 'axios';
+import beUrl from '../../api-url/api-backend';
 import './Home.css';
 
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  console.log("user:", user);
+  
+  const [commentsList, setCommentsList] = useState([]);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+
+  const fetchComments = async () => {
+    try {
+      const response = await axios.get(`${beUrl}/comments/get-all`);
+      const sorted = (response.data.comments || []).sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setCommentsList(sorted);
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  const handleSendComment = async (e) => {
+    e.preventDefault();
+    if (!newCommentText.trim()) return;
+    if (!user) return;
+
+    setSubmittingComment(true);
+    try {
+      await axios.post(`${beUrl}/comments/create`, {
+        content: newCommentText,
+        userId: user.id
+      });
+      setNewCommentText('');
+      fetchComments();
+    } catch (err) {
+      console.error("Error posting comment:", err);
+      alert("Không thể gửi bình luận. Vui lòng thử lại!");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
 
   const love = {
     birthday: "0201"
@@ -87,64 +129,83 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
         </div>
       </section>
 
-      {/* Course Band Selection Cards */}
-      <section className="section-container">
-        <div className="section-header-container">
-          <h3 className="section-title">Lộ trình học theo trình độ</h3>
-          <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--color-primary)', cursor: 'pointer' }} onClick={() => navigate('/roadmap')}>
-            Xem tất cả →
-          </span>
+      {/* Comments Board Section */}
+      <section className="comments-section">
+        <div className="comments-header">
+          <h3 className="comments-title">
+            💬 Góc Bình Luận & Chia Sẻ
+            <span className="comments-count-badge">{commentsList.length}</span>
+          </h3>
         </div>
-        <div className="course-grid">
 
-          {/* Course 1 */}
-          <div className="neo-card course-card" style={{ borderTop: '10px solid var(--color-secondary)' }}>
-            <div className="course-header">
-              <span className="course-tag">Mới học</span>
-              <span className="course-band" style={{ color: 'var(--color-secondary)' }}>Band A</span>
+        {user ? (
+          <form onSubmit={handleSendComment} className="comment-input-area">
+            <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
+              <div className="comment-avatar">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" className="comment-avatar-img" />
+                ) : (
+                  user.name ? user.name[0].toUpperCase() : 'U'
+                )}
+              </div>
+              <div style={{ flexGrow: 1 }}>
+                <div style={{ fontSize: '13px', fontWeight: '800', marginBottom: '8px' }}>
+                  Đang bình luận dưới tên: <span style={{ color: 'var(--color-primary)' }}>{user.name}</span> ({user.email})
+                </div>
+                <textarea
+                  className="comment-textarea"
+                  placeholder="Chia sẻ ý kiến hoặc thắc mắc của bạn về lộ trình học..."
+                  value={newCommentText}
+                  onChange={(e) => setNewCommentText(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="neo-btn neo-btn-primary"
+                  style={{ padding: '8px 20px', fontSize: '13px' }}
+                  disabled={submittingComment}
+                >
+                  {submittingComment ? 'Đang gửi...' : 'Gửi bình luận 🚀'}
+                </button>
+              </div>
             </div>
-            <div>
-              <h4 className="course-name">TOCFL Sơ Cấp (A1 & A2)</h4>
-              <p className="course-desc">Nền tảng phát âm bồi, bộ chữ cơ bản, giao tiếp hàng ngày ở mức cơ bản, mua sắm và đi tàu MRT.</p>
-            </div>
-            <div className="course-footer">
-              <span className="course-stats">50 bài học • 500 Từ</span>
-              <button className="neo-btn neo-btn-primary" style={{ padding: '8px 16px', fontSize: '12px' }} onClick={() => navigate('/vocab')}>Vào học</button>
-            </div>
+          </form>
+        ) : (
+          <div className="login-to-comment-box" style={{ marginBottom: '30px' }}>
+            🔒 Vui lòng đăng nhập để tham gia bình luận cùng mọi người!
           </div>
+        )}
 
-          {/* Course 2 */}
-          <div className="neo-card course-card" style={{ borderTop: '10px solid var(--color-accent)' }}>
-            <div className="course-header">
-              <span className="course-tag">Khá tốt</span>
-              <span className="course-band" style={{ color: 'var(--color-accent)' }}>Band B</span>
+        <div className="comments-list">
+          {commentsList.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '30px', color: '#666', fontWeight: 'bold' }}>
+              📭 Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ!
             </div>
-            <div>
-              <h4 className="course-name">TOCFL Trung Cấp (B1 & B2)</h4>
-              <p className="course-desc">Diễn đạt ý kiến cá nhân, thuyết trình cơ bản, đọc hiểu tin tức xã hội Đài Loan, làm quen văn hoá sâu hơn.</p>
-            </div>
-            <div className="course-footer">
-              <span className="course-stats">80 bài học • 1200 Từ</span>
-              <button className="neo-btn neo-btn-primary" style={{ padding: '8px 16px', fontSize: '12px', backgroundColor: 'var(--color-accent)' }} onClick={() => navigate('/vocab')}>Vào học</button>
-            </div>
-          </div>
-
-          {/* Course 3 */}
-          <div className="neo-card course-card" style={{ borderTop: '10px solid var(--color-blue)' }}>
-            <div className="course-header">
-              <span className="course-tag">Cao cấp</span>
-              <span className="course-band" style={{ color: 'var(--color-blue)' }}>Band C</span>
-            </div>
-            <div>
-              <h4 className="course-name">TOCFL Cao Cấp (C1 & C2)</h4>
-              <p className="course-desc">Sử dụng tiếng Trung nhuần nhuyễn trong nghiên cứu học thuật, dịch thuật, công việc văn phòng chuyên nghiệp tại Đài Loan.</p>
-            </div>
-            <div className="course-footer">
-              <span className="course-stats">100 bài học • 2500 Từ</span>
-              <button className="neo-btn neo-btn-primary" style={{ padding: '8px 16px', fontSize: '12px', backgroundColor: 'var(--color-blue)' }} onClick={() => navigate('/vocab')}>Vào học</button>
-            </div>
-          </div>
-
+          ) : (
+            commentsList.map((c) => (
+              <div key={c.id} className="comment-card">
+                <div className="comment-avatar">
+                  {c.user?.avatarUrl ? (
+                    <img src={c.user.avatarUrl} alt={c.user.userName} className="comment-avatar-img" />
+                  ) : (
+                    c.user?.userName ? c.user.userName[0].toUpperCase() : '?'
+                  )}
+                </div>
+                <div className="comment-content-wrapper">
+                  <div className="comment-user-info">
+                    <span className="comment-username">{c.user?.userName || 'Người ẩn danh'}</span>
+                    <span className="comment-email">{c.user?.email}</span>
+                    <span className="comment-time">
+                      {c.createdAt ? new Date(c.createdAt).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}
+                    </span>
+                  </div>
+                  <div className="comment-text">
+                    {c.content}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 

@@ -22,6 +22,48 @@ const Sidebar = () => {
       setVocabExpanded(true);
     }
   }, [location.pathname]);
+
+  const handleGoogleLoginCallback = async (response) => {
+    try {
+      const { credential } = response;
+      const res = await axios.post(`${beUrl}/auth/google-login`, {
+        credential
+      }, {
+        withCredentials: true
+      });
+      const userData = res.data.user || res.data;
+      if (userData) {
+        setUser({ ...userData });
+        setShowLoginModal(false);
+        setLoginEmail('');
+        setLoginPassword('');
+        setLoginError('');
+        showToast('Đăng nhập bằng Google thành công!', 'success');
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      alert(error.response?.data?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+    }
+  };
+
+  React.useEffect(() => {
+    if (showLoginModal) {
+      const timer = setTimeout(() => {
+        if (window.google) {
+          window.google.accounts.id.initialize({
+            client_id: "652750728253-m7vfrdsrp2iuma5ct7h52n0buppmb0eh.apps.googleusercontent.com",
+            callback: handleGoogleLoginCallback
+          });
+          window.google.accounts.id.renderButton(
+            document.getElementById("google-signin-btn"),
+            { theme: "outline", size: "large", width: 340 }
+          );
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoginModal]);
+
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -659,29 +701,9 @@ const Sidebar = () => {
               <div style={{ flex: 1, height: '2px', backgroundColor: '#000' }}></div>
             </div>
 
-            <button
-              className="neo-btn"
-              style={{
-                width: '100%',
-                padding: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                backgroundColor: 'var(--color-white)',
-                fontSize: '14px',
-                color: 'var(--color-black)'
-              }}
-              onClick={""}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.47 15 0 12 0 7.35 0 3.39 2.67 1.45 6.57l3.86 3C6.22 6.57 8.92 5.04 12 5.04z" />
-                <path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.44h6.44c-.28 1.47-1.11 2.72-2.36 3.56l3.66 2.84c2.14-1.98 3.38-4.89 3.38-8.5z" />
-                <path fill="#FBBC05" d="M5.31 14.43c-.23-.69-.36-1.43-.36-2.18s.13-1.49.36-2.18l-3.86-3C.55 8.78 0 10.33 0 12s.55 3.22 1.45 4.75l3.86-3z" />
-                <path fill="#34A853" d="M12 24c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.08 0-5.78-1.53-6.69-4.53l-3.86 3C3.39 21.33 7.35 24 12 24z" />
-              </svg>
-              Đăng nhập với Google
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '5px' }}>
+              <div id="google-signin-btn"></div>
+            </div>
           </div>
         </div>
       )}

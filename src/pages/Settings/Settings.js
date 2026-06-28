@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/authContext';
 
 const Settings = ({ resetVocabProgress }) => {
   const { user, setUser } = useContext(AuthContext);
+  const isGoogleUser = !!user?.isGoogleLogin;
 
   // Theme state persisted in localStorage
   const [activeTheme, setActiveTheme] = useState(localStorage.getItem('theme') || 'terracotta');
@@ -261,30 +262,36 @@ const Settings = ({ resetVocabProgress }) => {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label className="settings-label" style={{ marginBottom: '2px' }}>Ảnh đại diện (Avatar)</label>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    type="button" 
-                    className="neo-btn" 
-                    style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: 'var(--color-white)' }}
-                    onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                  >
-                    🖼️ Chọn ảnh
-                  </button>
-                  {avatarUrl && (
+                {!isGoogleUser ? (
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     <button 
                       type="button" 
                       className="neo-btn" 
-                      style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#ffe5e0', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
-                      onClick={() => setAvatarUrl('')}
+                      style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: 'var(--color-white)' }}
+                      onClick={() => setShowAvatarPicker(!showAvatarPicker)}
                     >
-                      🗑️ Xoá
+                      🖼️ Chọn ảnh
                     </button>
-                  )}
-                </div>
+                    {avatarUrl && (
+                      <button 
+                        type="button" 
+                        className="neo-btn" 
+                        style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#ffe5e0', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
+                        onClick={() => setAvatarUrl('')}
+                      >
+                        🗑️ Xoá
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <span style={{ fontSize: '12.5px', color: '#666', fontStyle: 'italic', fontWeight: 'bold' }}>
+                    * Ảnh đại diện được đồng bộ từ Google
+                  </span>
+                )}
               </div>
             </div>
 
-            {showAvatarPicker && (
+            {showAvatarPicker && !isGoogleUser && (
               <div 
                 className="neo-card" 
                 style={{ 
@@ -343,6 +350,7 @@ const Settings = ({ resetVocabProgress }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nhập họ tên của bạn"
+                disabled={isGoogleUser}
               />
             </div>
 
@@ -354,6 +362,7 @@ const Settings = ({ resetVocabProgress }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
+                disabled={isGoogleUser}
               />
             </div>
 
@@ -367,9 +376,15 @@ const Settings = ({ resetVocabProgress }) => {
               />
             </div>
 
-            <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px' }}>
-              Lưu thay đổi
-            </button>
+            {!isGoogleUser ? (
+              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px' }}>
+                Lưu thay đổi
+              </button>
+            ) : (
+              <div style={{ fontSize: '13px', color: '#666', fontStyle: 'italic', fontWeight: '800', marginTop: '10px', padding: '8px 12px', borderLeft: '3px solid var(--color-primary)', backgroundColor: 'var(--color-primary-light)' }}>
+                ℹ Tài khoản liên kết Google không hỗ trợ sửa đổi trực tiếp trên hệ thống.
+              </div>
+            )}
           </form>
 
           {/* Preferences Settings */}
@@ -416,60 +431,71 @@ const Settings = ({ resetVocabProgress }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
           
           {/* Password Change Form */}
-          <form className="settings-section-card" onSubmit={handleUpdatePassword}>
-            <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px' }}>
-              🔑 Đổi mật khẩu
-            </h3>
+          {!isGoogleUser ? (
+            <form className="settings-section-card" onSubmit={handleUpdatePassword}>
+              <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px' }}>
+                🔑 Đổi mật khẩu
+              </h3>
 
-            {passwordSuccess && (
-              <div className="settings-alert-success">
-                ✓ Đổi mật khẩu thành công! Mật khẩu mới đã được lưu.
+              {passwordSuccess && (
+                <div className="settings-alert-success">
+                  ✓ Đổi mật khẩu thành công! Mật khẩu mới đã được lưu.
+                </div>
+              )}
+
+              {passwordError && (
+                <div className="settings-alert-error">
+                  ⚠ {passwordError}
+                </div>
+              )}
+
+              <div className="settings-input-group">
+                <label className="settings-label">Mật khẩu hiện tại</label>
+                <input 
+                  type="password" 
+                  className="settings-input" 
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
               </div>
-            )}
 
-            {passwordError && (
-              <div className="settings-alert-error">
-                ⚠ {passwordError}
+              <div className="settings-input-group">
+                <label className="settings-label">Mật khẩu mới</label>
+                <input 
+                  type="password" 
+                  className="settings-input" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Tối thiểu 6 ký tự"
+                />
               </div>
-            )}
 
-            <div className="settings-input-group">
-              <label className="settings-label">Mật khẩu hiện tại</label>
-              <input 
-                type="password" 
-                className="settings-input" 
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="••••••••"
-              />
+              <div className="settings-input-group">
+                <label className="settings-label">Xác nhận mật khẩu mới</label>
+                <input 
+                  type="password" 
+                  className="settings-input" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Nhập lại mật khẩu mới"
+                />
+              </div>
+
+              <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px', backgroundColor: 'var(--color-accent)' }}>
+                Cập nhật mật khẩu
+              </button>
+            </form>
+          ) : (
+            <div className="settings-section-card" style={{ opacity: 0.85 }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px' }}>
+                🔑 Đổi mật khẩu
+              </h3>
+              <div style={{ padding: '15px', backgroundColor: '#f0f4f8', border: '2px solid #b0c4de', borderRadius: 'var(--radius-sm)', fontSize: '14px', fontWeight: '700', color: '#4a5568' }}>
+                💡 Tài khoản đăng nhập bằng Google. Vui lòng đổi mật khẩu thông qua trang quản lý tài khoản Google của bạn.
+              </div>
             </div>
-
-            <div className="settings-input-group">
-              <label className="settings-label">Mật khẩu mới</label>
-              <input 
-                type="password" 
-                className="settings-input" 
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Tối thiểu 6 ký tự"
-              />
-            </div>
-
-            <div className="settings-input-group">
-              <label className="settings-label">Xác nhận mật khẩu mới</label>
-              <input 
-                type="password" 
-                className="settings-input" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Nhập lại mật khẩu mới"
-              />
-            </div>
-
-            <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px', backgroundColor: 'var(--color-accent)' }}>
-              Cập nhật mật khẩu
-            </button>
-          </form>
+          )}
 
           {/* Reset Progress / Danger Zone */}
           <div className="settings-section-card" style={{ borderColor: 'var(--color-primary)' }}>

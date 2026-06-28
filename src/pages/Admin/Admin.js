@@ -16,6 +16,10 @@ const Admin = () => {
   const [grammars, setGrammars] = useState([]);
   const [vocabularies, setVocabularies] = useState([]);
   const [examples, setExamples] = useState([]);
+  const [radicals, setRadicals] = useState([]);
+  const [usersList, setUsersList] = useState([]);
+  const [excersises, setExcersises] = useState([]);
+
 
   // Loading & error status
   const [loading, setLoading] = useState(false);
@@ -59,7 +63,30 @@ const Admin = () => {
   const [vocabAudioUrl, setVocabAudioUrl] = useState('');
   const [vocabLessonId, setVocabLessonId] = useState('');
 
+  // 6. Radical form
+  const [radicalText, setRadicalText] = useState('');
+  const [radicalPinyin, setRadicalPinyin] = useState('');
+  const [radicalMeaning, setRadicalMeaning] = useState('');
+  const [radicalEnglishMeaning, setRadicalEnglishMeaning] = useState('');
+  const [radicalProfoundMeaning, setRadicalProfoundMeaning] = useState('');
+  const [radicalExample, setRadicalExample] = useState('');
+  const [radicalStroke, setRadicalStroke] = useState('');
+
+  // 7. User form
+  const [userFormName, setUserFormName] = useState('');
+  const [userFormEmail, setUserFormEmail] = useState('');
+  const [userFormPassword, setUserFormPassword] = useState('');
+  const [userFormRole, setUserFormRole] = useState('user');
+  const [userFormIsPremium, setUserFormIsPremium] = useState(false);
+
+  // 8. Excersise form
+  const [excersiseTitle, setExcersiseTitle] = useState('');
+  const [excersiseMeaning, setExcersiseMeaning] = useState('');
+  const [excersiseEnglishMeaning, setExcersiseEnglishMeaning] = useState('');
+  const [excersiseGrammarId, setExcersiseGrammarId] = useState('');
+
   const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     fetchData();
@@ -68,12 +95,15 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [levelsRes, lessonsRes, grammarsRes, vocabRes, examplesRes] = await Promise.all([
+      const [levelsRes, lessonsRes, grammarsRes, vocabRes, examplesRes, radicalsRes, usersRes, excersisesRes] = await Promise.all([
         axios.get(`${beUrl}/levels/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/lessons/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/grammars/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/vocabularies/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/examples/get-all`, { withCredentials: true }),
+        axios.get(`${beUrl}/radicals/get-all`, { withCredentials: true }),
+        axios.get(`${beUrl}/users/admin/get-all`, { withCredentials: true }),
+        axios.get(`${beUrl}/excersises/get-all`, { withCredentials: true }),
       ]);
 
       setLevels(levelsRes.data.levels || []);
@@ -81,6 +111,10 @@ const Admin = () => {
       setGrammars(grammarsRes.data.grammars || []);
       setVocabularies(vocabRes.data.vocabularies || []);
       setExamples(examplesRes.data.examples || []);
+      setRadicals(radicalsRes.data.radicals || []);
+      setUsersList(usersRes.data.users || []);
+      setExcersises(excersisesRes.data.excersises || []);
+
     } catch (error) {
       console.error('Error fetching admin data:', error);
       setActionError('Không thể tải dữ liệu từ server. Vui lòng kiểm tra lại kết nối.');
@@ -127,7 +161,24 @@ const Admin = () => {
     setVocabPinyin('');
     setVocabAudioUrl('');
     setVocabLessonId('');
+    setRadicalText('');
+    setRadicalPinyin('');
+    setRadicalMeaning('');
+    setRadicalEnglishMeaning('');
+    setRadicalProfoundMeaning('');
+    setRadicalExample('');
+    setRadicalStroke('');
+    setUserFormName('');
+    setUserFormEmail('');
+    setUserFormPassword('');
+    setUserFormRole('user');
+    setUserFormIsPremium(false);
+    setExcersiseTitle('');
+    setExcersiseMeaning('');
+    setExcersiseEnglishMeaning('');
+    setExcersiseGrammarId('');
   };
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -311,6 +362,159 @@ const Admin = () => {
     }
   };
 
+  const handleSaveRadical = async (e) => {
+    e.preventDefault();
+    if (!radicalText || !radicalPinyin || !radicalMeaning || !radicalEnglishMeaning || !radicalStroke) {
+      showError('Vui lòng điền đầy đủ các trường bắt buộc cho bộ thủ!');
+      return;
+    }
+    try {
+      const payload = {
+        radical: radicalText,
+        pinyin: radicalPinyin,
+        meaning: radicalMeaning,
+        englishMeaning: radicalEnglishMeaning,
+        profoundMeaning: radicalProfoundMeaning || '',
+        example: radicalExample || '',
+        stroke: radicalStroke
+      };
+      if (editId) {
+        await axios.put(
+          `${beUrl}/radicals/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật bộ thủ thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/radicals/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm bộ thủ mới thành công!');
+      }
+      resetForm();
+      fetchData();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu bộ thủ.');
+    }
+  };
+
+  const handleSaveUser = async (e) => {
+    e.preventDefault();
+    try {
+      if (editId) {
+        const originalUser = usersList.find(u => u.id === editId);
+        if (!originalUser) return;
+
+        if (userFormRole !== originalUser.role) {
+          await axios.put(
+            `${beUrl}/users/admin/update-role/${editId}`,
+            { role: userFormRole },
+            { withCredentials: true }
+          );
+        }
+
+        if (userFormIsPremium !== !!originalUser.isPremium) {
+          await axios.put(
+            `${beUrl}/users/admin/toggle-premium/${editId}`,
+            {},
+            { withCredentials: true }
+          );
+        }
+
+        showSuccess('Cập nhật người dùng thành công!');
+      } else {
+        if (!userFormName || !userFormEmail || !userFormPassword) {
+          showError('Vui lòng nhập đầy đủ tên hiển thị, email và mật khẩu!');
+          return;
+        }
+
+        const response = await axios.post(`${beUrl}/auth/register`, {
+          userName: userFormName,
+          email: userFormEmail,
+          password: userFormPassword
+        });
+
+        if (response.data.success) {
+          const newUserId = response.data.data.id;
+          
+          if (userFormRole === 'admin') {
+            await axios.put(
+              `${beUrl}/users/admin/update-role/${newUserId}`,
+              { role: 'admin' },
+              { withCredentials: true }
+            );
+          }
+
+          if (userFormIsPremium) {
+            await axios.put(
+              `${beUrl}/users/admin/toggle-premium/${newUserId}`,
+              {},
+              { withCredentials: true }
+            );
+          }
+
+          showSuccess('Thêm người dùng mới thành công!');
+        }
+      }
+      resetForm();
+      fetchData();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu người dùng.');
+    }
+  };
+
+  const handleSaveExcersise = async (e) => {
+    e.preventDefault();
+    if (!excersiseTitle || !excersiseMeaning || !excersiseEnglishMeaning || !excersiseGrammarId) {
+      showError('Vui lòng điền đầy đủ thông tin bài tập!');
+      return;
+    }
+    try {
+      const payload = {
+        title: excersiseTitle,
+        meaning: excersiseMeaning,
+        englishMeaning: excersiseEnglishMeaning,
+        grammarId: parseInt(excersiseGrammarId),
+      };
+      if (editId) {
+        await axios.put(
+          `${beUrl}/excersises/update/${editId}`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Cập nhật bài tập thành công!');
+      } else {
+        await axios.post(
+          `${beUrl}/excersises/create`,
+          payload,
+          { withCredentials: true }
+        );
+        showSuccess('Thêm bài tập mới thành công!');
+      }
+      resetForm();
+      fetchData();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu bài tập.');
+    }
+  };
+
+
+  const handleQuickTogglePremium = async (userId) => {
+    try {
+      await axios.put(
+        `${beUrl}/users/admin/toggle-premium/${userId}`,
+        {},
+        { withCredentials: true }
+      );
+      showSuccess('Cập nhật trạng thái Premium thành công!');
+      fetchData();
+    } catch (error) {
+      showError(error.response?.data?.message || 'Không thể cập nhật trạng thái Premium.');
+    }
+  };
+
   const handleImportExcel = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -384,8 +588,28 @@ const Admin = () => {
       setVocabPinyin(item.pinyin);
       setVocabAudioUrl(item.audioUrl || '');
       setVocabLessonId(item.lessonId);
+    } else if (activeTab === 'radicals') {
+      setRadicalText(item.radical);
+      setRadicalPinyin(item.pinyin);
+      setRadicalMeaning(item.meaning);
+      setRadicalEnglishMeaning(item.englishMeaning || '');
+      setRadicalProfoundMeaning(item.profoundMeaning || '');
+      setRadicalExample(item.example || '');
+      setRadicalStroke(item.stroke);
+    } else if (activeTab === 'users') {
+      setUserFormName(item.userName || '');
+      setUserFormEmail(item.email || '');
+      setUserFormPassword('');
+      setUserFormRole(item.role || 'user');
+      setUserFormIsPremium(!!item.isPremium);
+    } else if (activeTab === 'excersises') {
+      setExcersiseTitle(item.title || '');
+      setExcersiseMeaning(item.meaning || '');
+      setExcersiseEnglishMeaning(item.englishMeaning || '');
+      setExcersiseGrammarId(item.grammarId || '');
     }
   };
+
 
   // Delete Handlers
   const handleDeleteItem = async (route, id) => {
@@ -452,6 +676,25 @@ const Admin = () => {
         >
           💡 Ví Dụ Mẫu (Examples) <span className="tab-count-badge">{examples.length}</span>
         </button>
+        <button
+          className={`neo-btn tab-btn ${activeTab === 'radicals' ? 'active' : ''}`}
+          onClick={() => handleTabChange('radicals')}
+        >
+          部 Bộ Thủ (Radicals) <span className="tab-count-badge">{radicals.length}</span>
+        </button>
+        <button
+          className={`neo-btn tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => handleTabChange('users')}
+        >
+          👥 Người Dùng (Users) <span className="tab-count-badge">{usersList.length}</span>
+        </button>
+        <button
+          className={`neo-btn tab-btn ${activeTab === 'excersises' ? 'active' : ''}`}
+          onClick={() => handleTabChange('excersises')}
+        >
+          🎯 Bài Tập (Exercises) <span className="tab-count-badge">{excersises.length}</span>
+        </button>
+
       </div>
 
       <div className="admin-grid-layout">
@@ -867,15 +1110,256 @@ const Admin = () => {
               </div>
             </form>
           )}
+
+          {activeTab === 'radicals' && (
+            <form onSubmit={handleSaveRadical} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Bộ Thủ (ID: ${editId})` : '部 Thêm Bộ Thủ Mới'}
+              </h3>
+              <div className="settings-input-group">
+                <label className="settings-label">Chữ bộ thủ (Radical glyph) *</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: 人 (亻) hoặc 口"
+                  value={radicalText}
+                  onChange={(e) => setRadicalText(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Phiên âm Pinyin *</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: nhân (rén)"
+                  value={radicalPinyin}
+                  onChange={(e) => setRadicalPinyin(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Ý nghĩa tiếng Việt *</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: Người"
+                  value={radicalMeaning}
+                  onChange={(e) => setRadicalMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Ý nghĩa tiếng Anh *</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: person"
+                  value={radicalEnglishMeaning}
+                  onChange={(e) => setRadicalEnglishMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Số nét (Strokes) *</label>
+                <input
+                  type="number"
+                  className="settings-input"
+                  placeholder="Ví dụ: 2"
+                  value={radicalStroke}
+                  onChange={(e) => setRadicalStroke(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Giải nghĩa chi tiết (Profound Meaning)</label>
+                <textarea
+                  className="settings-input"
+                  placeholder="Ví dụ: Liên quan đến con người, hành vi hoặc tư thế của con người..."
+                  style={{ minHeight: '80px', fontFamily: 'inherit' }}
+                  value={radicalProfoundMeaning}
+                  onChange={(e) => setRadicalProfoundMeaning(e.target.value)}
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Ví dụ chữ Hán (Examples)</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: 你 (nǐ), 他 (tā), 們 (men)"
+                  value={radicalExample}
+                  onChange={(e) => setRadicalExample(e.target.value)}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu bộ thủ'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
+
+          {activeTab === 'users' && (
+            <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Quyền Hạn (ID: ${editId})` : '👥 Thêm Người Dùng Mới'}
+              </h3>
+              <div className="settings-input-group">
+                <label className="settings-label">Tên hiển thị (Username) *</label>
+                <input
+                  type="text"
+                  className="settings-input"
+                  placeholder="Ví dụ: Nguyễn Văn A"
+                  value={userFormName}
+                  onChange={(e) => setUserFormName(e.target.value)}
+                  disabled={!!editId}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Địa chỉ Email *</label>
+                <input
+                  type="email"
+                  className="settings-input"
+                  placeholder="Ví dụ: email@gmail.com"
+                  value={userFormEmail}
+                  onChange={(e) => setUserFormEmail(e.target.value)}
+                  disabled={!!editId}
+                  required
+                />
+              </div>
+              {!editId && (
+                <div className="settings-input-group">
+                  <label className="settings-label">Mật khẩu *</label>
+                  <input
+                    type="password"
+                    className="settings-input"
+                    placeholder="••••••••"
+                    value={userFormPassword}
+                    onChange={(e) => setUserFormPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+              <div className="settings-input-group">
+                <label className="settings-label">Vai trò (Role) *</label>
+                <select
+                  className="settings-input"
+                  value={userFormRole}
+                  onChange={(e) => setUserFormRole(e.target.value)}
+                  required
+                >
+                  <option value="user">Người dùng thông thường (user)</option>
+                  <option value="admin">Quản trị viên hệ thống (admin)</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input
+                  type="checkbox"
+                  id="userFormPremiumCheck"
+                  checked={userFormIsPremium}
+                  onChange={(e) => setUserFormIsPremium(e.target.checked)}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                />
+                <label htmlFor="userFormPremiumCheck" style={{ fontSize: '13px', fontWeight: '800', cursor: 'pointer' }}>
+                  👑 Kích hoạt tài khoản Premium
+                </label>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu người dùng'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
+
+          {activeTab === 'excersises' && (
+            <form onSubmit={handleSaveExcersise} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 className="form-section-title">
+                {editId ? `✏️ Sửa Bài Tập (ID: ${editId})` : '🎯 Thêm Bài Tập Mới'}
+              </h3>
+              <div className="settings-input-group">
+                <label className="settings-label">Thuộc Cấu Trúc Ngữ Pháp *</label>
+                <select
+                  className="settings-input"
+                  value={excersiseGrammarId}
+                  onChange={(e) => setExcersiseGrammarId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Chọn cấu trúc ngữ pháp --</option>
+                  {grammars.map((gm) => (
+                    <option key={gm.id} value={gm.id}>
+                      {gm.grammar} ({lessons.find(ls => ls.id === gm.lessonId)?.lessonName})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Câu hỏi / Đề bài (Tiếng Trung) *</label>
+                <textarea
+                  className="settings-input"
+                  placeholder="Ví dụ: 請翻譯這句：我是昨天坐飛機來的。"
+                  style={{ minHeight: '60px', fontFamily: 'inherit' }}
+                  value={excersiseTitle}
+                  onChange={(e) => setExcersiseTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Đáp án / Giải nghĩa tiếng Việt *</label>
+                <textarea
+                  className="settings-input"
+                  placeholder="Ví dụ: Tôi đi máy bay đến đây ngày hôm qua."
+                  style={{ minHeight: '60px', fontFamily: 'inherit' }}
+                  value={excersiseMeaning}
+                  onChange={(e) => setExcersiseMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Đáp án / Giải nghĩa tiếng Anh *</label>
+                <textarea
+                  className="settings-input"
+                  placeholder="Ví dụ: I came by plane yesterday."
+                  style={{ minHeight: '60px', fontFamily: 'inherit' }}
+                  value={excersiseEnglishMeaning}
+                  onChange={(e) => setExcersiseEnglishMeaning(e.target.value)}
+                  required
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                  {editId ? 'Cập nhật' : 'Lưu bài tập'}
+                </button>
+                {editId && (
+                  <button type="button" className="neo-btn" onClick={resetForm} style={{ padding: '12px 25px', backgroundColor: 'var(--color-bg)' }}>
+                    Hủy sửa
+                  </button>
+                )}
+              </div>
+            </form>
+          )}
         </div>
+
 
         {/* Right: Data List View Card */}
         <div className="neo-card admin-list-card" style={{ padding: '25px', maxHeight: '720px', overflowY: 'auto' }}>
           <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span> Danh Sách Hiện Tại</span>
             <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-              Tổng cộng: {activeTab === 'levels' ? levels.length : activeTab === 'lessons' ? lessons.length : activeTab === 'vocabularies' ? vocabularies.length : activeTab === 'grammars' ? grammars.length : examples.length}
+              Tổng cộng: {activeTab === 'levels' ? levels.length : activeTab === 'lessons' ? lessons.length : activeTab === 'vocabularies' ? vocabularies.length : activeTab === 'grammars' ? grammars.length : activeTab === 'examples' ? examples.length : activeTab === 'radicals' ? radicals.length : activeTab === 'users' ? usersList.length : activeTab === 'excersises' ? excersises.length : 0}
             </span>
+
           </h3>
 
           {loading ? (
@@ -1129,7 +1613,206 @@ const Admin = () => {
                   </tbody>
                 </table>
               )}
+
+              {activeTab === 'radicals' && (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Bộ thủ</th>
+                      <th>Phiên âm / Ý nghĩa</th>
+                      <th>Số nét</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {radicals.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="empty-table-row">Chưa có bộ thủ nào</td>
+                      </tr>
+                    ) : (
+                      radicals.map((rad) => (
+                        <tr key={rad.id}>
+                          <td>{rad.id}</td>
+                          <td>
+                            <div style={{ fontWeight: '900', fontSize: '20px' }}>{rad.radical}</div>
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: '800', color: 'var(--color-primary)' }}>{rad.pinyin}</div>
+                            <div style={{ fontWeight: '700' }}>{rad.meaning} (En: {rad.englishMeaning})</div>
+                          </td>
+                          <td><span className="level-code-badge">{rad.stroke} nét</span></td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                className="edit-action-btn"
+                                onClick={() => handleEditClick(rad)}
+                              >
+                                ✏️ Sửa
+                              </button>
+                              <button
+                                className="delete-action-btn"
+                                onClick={() => handleDeleteItem('radicals', rad.id)}
+                              >
+                                🗑️ Xóa
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
+
+              {activeTab === 'users' && (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Thông tin người dùng</th>
+                      <th>Vai trò</th>
+                      <th>Premium</th>
+                      <th>Đăng nhập cuối</th>
+                      <th style={{ width: '170px' }}>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usersList.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="empty-table-row">Chưa có người dùng nào</td>
+                      </tr>
+                    ) : (
+                      usersList.map((usr) => (
+                        <tr key={usr.id}>
+                          <td>{usr.id}</td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid #000', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e2e8f0', fontSize: '13px', fontWeight: '800' }}>
+                                {usr.avatarUrl ? (
+                                  <img src={usr.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                  usr.userName ? usr.userName[0].toUpperCase() : 'U'
+                                )}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: '800' }}>
+                                  {usr.userName} {usr.googleId && <span style={{ fontSize: '10px', backgroundColor: '#e2e8f0', padding: '1px 4px', borderRadius: '4px' }}>Google</span>}
+                                </div>
+                                <div style={{ fontSize: '11px', color: '#666', fontWeight: '600' }}>{usr.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span 
+                              className="level-code-badge" 
+                              style={{ 
+                                backgroundColor: usr.role === 'admin' ? '#ffe8e8' : '#eef2f3', 
+                                color: usr.role === 'admin' ? 'var(--color-primary)' : '#475569',
+                                border: '2px solid #000'
+                              }}
+                            >
+                              {usr.role}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="neo-btn"
+                              style={{ 
+                                padding: '4px 8px', 
+                                fontSize: '11px', 
+                                backgroundColor: usr.isPremium ? '#fff3cd' : 'var(--color-white)', 
+                                color: usr.isPremium ? '#856404' : '#000',
+                                border: '2px solid #000',
+                                boxShadow: 'none'
+                              }}
+                              onClick={() => handleQuickTogglePremium(usr.id)}
+                            >
+                              {usr.isPremium ? '👑 Premium' : '🔓 Thường'}
+                            </button>
+                          </td>
+                          <td style={{ fontSize: '11px', fontWeight: '600', color: '#555' }}>
+                            {usr.lastLogin ? new Date(usr.lastLogin).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Chưa'}
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button
+                                className="edit-action-btn"
+                                onClick={() => handleEditClick(usr)}
+                              >
+                                ✏️ Sửa
+                              </button>
+                              <button
+                                className="delete-action-btn"
+                                onClick={() => handleDeleteItem('users/admin', usr.id)}
+                              >
+                                🗑️ Xóa
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
+
+              {activeTab === 'excersises' && (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Đề bài / Câu hỏi</th>
+                      <th>Giải nghĩa (Vi / En)</th>
+                      <th>Cấu trúc ngữ pháp</th>
+                      <th style={{ width: '150px' }}>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {excersises.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="empty-table-row">Chưa có bài tập nào</td>
+                      </tr>
+                    ) : (
+                      excersises.map((ex) => {
+                        const gm = grammars.find((g) => g.id === ex.grammarId);
+                        return (
+                          <tr key={ex.id}>
+                            <td>{ex.id}</td>
+                            <td>
+                              <div style={{ fontWeight: '800', fontSize: '14px', whiteSpace: 'pre-wrap' }}>{ex.title}</div>
+                            </td>
+                            <td>
+                              <div style={{ fontWeight: '700' }}>{ex.meaning}</div>
+                              <div style={{ fontSize: '12px', color: '#666' }}>{ex.englishMeaning}</div>
+                            </td>
+                            <td>{gm ? gm.grammar : `ID: ${ex.grammarId}`}</td>
+                            <td>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  className="edit-action-btn"
+                                  onClick={() => handleEditClick(ex)}
+                                >
+                                  ✏️ Sửa
+                                </button>
+                                <button
+                                  className="delete-action-btn"
+                                  onClick={() => handleDeleteItem('excersises', ex.id)}
+                                >
+                                  🗑️ Xóa
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
+
           )}
         </div>
       </div>
