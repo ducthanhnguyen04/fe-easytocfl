@@ -26,7 +26,8 @@ const Grammar = ({ playAudio }) => {
     const fecthLevel = async () => {
       try {
         const response = await axios.get(`${beUrl}/levels/get-all`);
-        setLevels(response.data.levels || []);
+        const sorted = (response.data.levels || []).sort((a, b) => Number(a.id) - Number(b.id));
+        setLevels(sorted);
       } catch (err) {
         console.error("Error fetching levels in Vocabulary page:", err);
         setLevels([]);
@@ -56,7 +57,8 @@ const Grammar = ({ playAudio }) => {
   }, [levels, selectedGrammarBook]);
 
   const lessonsList = useMemo(() => {
-    return Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedGrammarBook] || []);
+    const list = Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedGrammarBook] || []);
+    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
   }, [currentBook, selectedGrammarBook]);
 
   const currentLesson = useMemo(() => {
@@ -109,7 +111,8 @@ const Grammar = ({ playAudio }) => {
             : (staticMatch ? staticMatch.exercises : [])
         };
       });
-      setLocalLessonGrammars(mapped);
+      const sortedMapped = mapped.sort((a, b) => Number(a.id) - Number(b.id));
+      setLocalLessonGrammars(sortedMapped);
     }).catch(err => {
       console.error('Error fetching lesson grammars:', err);
       setLocalLessonGrammars([]);

@@ -26,7 +26,8 @@ const Radicals = () => {
           desc: r.profoundMeaning || '',
           examples: r.example || ''
         }));
-        setRadicals(mapped);
+        const sorted = mapped.sort((a, b) => Number(a.id) - Number(b.id));
+        setRadicals(sorted);
       } catch (err) {
         console.error("Error fetching radicals:", err);
         setRadicals([]);

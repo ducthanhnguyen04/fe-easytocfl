@@ -25,7 +25,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     const fecthLevel = async () => {
       try {
         const response = await axios.get(`${beUrl}/levels/get-all`);
-        setLevels(response.data.levels || []);
+        const sorted = (response.data.levels || []).sort((a, b) => Number(a.id) - Number(b.id));
+        setLevels(sorted);
       } catch (err) {
         console.error("Error fetching levels in Vocabulary page:", err);
         setLevels([]);
@@ -54,7 +55,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   }, [levels, selectedBook]);
 
   const lessonsList = useMemo(() => {
-    return Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedBook] || []);
+    const list = Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedBook] || []);
+    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
   }, [currentBook, selectedBook]);
 
   const currentLessonObj = useMemo(() => {
@@ -105,7 +107,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
         id: v.id,
         audioUrl: v.audioUrl
       }));
-      setLocalLessonVocabs(mapped);
+      const sortedMapped = mapped.sort((a, b) => Number(a.id) - Number(b.id));
+      setLocalLessonVocabs(sortedMapped);
     }).catch(err => {
       console.error('Error fetching lesson vocabularies:', err);
       setLocalLessonVocabs([]);
