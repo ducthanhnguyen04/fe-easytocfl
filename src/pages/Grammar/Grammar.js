@@ -6,6 +6,7 @@ import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Grammar.css';
 import { useAuth } from '../../context/authContext';
+import { showToast } from '../../utils/toast';
 
 const getBookColor = (bookId) => {
   const colors = {
@@ -205,7 +206,7 @@ const Grammar = ({ playAudio }) => {
                     className="neo-card lesson-select-card"
                     onClick={() => {
                       if (isPremium && !hasPremiumAccess) {
-                        alert("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!");
+                        showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
                         navigate('/settings');
                       } else {
                         navigate(`/grammar/${selectedGrammarBook}/${lesson.id}`);

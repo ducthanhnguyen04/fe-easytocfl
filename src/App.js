@@ -5,6 +5,7 @@ import AppRoutes from './routes/AppRoutes';
 import { quizzes } from './data/db';
 import axios from 'axios';
 import beUrl from './api-url/api-backend';
+import { showToast } from './utils/toast';
 import './App.css';
 
 function App() {
@@ -73,7 +74,7 @@ function App() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   const playAudio = (text) => {
-    alert(`🔊 Đang phát âm thanh mô phỏng cho: "${text}"`);
+    showToast(`🔊 Đang phát âm thanh mô phỏng cho: "${text}"`, 'info');
   };
 
   const toggleVocabLearned = (index) => {
@@ -84,7 +85,7 @@ function App() {
 
   const handleWordLearned = () => {
     setDailyWord({ ...dailyWord, learned: true });
-    alert('🎉 Tuyệt vời! Bạn đã thêm chữ "' + dailyWord.word + '" vào kho từ vựng.');
+    showToast('🎉 Tuyệt vời! Bạn đã thêm chữ "' + dailyWord.word + '" vào kho từ vựng.', 'success');
   };
 
   const handleAnswerSelect = (qId, optionIdx) => {

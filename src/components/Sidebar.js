@@ -42,7 +42,7 @@ const Sidebar = () => {
       }
     } catch (error) {
       console.error("Google login error:", error);
-      alert(error.response?.data?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.');
+      showToast(error.response?.data?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.', 'error');
     }
   };
 
@@ -127,7 +127,7 @@ const Sidebar = () => {
     } catch (error) {
       console.error("Login error:", error);
       setLoginError(error.response?.data?.message || error.message || 'Đăng nhập thất bại');
-      alert("Đăng nhập thất bại. Vui lòng thử lại.");
+      showToast("Đăng nhập thất bại. Vui lòng thử lại.", 'error');
     }
   };
 
@@ -170,7 +170,7 @@ const Sidebar = () => {
     } catch (error) {
       console.error("Register error:", error);
       setRegisterError(error.response?.data?.message || error.message || 'Đăng ký thất bại');
-      alert(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      showToast(error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.", 'error');
     }
   };
 

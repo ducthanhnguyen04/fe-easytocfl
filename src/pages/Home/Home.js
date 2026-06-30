@@ -4,6 +4,7 @@ import { useAuth } from '../../context/authContext';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Home.css';
+import { showToast } from '../../utils/toast';
 
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
       fetchComments();
     } catch (err) {
       console.error("Error posting comment:", err);
-      alert("Không thể gửi bình luận. Vui lòng thử lại!");
+      showToast("Không thể gửi bình luận. Vui lòng thử lại!", "error");
     } finally {
       setSubmittingComment(false);
     }
@@ -243,7 +244,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
               <button
                 className="neo-btn"
                 style={{ padding: '8px 16px', fontSize: '12px' }}
-                onClick={() => alert('Đang chuyển hướng tới phần viết chữ Hán...')}
+                onClick={() => showToast('Đang chuyển hướng tới phần viết chữ Hán...', 'info')}
               >
                 Xem hướng dẫn tập viết
               </button>

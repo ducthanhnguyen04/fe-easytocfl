@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Settings.css';
+import { showToast } from '../../utils/toast';
 import { AuthContext } from '../../context/authContext';
 
 const Settings = ({ resetVocabProgress }) => {
@@ -511,7 +512,7 @@ const Settings = ({ resetVocabProgress }) => {
               onClick={() => {
                 if (window.confirm('Bạn có chắc chắn muốn đặt lại toàn bộ tiến trình học không?')) {
                   resetVocabProgress();
-                  alert('Đặt lại tiến trình học thành công!');
+                  showToast('Đặt lại tiến trình học thành công!', 'success');
                 }
               }}
             >

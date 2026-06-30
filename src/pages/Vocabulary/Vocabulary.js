@@ -5,6 +5,7 @@ import beUrl from '../../api-url/api-backend';
 import './Vocabulary.css';
 import axios from 'axios';
 import { useAuth } from '../../context/authContext';
+import { showToast } from '../../utils/toast';
 
 const getBookColor = (bookId) => {
   const colors = {
@@ -542,7 +543,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         className="neo-card lesson-select-card"
                         onClick={() => {
                           if (isPremium && !hasPremiumAccess) {
-                            alert("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!");
+                            showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
                             navigate('/settings');
                           } else {
                             navigate(`/vocab/${selectedBook}/${lesson.id}`);
@@ -636,7 +637,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                     <div className="neo-btn-group">
                       <button className="neo-btn active" style={{ padding: '6px 12px', fontSize: '12px' }}>Từ vựng</button>
-                      <button className="neo-btn" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => alert(`Ví dụ: ${activeFlashWord?.word} 是一句非常有用的話。`)}>Ví dụ</button>
+                      <button className="neo-btn" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => showToast(`Ví dụ: ${activeFlashWord?.word} 是一句非常有用的話。`, 'info')}>Ví dụ</button>
                     </div>
                     <div style={{ fontSize: '14px', fontWeight: '800' }}>
                       {(flashIndex % currentLessonWords.length) + 1} / {currentLessonWords.length}
