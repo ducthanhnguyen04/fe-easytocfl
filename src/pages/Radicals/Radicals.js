@@ -9,7 +9,11 @@ const Radicals = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStrokes, setSelectedStrokes] = useState('All');
 
-  const strokeOptions = ['All', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const strokeOptions = useMemo(() => {
+    const strokeList = radicals.map(r => r.strokes).filter(s => s > 0);
+    const uniqueStrokes = [...new Set(strokeList)].sort((a, b) => a - b);
+    return ['All', ...uniqueStrokes.map(String)];
+  }, [radicals]);
 
   useEffect(() => {
     const fetchRadicals = async () => {

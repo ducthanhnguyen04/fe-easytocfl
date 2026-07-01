@@ -31,6 +31,8 @@ const Admin = () => {
   // 1. Level form
   const [levelName, setLevelName] = useState('');
   const [levelCode, setLevelCode] = useState('');
+  const [levelImage, setLevelImage] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // 2. Lesson form
   const [lessonName, setLessonName] = useState('');
@@ -138,6 +140,7 @@ const Admin = () => {
     setEditId(null);
     setLevelName('');
     setLevelCode('');
+    setLevelImage('');
     setLessonName('');
     setLessonTitle('');
     setLessonSlug('');
@@ -186,6 +189,41 @@ const Admin = () => {
   };
 
   // Submit & Edit Handlers
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    setUploadingImage(true);
+    setActionError('');
+    try {
+      const response = await axios.post(
+        `${beUrl}/levels/upload-image`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.imageUrl) {
+        setLevelImage(response.data.imageUrl);
+        showSuccess('Tải ảnh đại diện lên thành công!');
+      } else {
+        showError('Không nhận được đường dẫn ảnh từ server.');
+      }
+    } catch (err) {
+      console.error('Upload image error:', err);
+      showError(err.response?.data?.message || err.response?.data?.error || 'Có lỗi xảy ra khi tải ảnh lên.');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
   const handleSaveLevel = async (e) => {
     e.preventDefault();
     if (!levelName || !levelCode) {
@@ -196,14 +234,14 @@ const Admin = () => {
       if (editId) {
         await axios.put(
           `${beUrl}/levels/update/${editId}`,
-          { levelName, level: levelCode },
+          { levelName, level: levelCode, image: levelImage },
           { withCredentials: true }
         );
         showSuccess('Cập nhật giáo trình thành công!');
       } else {
         await axios.post(
           `${beUrl}/levels/create`,
-          { levelName, level: levelCode },
+          { levelName, level: levelCode, image: levelImage },
           { withCredentials: true }
         );
         showSuccess('Thêm giáo trình mới thành công!');
@@ -561,6 +599,7 @@ const Admin = () => {
     if (activeTab === 'levels') {
       setLevelName(item.levelName);
       setLevelCode(item.level);
+      setLevelImage(item.image || '');
     } else if (activeTab === 'lessons') {
       setLessonName(item.lessonName);
       setLessonTitle(item.title);
@@ -624,7 +663,9 @@ const Admin = () => {
       }
       fetchData();
     } catch (error) {
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi xóa mục.');
+      console.error('Delete item error:', error);
+      const errMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'Có lỗi xảy ra khi xóa mục.';
+      showError(errMsg);
     }
   };
 
@@ -727,8 +768,62 @@ const Admin = () => {
                   required
                 />
               </div>
+              <div className="settings-input-group">
+                <label className="settings-label">Hình ảnh giáo trình (Tùy chọn)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  style={{ display: 'none' }}
+                  id="levelImageInput"
+                />
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '5px' }}>
+                  <button
+                    type="button"
+                    className="neo-btn"
+                    style={{ backgroundColor: '#edf2f7', fontSize: '13px', padding: '8px 15px' }}
+                    onClick={() => document.getElementById('levelImageInput').click()}
+                    disabled={uploadingImage}
+                  >
+                    {uploadingImage ? '⏳ Đang tải ảnh...' : '📥 Chọn ảnh đại diện'}
+                  </button>
+                  {levelImage && (
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img
+                        src={levelImage}
+                        alt="Preview"
+                        style={{ width: '60px', height: '60px', borderRadius: '6px', border: '2px solid #000', objectFit: 'cover' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setLevelImage('')}
+                        style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          background: 'red',
+                          color: 'white',
+                          border: '2px solid black',
+                          borderRadius: '50%',
+                          width: '20px',
+                          height: '20px',
+                          fontSize: '10px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        X
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: '10px' }}>
-                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }}>
+                <button type="submit" className="neo-btn neo-btn-primary" style={{ padding: '12px 25px' }} disabled={uploadingImage}>
                   {editId ? 'Cập nhật' : 'Lưu giáo trình'}
                 </button>
                 {editId && (
@@ -1373,6 +1468,7 @@ const Admin = () => {
                   <thead>
                     <tr>
                       <th>ID</th>
+                      <th>Hình ảnh</th>
                       <th>Tên Giáo Trình</th>
                       <th>Mã Cấp Độ</th>
                       <th style={{ width: '150px' }}>Hành động</th>
@@ -1381,12 +1477,19 @@ const Admin = () => {
                   <tbody>
                     {levels.length === 0 ? (
                       <tr>
-                        <td colSpan="4" className="empty-table-row">Chưa có giáo trình nào</td>
+                        <td colSpan="5" className="empty-table-row">Chưa có giáo trình nào</td>
                       </tr>
                     ) : (
                       levels.map((lvl) => (
                         <tr key={lvl.id}>
                           <td>{lvl.id}</td>
+                          <td>
+                            {lvl.image ? (
+                              <img src={lvl.image} alt={lvl.levelName} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1.5px solid #000' }} />
+                            ) : (
+                              <span style={{ color: '#aaa', fontSize: '11px' }}>Không có ảnh</span>
+                            )}
+                          </td>
                           <td style={{ fontWeight: '800' }}>{lvl.levelName}</td>
                           <td><span className="level-code-badge">{lvl.level}</span></td>
                           <td>

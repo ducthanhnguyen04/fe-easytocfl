@@ -17,9 +17,8 @@
 
 @media (min-width: 768px) {
   .filter-row {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+    /* Keep stack layout, just adjust gap if needed */
+    gap: 24px;
   }
 }
 
