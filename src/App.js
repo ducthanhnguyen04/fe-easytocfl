@@ -6,10 +6,12 @@ import { quizzes } from './data/db';
 import axios from 'axios';
 import beUrl from './api-url/api-backend';
 import { showToast } from './utils/toast';
+import { cacheService } from './utils/cacheService';
 import './App.css';
 
 function App() {
   const [vocabWords, setVocabWords] = useState([]);
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'terracotta';
@@ -20,11 +22,19 @@ function App() {
   useEffect(() => {
     const fetchBackendData = async () => {
       try {
-        const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
-        const dbLevels = levelsRes.data.levels || [];
+        let dbLevels = cacheService.get('levels_all');
+        if (!dbLevels) {
+          const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
+          dbLevels = levelsRes.data.levels || [];
+          cacheService.set('levels_all', dbLevels);
+        }
 
-        const vocabRes = await axios.get(`${beUrl}/vocabularies/get-all`);
-        const dbVocabs = vocabRes.data.vocabularies || [];
+        let dbVocabs = cacheService.get('vocabularies_all');
+        if (!dbVocabs) {
+          const vocabRes = await axios.get(`${beUrl}/vocabularies/get-all`);
+          dbVocabs = vocabRes.data.vocabularies || [];
+          cacheService.set('vocabularies_all', dbVocabs);
+        }
 
         const mappedVocabs = dbVocabs.map(v => {
           let bookId = null;
@@ -117,7 +127,7 @@ function App() {
 
         {/* Main Content Area */}
         <main className="main-panel">
-          <AppRoutes 
+          <AppRoutes
             dailyWord={dailyWord}
             handleWordLearned={handleWordLearned}
             playAudio={playAudio}
@@ -155,9 +165,9 @@ function App() {
                       </div>
                     </div>
                   ))}
-                  
-                  <button 
-                    className="neo-btn neo-btn-primary" 
+
+                  <button
+                    className="neo-btn neo-btn-primary"
                     style={{ width: '100%', marginTop: '10px' }}
                     onClick={submitQuiz}
                     disabled={Object.keys(selectedAnswers).length < activeQuiz.questions.length}
@@ -169,7 +179,7 @@ function App() {
                 <div style={{ textAlign: 'center', padding: '10px 0' }}>
                   <span style={{ fontSize: '50px' }} role="img" aria-label="party">🎉</span>
                   <h3 style={{ margin: '15px 0 10px 0' }}>Hoàn thành bài thi!</h3>
-                  
+
                   <div style={{ margin: '20px 0', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     {activeQuiz.questions.map((question, qIdx) => {
                       const isCorrect = selectedAnswers[question.id] === question.correct;
@@ -197,8 +207,8 @@ function App() {
                   </div>
 
                   <div style={{ display: 'flex', gap: '15px', marginTop: '25px' }}>
-                    <button 
-                      className="neo-btn" 
+                    <button
+                      className="neo-btn"
                       style={{ flex: 1 }}
                       onClick={() => {
                         setSelectedAnswers({});
@@ -207,8 +217,8 @@ function App() {
                     >
                       Làm lại
                     </button>
-                    <button 
-                      className="neo-btn neo-btn-primary" 
+                    <button
+                      className="neo-btn neo-btn-primary"
                       style={{ flex: 1 }}
                       onClick={() => setActiveQuiz(null)}
                     >
@@ -220,6 +230,54 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* Floating Contact Arc Menu */}
+        <div className="contact-fab-wrapper">
+          <div className={`contact-fab-socials ${contactOpen ? 'open' : ''}`}>
+            <a
+              href="https://www.facebook.com/nguyen.duc.thanh.0810/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-arc-item facebook"
+              title="Facebook"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.instagram.com/_thahnd_/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-arc-item instagram"
+              title="Instagram"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+            <a
+              href="https://line.me/ti/p/JhHWg2jK9M?fbclid=IwY2xjawSzhbFleHRuA2FlbQIxMABicmlkETEyc09NejNqbU5lb3NFTXFTc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHpadCLavUF3R8xuCe2X3OtKp0lTi6rPiNpN3GjAsfq97KJBQui8xx6t_7HwB_aem_DfSe09YzrvySUQui8Npn_w"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-arc-item line"
+              title="Line"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M21.9 8.2c-.3-2-1.7-3.4-3.7-3.7C16.4 4.2 14.2 4 12 4s-4.4.2-6.2.5C3.8 4.8 2.4 6.2 2.1 8.2c-.3 1.8-.4 4-.4 6.2s.1 4.4.4 6.2c.3 2 1.7 3.4 3.7 3.7 1.8.3 4 .4 6.2.4s4.4-.1 6.2-.4c2-.3 3.4-1.7 3.7-3.7.3-1.8.4-4 .4-6.2s-.1-4.4-.4-6.2zm-12 8.7H8.3c-.3 0-.5-.2-.5-.5V10.1c0-.3.2-.5.5-.5h1.6c.3 0 .5.2.5.5v3.9h1.9c.3 0 .5.2.5.5v1c0 .3-.2.4-.5.4zm3.9 0h-1.6c-.3 0-.5-.2-.5-.5V10.1c0-.3.2-.5.5-.5h1.6c.3 0 .5.2.5.5v5.3c0 .3-.2.5-.5.5zm5-1.9c.2.2.3.4.3.7 0 .3-.1.5-.3.7l-1 1c-.2.2-.4.3-.7.3s-.5-.1-.7-.3l-1.9-1.9v1.2c0 .3-.2.5-.5.5h-1.6c-.3 0-.5-.2-.5-.5V10.1c0-.3.2-.5.5-.5h1.6c.3 0 .5.2.5.5v2.8l1.9-1.9c.2-.2.4-.3.7-.3s.5.1.7.3l1 1c.2.2.3.4.3.7 0 .3-.1.5-.3.7l-1 1 1.2 1.2zm2.3 1.9h-3.2c-.3 0-.5-.2-.5-.5V10.1c0-.3.2-.5.5-.5h3.2c.3 0 .5.2.5.5v1c0 .3-.2.5-.5.5h-2.1v.9h1.7c.3 0 .5.2.5.5v.8c0 .3-.2.5-.5.5h-1.7v1.1h2.1c.3 0 .5.2.5.5v1c0 .3-.2.5-.5.5z" />
+              </svg>
+            </a>
+          </div>
+          <button
+            className={`contact-fab-trigger ${contactOpen ? 'active' : ''}`}
+            onClick={() => setContactOpen(!contactOpen)}
+            title="Liên hệ với chúng tôi"
+          >
+            {contactOpen ? '✕' : '💬'}
+          </button>
+        </div>
       </div>
     </BrowserRouter>
   );

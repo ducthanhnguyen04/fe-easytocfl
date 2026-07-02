@@ -6,6 +6,7 @@ import './Vocabulary.css';
 import axios from 'axios';
 import { useAuth } from '../../context/authContext';
 import { showToast } from '../../utils/toast';
+import { cacheService } from '../../utils/cacheService';
 
 import FlashcardMode from './components/FlashcardMode';
 import QuizMode from './components/QuizMode';
@@ -32,8 +33,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   useEffect(() => {
     const fecthLevel = async () => {
       try {
-        const response = await axios.get(`${beUrl}/levels/get-all`);
-        const sorted = (response.data.levels || []).sort((a, b) => Number(a.id) - Number(b.id));
+        let data = cacheService.get('levels_all');
+        if (!data) {
+          const response = await axios.get(`${beUrl}/levels/get-all`);
+          data = response.data.levels || [];
+          cacheService.set('levels_all', data);
+        }
+        const sorted = [...data].sort((a, b) => Number(a.id) - Number(b.id));
         setLevels(sorted);
       } catch (err) {
         console.error("Error fetching levels in Vocabulary page:", err);
@@ -89,6 +95,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'reading', 'dictation'
   const [localLessonVocabs, setLocalLessonVocabs] = useState([]);
   const [vocabLoading, setVocabLoading] = useState(false);
+
+  // Review states
+  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [reviewSelecting, setReviewSelecting] = useState(false);
+  const [selectedLessonIdsForReview, setSelectedLessonIdsForReview] = useState([]);
+
+  useEffect(() => {
+    setIsReviewMode(false);
+    setReviewSelecting(false);
+    setSelectedLessonIdsForReview([]);
+  }, [bookId, lessonId]);
 
   // Fetch vocabularies for current lesson directly from backend
   useEffect(() => {
@@ -152,6 +169,56 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }
   };
 
+  const handleStartReview = async () => {
+    if (!user) {
+      showToast("Vui lòng đăng nhập để sử dụng chức năng tổng ôn tập!", "warning");
+      navigate('/settings');
+      return;
+    }
+    if (selectedLessonIdsForReview.length === 0) return;
+    setVocabLoading(true);
+    setIsReviewMode(true);
+    setReviewSelecting(false);
+
+    try {
+      const requests = selectedLessonIdsForReview.map(lId =>
+        axios.get(`${beUrl}/vocabularies/get-vocabulary-by-lesson-id`, {
+          params: { lessonId: lId },
+          withCredentials: true
+        })
+      );
+
+      const responses = await Promise.all(requests);
+      const allVocabs = [];
+      responses.forEach(res => {
+        const dbVocabs = res.data.vocabularies || [];
+        const mapped = dbVocabs.map(v => ({
+          word: v.vocabulary,
+          pinyin: v.pinyin,
+          trans: v.meaning,
+          englishMeaning: v.englishMeaning,
+          learned: false,
+          tag: 'Học tập',
+          bookId: selectedBook,
+          lessonId: v.lessonId,
+          id: v.id,
+          audioUrl: v.audioUrl
+        }));
+        allVocabs.push(...mapped);
+      });
+
+      const sortedMapped = allVocabs.sort((a, b) => Number(a.id) - Number(b.id));
+      setLocalLessonVocabs(sortedMapped);
+    } catch (err) {
+      console.error('Error fetching review vocabularies:', err);
+      showToast('Có lỗi xảy ra khi tải dữ liệu ôn tập.', 'error');
+      setLocalLessonVocabs([]);
+      setIsReviewMode(false);
+    } finally {
+      setVocabLoading(false);
+    }
+  };
+
   return (
     <div>
       {selectedBook === null ? (
@@ -193,13 +260,51 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             })}
           </div>
         </div>
-      ) : selectedLesson === null ? (
+      ) : (selectedLesson === null && !isReviewMode) ? (
         // LESSONS LISTING VIEW FOR SELECTED BOOK
         <div>
-          <div className="back-btn-container">
+          <div className="back-btn-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button className="neo-btn" onClick={() => navigate('/vocab')}>
               ← Danh sách sách
             </button>
+
+            {!reviewSelecting ? (
+              <button
+                className="neo-btn"
+                style={{ backgroundColor: 'var(--color-yellow-light)', fontWeight: 'bold' }}
+                onClick={() => {
+                  if (!user) {
+                    showToast("Vui lòng đăng nhập để sử dụng chức năng tổng ôn tập!", "warning");
+                    navigate('/settings');
+                    return;
+                  }
+                  setReviewSelecting(true);
+                  setSelectedLessonIdsForReview([]);
+                }}
+              >
+                🔁 Tổng ôn tập
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  className="neo-btn neo-btn-primary"
+                  onClick={handleStartReview}
+                  disabled={selectedLessonIdsForReview.length === 0}
+                >
+                  🚀 Bắt đầu ôn tập ({selectedLessonIdsForReview.length} bài)
+                </button>
+                <button
+                  className="neo-btn"
+                  style={{ backgroundColor: '#e2e8f0' }}
+                  onClick={() => {
+                    setReviewSelecting(false);
+                    setSelectedLessonIdsForReview([]);
+                  }}
+                >
+                  Hủy
+                </button>
+              </div>
+            )}
           </div>
 
           {(() => {
@@ -242,29 +347,51 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
                     const displayTranslation = lesson.trans || '';
                     const isPremium = lesson.isPremium || lesson.premium;
+                    const isSelected = selectedLessonIdsForReview.includes(lesson.id);
 
                     return (
                       <div
                         key={lesson.id}
-                        className="neo-card lesson-select-card"
+                        className={`neo-card lesson-select-card ${isSelected ? 'selected-for-review' : ''}`}
+                        style={isSelected ? { border: '2.5px solid var(--color-primary)', backgroundColor: 'var(--color-primary-light)' } : {}}
                         onClick={() => {
                           if (isPremium && !hasPremiumAccess) {
                             showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
-                            navigate('/settings');
+                            if (!reviewSelecting) {
+                              navigate('/settings');
+                            }
                           } else {
-                            navigate(`/vocab/${selectedBook}/${lesson.id}`);
+                            if (reviewSelecting) {
+                              if (isSelected) {
+                                setSelectedLessonIdsForReview(prev => prev.filter(id => id !== lesson.id));
+                              } else {
+                                setSelectedLessonIdsForReview(prev => [...prev, lesson.id]);
+                              }
+                            } else {
+                              navigate(`/vocab/${selectedBook}/${lesson.id}`);
+                            }
                           }
                         }}
                       >
-                        <div className="lesson-select-info">
-                          <h4 className="lesson-select-title">
-                            {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
-                          </h4>
-                          {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
-                          <div className="lesson-select-meta">
-                            <span>📖 {lessonWords.length} từ vựng</span>
-                            <span>✓ Đã thuộc {learnedInLesson}/{lessonWords.length}</span>
+                        <div className="lesson-select-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                          <div>
+                            <h4 className="lesson-select-title">
+                              {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
+                            </h4>
+                            {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
+                            <div className="lesson-select-meta">
+                              <span>📖 {lessonWords.length} từ vựng</span>
+                              <span>✓ Đã thuộc {learnedInLesson}/{lessonWords.length}</span>
+                            </div>
                           </div>
+                          {reviewSelecting && (
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              readOnly
+                              style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+                            />
+                          )}
                         </div>
                       </div>
                     );
@@ -275,15 +402,26 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           })()}
         </div>
       ) : (
-        // VOCABULARY DRILL-DOWN VIEW FOR SELECTED LESSON
+        // VOCABULARY DRILL-DOWN VIEW FOR SELECTED LESSON OR REVIEW MODE
         <div>
           <div className="back-btn-container">
-            <button className="neo-btn" onClick={() => navigate(`/vocab/${selectedBook}`)}>
+            <button
+              className="neo-btn"
+              onClick={() => {
+                if (isReviewMode) {
+                  setIsReviewMode(false);
+                  setLocalLessonVocabs([]);
+                  setReviewSelecting(true);
+                } else {
+                  navigate(`/vocab/${selectedBook}`);
+                }
+              }}
+            >
               ← Quay lại danh sách bài
             </button>
           </div>
 
-          {isLessonPremium && !hasPremiumAccess ? (
+          {isLessonPremium && !hasPremiumAccess && !isReviewMode ? (
             <div className="neo-card premium-upgrade-card" style={{ padding: '40px', textAlign: 'center', marginTop: '20px', border: '2px dashed var(--color-primary)' }}>
               <span style={{ fontSize: '50px' }}>👑</span>
               <h3 style={{ margin: '15px 0', color: 'var(--color-primary)' }}>Nâng cấp tài khoản Premium</h3>
@@ -300,8 +438,21 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
               {(() => {
                 const currentLearned = currentLessonWords.filter(v => v.learned).length;
                 const bookColor = currentBook?.color || getBookColor(selectedBook);
-                const lessonTitleText = currentLessonObj ? (currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`) : `Bài ${selectedLesson}`;
-                const lessonSubTitleText = currentLessonObj?.trans || '';
+                
+                let lessonTitleText = '';
+                let lessonSubTitleText = '';
+                
+                if (isReviewMode) {
+                  const names = selectedLessonIdsForReview.map(id => {
+                    const l = lessonsList.find(lesson => lesson.id === id);
+                    return l ? l.lessonName || `Bài ${id}` : `Bài ${id}`;
+                  }).join(', ');
+                  lessonTitleText = 'Tổng ôn tập từ vựng';
+                  lessonSubTitleText = `Các bài ôn tập: ${names}`;
+                } else {
+                  lessonTitleText = currentLessonObj ? (currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`) : `Bài ${selectedLesson}`;
+                  lessonSubTitleText = currentLessonObj?.trans || '';
+                }
 
                 return (
                   <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
@@ -428,12 +579,14 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     </div>
                   </div>
 
-                  <VocabList
-                    currentLessonWords={currentLessonWords}
-                    vocabWords={vocabWords}
-                    toggleVocabLearned={toggleVocabLearned}
-                    handlePlayAudio={handlePlayAudio}
-                  />
+                  {!isReviewMode && (
+                    <VocabList
+                      currentLessonWords={currentLessonWords}
+                      vocabWords={vocabWords}
+                      toggleVocabLearned={toggleVocabLearned}
+                      handlePlayAudio={handlePlayAudio}
+                    />
+                  )}
                 </>
               )}
             </>

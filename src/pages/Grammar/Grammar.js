@@ -7,6 +7,7 @@ import beUrl from '../../api-url/api-backend';
 import './Grammar.css';
 import { useAuth } from '../../context/authContext';
 import { showToast } from '../../utils/toast';
+import { cacheService } from '../../utils/cacheService';
 
 const getBookColor = (bookId) => {
   const colors = {
@@ -26,16 +27,21 @@ const Grammar = ({ playAudio }) => {
   useEffect(() => {
     const fecthLevel = async () => {
       try {
-        const response = await axios.get(`${beUrl}/levels/get-all`);
-        const sorted = (response.data.levels || []).sort((a, b) => Number(a.id) - Number(b.id));
+        let data = cacheService.get('levels_all');
+        if (!data) {
+          const response = await axios.get(`${beUrl}/levels/get-all`);
+          data = response.data.levels || [];
+          cacheService.set('levels_all', data);
+        }
+        const sorted = [...data].sort((a, b) => Number(a.id) - Number(b.id));
         setLevels(sorted);
       } catch (err) {
-        console.error("Error fetching levels in Vocabulary page:", err);
+        console.error("Error fetching levels in Grammar page:", err);
         setLevels([]);
       }
-    }
+    };
     fecthLevel();
-  }, [])
+  }, []);
   console.log("level:", levels);
   const navigate = useNavigate();
 

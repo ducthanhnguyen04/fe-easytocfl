@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
+import { cacheService } from '../../utils/cacheService';
 import './Radicals.css';
 
 const Radicals = () => {
@@ -19,8 +20,12 @@ const Radicals = () => {
     const fetchRadicals = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${beUrl}/radicals/get-all`);
-        const dbRadicals = response.data.radicals || [];
+        let dbRadicals = cacheService.get('radicals_all');
+        if (!dbRadicals) {
+          const response = await axios.get(`${beUrl}/radicals/get-all`);
+          dbRadicals = response.data.radicals || [];
+          cacheService.set('radicals_all', dbRadicals);
+        }
         const mapped = dbRadicals.map(r => ({
           id: r.id,
           glyph: r.radical,

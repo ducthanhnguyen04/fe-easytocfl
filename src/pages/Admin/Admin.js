@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
+import { cacheService } from '../../utils/cacheService';
 import './Admin.css';
 
 import AdminLevels from './components/AdminLevels';
@@ -66,6 +67,7 @@ const Admin = () => {
   };
 
   const showSuccess = (msg) => {
+    cacheService.clear(); // invalidate cache on client whenever updates are made
     setActionSuccess(msg);
     setTimeout(() => setActionSuccess(''), 3000);
   };
