@@ -15,6 +15,12 @@
   font-size: 26px;
 }
 
+.book-cover-img {
+  width: 90px;
+  height: 130px;
+  border-radius: 10px !important;
+}
+
 .page-title-banner p {
   color: #666;
   margin-top: 4px;
@@ -61,7 +67,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
   pointer-events: none;
 }
 
@@ -75,7 +81,7 @@
   margin: 0 auto;
   letter-spacing: 2px;
   line-height: 1.1;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
 .book-cover-vol {
@@ -84,7 +90,7 @@
   font-weight: 800;
   text-align: right;
   line-height: 1;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
 .book-select-info {
@@ -387,7 +393,7 @@
   padding: 10px 15px;
   outline: none;
   width: 100%;
-  box-shadow: inset 2px 2px 0px rgba(0,0,0,0.1);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1);
 }
 
 .grammar-exercise-actions {
@@ -410,6 +416,7 @@
   .books-grid {
     grid-template-columns: 1fr;
   }
+
   .lessons-grid {
     grid-template-columns: 1fr;
   }

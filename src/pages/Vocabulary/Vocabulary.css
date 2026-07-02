@@ -227,6 +227,12 @@
   cursor: pointer;
 }
 
+.book-cover-img {
+  width: 90px;
+  height: 130px;
+  border-radius: 10px !important;
+}
+
 .lesson-number-box {
   width: 45px;
   height: 45px;

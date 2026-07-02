@@ -90,8 +90,8 @@ const Grammar = ({ playAudio }) => {
     }).then(res => {
       const dbGrammars = res.data.grammars || [];
       const mapped = dbGrammars.map(v => {
-        const staticMatch = grammarPoints.find(g => 
-          g.structure.toLowerCase() === v.structure.toLowerCase() || 
+        const staticMatch = grammarPoints.find(g =>
+          g.structure.toLowerCase() === v.structure.toLowerCase() ||
           g.title.toLowerCase().includes(v.grammar.toLowerCase())
         );
         return {
@@ -154,9 +154,8 @@ const Grammar = ({ playAudio }) => {
                   navigate(`/grammar/${book.id}`);
                 }}
               >
-                <div className="book-cover">
-                  <span className="book-cover-title-traditional">{book.levelName}</span>
-                  <span className="book-cover-vol">{book.id}</span>
+                <div className="book-image">
+                  <img src={book.image} alt={book.levelName} className="book-cover-img" />
                 </div>
                 <div className="book-select-info">
                   <h4 className="book-select-title">{book.levelName}</h4>
@@ -213,9 +212,6 @@ const Grammar = ({ playAudio }) => {
                       }
                     }}
                   >
-                    <div className="lesson-number-box" style={{ backgroundColor: bookColor }}>
-                      {lesson.id}
-                    </div>
                     <div className="lesson-select-info">
                       <h4 className="lesson-select-title">
                         {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
