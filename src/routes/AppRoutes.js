@@ -18,7 +18,10 @@ const AppRoutes = ({
   startQuiz,
   vocabWords,
   toggleVocabLearned,
-  resetVocabProgress
+  resetVocabProgress,
+  refreshGlobalData,
+  activeTheme,
+  handleThemeChange
 }) => {
   return (
     <Routes>
@@ -106,7 +109,13 @@ const AppRoutes = ({
       />
       <Route
         path="/settings"
-        element={<Settings resetVocabProgress={resetVocabProgress} />}
+        element={
+          <Settings 
+            resetVocabProgress={resetVocabProgress} 
+            activeTheme={activeTheme}
+            handleThemeChange={handleThemeChange}
+          />
+        }
       />
 
       {/* Protected Admin Route */}
@@ -114,7 +123,7 @@ const AppRoutes = ({
         path="/admin"
         element={
           <AdminRoute>
-            <Admin />
+            <Admin refreshGlobalData={refreshGlobalData} />
           </AdminRoute>
         }
       />

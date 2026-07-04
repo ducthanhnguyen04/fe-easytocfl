@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
@@ -12,61 +12,78 @@ import './App.css';
 function App() {
   const [vocabWords, setVocabWords] = useState([]);
   const [contactOpen, setContactOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'terracotta');
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'terracotta';
+  const changeTheme = useCallback((themeId) => {
+    setTheme(themeId);
+    localStorage.setItem('theme', themeId);
     document.body.className = '';
-    document.body.classList.add(`theme-${savedTheme}`);
+    document.body.classList.add(`theme-${themeId}`);
   }, []);
 
   useEffect(() => {
-    const fetchBackendData = async () => {
-      try {
-        let dbLevels = cacheService.get('levels_all');
-        if (!dbLevels) {
-          const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
-          dbLevels = levelsRes.data.levels || [];
-          cacheService.set('levels_all', dbLevels);
-        }
+    document.body.className = '';
+    document.body.classList.add(`theme-${theme}`);
+  }, [theme]);
 
-        let dbVocabs = cacheService.get('vocabularies_all');
-        if (!dbVocabs) {
-          const vocabRes = await axios.get(`${beUrl}/vocabularies/get-all`);
-          dbVocabs = vocabRes.data.vocabularies || [];
-          cacheService.set('vocabularies_all', dbVocabs);
-        }
+  const toggleDarkMode = () => {
+    if (theme === 'dark' || theme === 'cyber') {
+      const prevLight = localStorage.getItem('prev-light-theme') || 'terracotta';
+      changeTheme(prevLight);
+    } else {
+      localStorage.setItem('prev-light-theme', theme);
+      changeTheme('dark');
+    }
+  };
 
-        const mappedVocabs = dbVocabs.map(v => {
-          let bookId = null;
-          for (const lvl of dbLevels) {
-            if (lvl.lessons && lvl.lessons.some(l => l.id === v.lessonId)) {
-              bookId = lvl.id;
-              break;
-            }
-          }
-
-          return {
-            word: v.vocabulary,
-            pinyin: v.pinyin,
-            trans: v.meaning,
-            englishMeaning: v.englishMeaning,
-            learned: false,
-            tag: 'Học tập',
-            bookId: bookId,
-            lessonId: v.lessonId,
-            id: v.id,
-            audioUrl: v.audioUrl
-          };
-        });
-
-        setVocabWords(mappedVocabs);
-      } catch (err) {
-        console.error("Error loading backend vocabularies:", err);
+  const fetchBackendData = useCallback(async () => {
+    try {
+      let dbLevels = cacheService.get('levels_all');
+      if (!dbLevels) {
+        const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
+        dbLevels = levelsRes.data.levels || [];
+        cacheService.set('levels_all', dbLevels);
       }
-    };
 
-    fetchBackendData();
+      let dbVocabs = cacheService.get('vocabularies_all');
+      if (!dbVocabs) {
+        const vocabRes = await axios.get(`${beUrl}/vocabularies/get-all`);
+        dbVocabs = vocabRes.data.vocabularies || [];
+        cacheService.set('vocabularies_all', dbVocabs);
+      }
+
+      const mappedVocabs = dbVocabs.map(v => {
+        let bookId = null;
+        for (const lvl of dbLevels) {
+          if (lvl.lessons && lvl.lessons.some(l => l.id === v.lessonId)) {
+            bookId = lvl.id;
+            break;
+          }
+        }
+
+        return {
+          word: v.vocabulary,
+          pinyin: v.pinyin,
+          trans: v.meaning,
+          englishMeaning: v.englishMeaning,
+          learned: false,
+          tag: 'Học tập',
+          bookId: bookId,
+          lessonId: v.lessonId,
+          id: v.id,
+          audioUrl: v.audioUrl
+        };
+      });
+
+      setVocabWords(mappedVocabs);
+    } catch (err) {
+      console.error("Error loading backend vocabularies:", err);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchBackendData();
+  }, [fetchBackendData]);
 
   // Daily Challenge state
   const [dailyWord, setDailyWord] = useState({
@@ -135,6 +152,9 @@ function App() {
             vocabWords={vocabWords}
             toggleVocabLearned={toggleVocabLearned}
             resetVocabProgress={resetVocabProgress}
+            refreshGlobalData={fetchBackendData}
+            activeTheme={theme}
+            handleThemeChange={changeTheme}
           />
         </main>
 
@@ -278,6 +298,15 @@ function App() {
             {contactOpen ? '✕' : '💬'}
           </button>
         </div>
+
+        {/* Floating Dark Mode Toggle */}
+        <button 
+          className="theme-toggle-floating"
+          onClick={toggleDarkMode}
+          title={theme === 'dark' || theme === 'cyber' ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+        >
+          {theme === 'dark' || theme === 'cyber' ? '☀️' : '🌙'}
+        </button>
       </div>
     </BrowserRouter>
   );

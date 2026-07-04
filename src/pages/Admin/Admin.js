@@ -13,7 +13,7 @@ import AdminRadicals from './components/AdminRadicals';
 import AdminUsers from './components/AdminUsers';
 import AdminExercises from './components/AdminExercises';
 
-const Admin = () => {
+const Admin = ({ refreshGlobalData }) => {
   const [activeTab, setActiveTab] = useState('levels');
 
   // Shared loaded data
@@ -68,6 +68,9 @@ const Admin = () => {
 
   const showSuccess = (msg) => {
     cacheService.clear(); // invalidate cache on client whenever updates are made
+    if (typeof refreshGlobalData === 'function') {
+      refreshGlobalData();
+    }
     setActionSuccess(msg);
     setTimeout(() => setActionSuccess(''), 3000);
   };

@@ -5,12 +5,9 @@ import './Settings.css';
 import { showToast } from '../../utils/toast';
 import { AuthContext } from '../../context/authContext';
 
-const Settings = ({ resetVocabProgress }) => {
+const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
   const { user, setUser } = useContext(AuthContext);
   const isGoogleUser = !!user?.isGoogleLogin;
-
-  // Theme state persisted in localStorage
-  const [activeTheme, setActiveTheme] = useState(localStorage.getItem('theme') || 'terracotta');
 
   // Profile state
   const [name, setName] = useState(user?.name || '');
@@ -69,17 +66,9 @@ const Settings = ({ resetVocabProgress }) => {
     { id: 'ocean', name: 'Ocean Blue', desc: 'Xanh Đại Dương', primaryColor: '#3d84b8', bgColor: '#f2f7fa' },
     { id: 'gold', name: 'Jiufen Gold', desc: 'Cửu Phần Cổ Kính', primaryColor: '#e9c46a', bgColor: '#fdfaf4' },
     { id: 'mint', name: 'Neo Mint', desc: 'Xanh Bạc Hà Tươi Mới', primaryColor: '#2a9d8f', bgColor: '#f4faf8' },
+    { id: 'dark', name: 'Classic Dark', desc: 'Tối Cổ Điển (Sắc nét)', primaryColor: '#e55b44', bgColor: '#121212' },
     { id: 'cyber', name: 'Cyber Dark', desc: 'Neon Cyberpunk (Tối)', primaryColor: '#f43f5e', bgColor: '#121214' }
   ];
-
-  const handleThemeChange = (themeId) => {
-    setActiveTheme(themeId);
-    localStorage.setItem('theme', themeId);
-    
-    // Apply theme class to document body
-    document.body.className = '';
-    document.body.classList.add(`theme-${themeId}`);
-  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -197,9 +186,9 @@ const Settings = ({ resetVocabProgress }) => {
               className={`theme-select-btn ${activeTheme === t.id ? 'active' : ''}`}
               onClick={() => handleThemeChange(t.id)}
             >
-              <div 
+              <div
                 className="theme-preview-dot"
-                style={{ 
+                style={{
                   background: `linear-gradient(135deg, ${t.primaryColor} 50%, ${t.bgColor} 50%)`
                 }}
               />
@@ -215,13 +204,13 @@ const Settings = ({ resetVocabProgress }) => {
       <div className="settings-grid-layout">
         {/* Left Column: Account Info & Preferences */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          
+
           {/* Account Profile Form */}
           <form className="settings-section-card" onSubmit={handleUpdateProfile}>
             <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px' }}>
               👤 Thông tin tài khoản
             </h3>
-            
+
             {profileSuccess && (
               <div className="settings-alert-success">
                 ✓ Cập nhật thông tin tài khoản thành công!
@@ -236,17 +225,17 @@ const Settings = ({ resetVocabProgress }) => {
 
             {/* Avatar Selection Section */}
             <div className="settings-avatar-container" style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: '10px 0' }}>
-              <div 
-                className="settings-avatar-preview" 
-                style={{ 
-                  width: '80px', 
-                  height: '80px', 
-                  borderRadius: '50%', 
-                  border: '3px solid #000', 
-                  boxShadow: '4px 4px 0px #000', 
-                  overflow: 'hidden', 
-                  display: 'flex', 
-                  alignItems: 'center', 
+              <div
+                className="settings-avatar-preview"
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  border: '3px solid #000',
+                  boxShadow: '4px 4px 0px #000',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'var(--color-primary-light)',
                   fontSize: '28px',
@@ -265,18 +254,18 @@ const Settings = ({ resetVocabProgress }) => {
                 <label className="settings-label" style={{ marginBottom: '2px' }}>Ảnh đại diện (Avatar)</label>
                 {!isGoogleUser ? (
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <button 
-                      type="button" 
-                      className="neo-btn" 
+                    <button
+                      type="button"
+                      className="neo-btn"
                       style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: 'var(--color-white)' }}
                       onClick={() => setShowAvatarPicker(!showAvatarPicker)}
                     >
                       🖼️ Chọn ảnh
                     </button>
                     {avatarUrl && (
-                      <button 
-                        type="button" 
-                        className="neo-btn" 
+                      <button
+                        type="button"
+                        className="neo-btn"
                         style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#ffe5e0', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
                         onClick={() => setAvatarUrl('')}
                       >
@@ -293,14 +282,14 @@ const Settings = ({ resetVocabProgress }) => {
             </div>
 
             {showAvatarPicker && !isGoogleUser && (
-              <div 
-                className="neo-card" 
-                style={{ 
-                  padding: '15px', 
-                  border: '2px solid #000', 
-                  borderRadius: 'var(--radius-sm)', 
-                  backgroundColor: '#fbf9f5', 
-                  boxShadow: '4px 4px 0px #000' 
+              <div
+                className="neo-card"
+                style={{
+                  padding: '15px',
+                  border: '2px solid #000',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: '#fbf9f5',
+                  boxShadow: '4px 4px 0px #000'
                 }}
               >
                 <div style={{ fontSize: '12px', fontWeight: '800', marginBottom: '10px' }}>CHỌN AVATAR MẪU:</div>
@@ -328,12 +317,12 @@ const Settings = ({ resetVocabProgress }) => {
                     </button>
                   ))}
                 </div>
-                
+
                 <div className="settings-input-group">
                   <label className="settings-label" style={{ fontSize: '11px' }}>Hoặc nhập URL ảnh tùy chỉnh:</label>
-                  <input 
-                    type="text" 
-                    className="settings-input" 
+                  <input
+                    type="text"
+                    className="settings-input"
                     style={{ padding: '8px 12px', fontSize: '13px' }}
                     value={avatarUrl}
                     onChange={(e) => setAvatarUrl(e.target.value)}
@@ -345,9 +334,9 @@ const Settings = ({ resetVocabProgress }) => {
 
             <div className="settings-input-group">
               <label className="settings-label">Họ và Tên</label>
-              <input 
-                type="text" 
-                className="settings-input" 
+              <input
+                type="text"
+                className="settings-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nhập họ tên của bạn"
@@ -357,26 +346,15 @@ const Settings = ({ resetVocabProgress }) => {
 
             <div className="settings-input-group">
               <label className="settings-label">Địa chỉ Email</label>
-              <input 
-                type="email" 
-                className="settings-input" 
+              <input
+                type="email"
+                className="settings-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
                 disabled={isGoogleUser}
               />
             </div>
-
-            <div className="settings-input-group">
-              <label className="settings-label">Trình độ TOCFL hiện tại</label>
-              <input 
-                type="text" 
-                className="settings-input" 
-                value="Band A (A2 - Sơ cấp)"
-                disabled 
-              />
-            </div>
-
             {!isGoogleUser ? (
               <button type="submit" className="neo-btn neo-btn-primary" style={{ alignSelf: 'flex-start', padding: '10px 20px' }}>
                 Lưu thay đổi
@@ -387,50 +365,11 @@ const Settings = ({ resetVocabProgress }) => {
               </div>
             )}
           </form>
-
-          {/* Preferences Settings */}
-          <div className="settings-section-card">
-            <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px' }}>
-              ⚙️ Tuỳ chọn học tập
-            </h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={soundEnabled} 
-                  onChange={(e) => setSoundEnabled(e.target.checked)}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
-                /> 
-                Tự động phát âm thanh khi xem từ mới
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={bopomofoEnabled} 
-                  onChange={(e) => setBopomofoEnabled(e.target.checked)}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
-                /> 
-                Hiển thị Chú âm Bopomofo (ㄅㄆㄇㄈ) thay cho Pinyin
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={devModeEnabled} 
-                  onChange={(e) => setDevModeEnabled(e.target.checked)}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
-                /> 
-                Chế độ nhà phát triển (Mở khoá tất cả các bài học)
-              </label>
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Password Change & Danger Zone */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          
+
           {/* Password Change Form */}
           {!isGoogleUser ? (
             <form className="settings-section-card" onSubmit={handleUpdatePassword}>
@@ -452,9 +391,9 @@ const Settings = ({ resetVocabProgress }) => {
 
               <div className="settings-input-group">
                 <label className="settings-label">Mật khẩu hiện tại</label>
-                <input 
-                  type="password" 
-                  className="settings-input" 
+                <input
+                  type="password"
+                  className="settings-input"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
@@ -463,9 +402,9 @@ const Settings = ({ resetVocabProgress }) => {
 
               <div className="settings-input-group">
                 <label className="settings-label">Mật khẩu mới</label>
-                <input 
-                  type="password" 
-                  className="settings-input" 
+                <input
+                  type="password"
+                  className="settings-input"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Tối thiểu 6 ký tự"
@@ -474,9 +413,9 @@ const Settings = ({ resetVocabProgress }) => {
 
               <div className="settings-input-group">
                 <label className="settings-label">Xác nhận mật khẩu mới</label>
-                <input 
-                  type="password" 
-                  className="settings-input" 
+                <input
+                  type="password"
+                  className="settings-input"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới"
@@ -497,28 +436,6 @@ const Settings = ({ resetVocabProgress }) => {
               </div>
             </div>
           )}
-
-          {/* Reset Progress / Danger Zone */}
-          <div className="settings-section-card" style={{ borderColor: 'var(--color-primary)' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-primary)', paddingBottom: '10px', color: 'var(--color-primary)' }}>
-              ⚠️ Vùng nguy hiểm
-            </h3>
-            <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.4' }}>
-              Xoá toàn bộ tiến trình học tập của tài khoản này. Thao tác này sẽ đặt các từ vựng đã học và kết quả thi thử về ban đầu và không thể hoàn tác.
-            </p>
-            <button 
-              className="neo-btn" 
-              style={{ backgroundColor: '#ffe5e0', color: 'var(--color-primary)', borderColor: 'var(--color-primary)', alignSelf: 'flex-start' }}
-              onClick={() => {
-                if (window.confirm('Bạn có chắc chắn muốn đặt lại toàn bộ tiến trình học không?')) {
-                  resetVocabProgress();
-                  showToast('Đặt lại tiến trình học thành công!', 'success');
-                }
-              }}
-            >
-              Xoá toàn bộ tiến trình học tập
-            </button>
-          </div>
         </div>
       </div>
     </div>

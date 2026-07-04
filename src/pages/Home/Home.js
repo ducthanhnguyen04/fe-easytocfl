@@ -9,7 +9,7 @@ import { showToast } from '../../utils/toast';
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  
+
   const [commentsList, setCommentsList] = useState([]);
   const [newCommentText, setNewCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
@@ -73,13 +73,10 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
           <h1 className="welcome-title">Chào, {loading ? '...' : (user?.name || 'bạn')} 👋</h1>
           <p className="welcome-subtitle">Chúc bạn một ngày học tập đầy hứng khởi! Cùng chinh phục TOCFL nào.</p>
         </div>
-        <button className="neo-btn neo-btn-primary" onClick={() => navigate('/roadmap')}>
-          Xem tiến trình học
-        </button>
       </header>
 
       {/* Stats Dashboard Row */}
-      <section className="stats-grid">
+      {/* <section className="stats-grid">
         <div className="neo-card stat-card" style={{ borderLeft: '8px solid var(--color-primary)' }}>
           <span className="stat-card-title">Xếp hạng của bạn</span>
           <span className="stat-card-value">3 / #3442</span>
@@ -100,7 +97,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
           <span className="stat-card-value">Band A2</span>
           <span className="stat-card-desc">Sắp sửa lên tới Band B1!</span>
         </div>
-      </section>
+      </section> */}
 
       {/* Hero Section with Custom Taiwan/Taipei 101 content */}
       <section className="hero-section">
