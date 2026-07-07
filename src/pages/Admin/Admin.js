@@ -12,6 +12,7 @@ import AdminExamples from './components/AdminExamples';
 import AdminRadicals from './components/AdminRadicals';
 import AdminUsers from './components/AdminUsers';
 import AdminExercises from './components/AdminExercises';
+import AdminComments from './components/AdminComments';
 
 const Admin = ({ refreshGlobalData }) => {
   const [activeTab, setActiveTab] = useState('levels');
@@ -25,6 +26,7 @@ const Admin = ({ refreshGlobalData }) => {
   const [radicals, setRadicals] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [excersises, setExcersises] = useState([]);
+  const [comments, setComments] = useState([]);
 
   // Loading & error status
   const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ const Admin = ({ refreshGlobalData }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [levelsRes, lessonsRes, grammarsRes, vocabRes, examplesRes, radicalsRes, usersRes, excersisesRes] = await Promise.all([
+      const [levelsRes, lessonsRes, grammarsRes, vocabRes, examplesRes, radicalsRes, usersRes, excersisesRes, commentsRes] = await Promise.all([
         axios.get(`${beUrl}/levels/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/lessons/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/grammars/get-all`, { withCredentials: true }),
@@ -47,6 +49,7 @@ const Admin = ({ refreshGlobalData }) => {
         axios.get(`${beUrl}/radicals/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/users/admin/get-all`, { withCredentials: true }),
         axios.get(`${beUrl}/excersises/get-all`, { withCredentials: true }),
+        axios.get(`${beUrl}/comments/get-all`, { withCredentials: true }),
       ]);
 
       setLevels(levelsRes.data.levels || []);
@@ -57,6 +60,7 @@ const Admin = ({ refreshGlobalData }) => {
       setRadicals(radicalsRes.data.radicals || []);
       setUsersList(usersRes.data.users || []);
       setExcersises(excersisesRes.data.excersises || []);
+      setComments(commentsRes.data.comments || []);
 
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -148,6 +152,12 @@ const Admin = ({ refreshGlobalData }) => {
         >
           🎯 Bài Tập (Exercises) <span className="tab-count-badge">{excersises.length}</span>
         </button>
+        <button
+          className={`neo-btn tab-btn ${activeTab === 'comments' ? 'active' : ''}`}
+          onClick={() => handleTabChange('comments')}
+        >
+          💬 Bình Luận (Comments) <span className="tab-count-badge">{comments.length}</span>
+        </button>
       </div>
 
       <div className="admin-grid-layout">
@@ -229,6 +239,15 @@ const Admin = ({ refreshGlobalData }) => {
             excersises={excersises}
             grammars={grammars}
             lessons={lessons}
+            onRefresh={fetchData}
+            beUrl={beUrl}
+            showError={showError}
+            showSuccess={showSuccess}
+          />
+        )}
+        {activeTab === 'comments' && (
+          <AdminComments
+            comments={comments}
             onRefresh={fetchData}
             beUrl={beUrl}
             showError={showError}

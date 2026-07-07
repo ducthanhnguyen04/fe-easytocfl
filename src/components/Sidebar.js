@@ -7,7 +7,7 @@ import { useAuth } from '../context/authContext';
 import beUrl from '../api-url/api-backend';
 import { showToast } from '../utils/toast';
 
-const Sidebar = () => {
+const Sidebar = ({ theme, toggleDarkMode }) => {
   const { user, setUser, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -305,6 +305,19 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
+          <li className="sidebar-item">
+            <button
+              onClick={toggleDarkMode}
+              className="sidebar-link"
+              style={{ width: '100%' }}
+              title={theme === 'dark' || theme === 'cyber' ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+            >
+              <span style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px' }}>
+                {theme === 'dark' || theme === 'cyber' ? '☀️' : '🌙'}
+              </span>
+              {theme === 'dark' || theme === 'cyber' ? 'Chế độ sáng' : 'Chế độ tối'}
+            </button>
+          </li>
         </ul>
 
         <div className="sidebar-footer">

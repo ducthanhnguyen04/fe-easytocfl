@@ -140,7 +140,7 @@ function App() {
     <BrowserRouter>
       <div className="app-container">
         {/* Sidebar Section */}
-        <Sidebar />
+        <Sidebar theme={theme} toggleDarkMode={toggleDarkMode} />
 
         {/* Main Content Area */}
         <main className="main-panel">
@@ -298,15 +298,6 @@ function App() {
             {contactOpen ? '✕' : '💬'}
           </button>
         </div>
-
-        {/* Floating Dark Mode Toggle */}
-        <button 
-          className="theme-toggle-floating"
-          onClick={toggleDarkMode}
-          title={theme === 'dark' || theme === 'cyber' ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
-        >
-          {theme === 'dark' || theme === 'cyber' ? '☀️' : '🌙'}
-        </button>
       </div>
     </BrowserRouter>
   );
