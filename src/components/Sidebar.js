@@ -13,6 +13,16 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
   const navigate = useNavigate();
   const [showUserModal, setShowUserModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const getLocalDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${date}`;
+  };
+
+  const streakCompletedToday = user && user.lastStudyDate === getLocalDateString();
   const [vocabExpanded, setVocabExpanded] = useState(
     location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals') || location.pathname.startsWith('/my-vocabularies')
   );
@@ -342,8 +352,33 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                   getInitials(user.name)
                 )}
               </div>
-              <div className="user-info">
-                <span className="user-name">{user.name}</span>
+              <div className="user-info" style={{ flex: 1, minWidth: 0 }}>
+                <span className="user-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '4px' }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</span>
+                  {user.streakCount > 0 && (
+                    <span 
+                      className={`streak-badge ${streakCompletedToday ? 'completed' : 'pending'}`} 
+                      title={streakCompletedToday ? `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay đã hoàn thành!)` : `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay chưa hoàn thành, hãy học 5 phút!)`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        backgroundColor: streakCompletedToday ? '#fff3e0' : 'var(--color-primary-light)',
+                        border: streakCompletedToday ? '1.5px solid #ff9800' : '1.5px solid var(--color-black)',
+                        borderRadius: '12px',
+                        padding: '1px 6px',
+                        fontSize: '11px',
+                        fontWeight: '800',
+                        color: streakCompletedToday ? '#e65100' : 'var(--color-black)',
+                        filter: streakCompletedToday ? 'none' : 'grayscale(1)',
+                        opacity: streakCompletedToday ? 1 : 0.6,
+                        flexShrink: 0
+                      }}
+                    >
+                      🔥 {user.streakCount}
+                    </span>
+                  )}
+                </span>
                 <span className="user-email">{user.email}</span>
               </div>
             </div>
@@ -379,6 +414,15 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               </div>
               <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: '900' }}>{user.name}</h3>
               <p style={{ margin: 0, fontSize: '12px', color: '#666', fontWeight: '700' }}>{user.email}</p>
+              {user.streakCount > 0 && (
+                <div style={{ margin: '10px 0 0 0', fontSize: '13px', fontWeight: '800', color: 'var(--color-black)' }}>
+                  {streakCompletedToday ? (
+                    <span style={{ color: '#e65100' }}>🔥 Chuỗi: <strong>{user.streakCount} ngày</strong> (Đã hoàn thành!)</span>
+                  ) : (
+                    <span style={{ color: 'var(--color-black)', opacity: 0.7 }}>🔥 Chuỗi: <strong>{user.streakCount} ngày</strong> ({Math.round(Math.min(300, user.studyTimeToday || 0) / 60)}/5p hôm nay)</span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

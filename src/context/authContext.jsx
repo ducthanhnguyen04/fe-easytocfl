@@ -32,6 +32,70 @@ export function AuthProvider({ children }) {
         checkLogin();
     }, []);
 
+    // Heartbeat to track user daily study time (streak)
+    useEffect(() => {
+        if (!user) return;
+
+        let isWindowFocused = true;
+
+        const handleFocus = () => { isWindowFocused = true; };
+        const handleBlur = () => { isWindowFocused = false; };
+
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('blur', handleBlur);
+
+        const interval = setInterval(async () => {
+            if (!isWindowFocused) return;
+
+            try {
+                const getLocalDateString = () => {
+                    const d = new Date();
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const date = String(d.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${date}`;
+                };
+
+                const localDate = getLocalDateString();
+                const res = await fetch("http://localhost:3008/users/streak-heartbeat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        duration: 30,
+                        localDate
+                    }),
+                    credentials: "include",
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(prev => {
+                        if (!prev) return prev;
+                        if (prev.streakCount === data.streakCount && prev.studyTimeToday === data.studyTimeToday) {
+                            return prev;
+                        }
+                        return {
+                            ...prev,
+                            streakCount: data.streakCount,
+                            studyTimeToday: data.studyTimeToday,
+                            lastStudyDate: data.lastStudyDate,
+                        };
+                    });
+                }
+            } catch (err) {
+                console.error("Heartbeat sync error:", err);
+            }
+        }, 30000);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('focus', handleFocus);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, [user]);
+
     return (
         <AuthContext.Provider value={{ user, setUser, loading }}>
             {children}

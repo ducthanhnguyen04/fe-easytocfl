@@ -126,7 +126,8 @@
 .empty-table-row {
   text-align: center;
   padding: 30px !important;
-  color: #666;
+  color: var(--color-black) !important;
+  opacity: 0.6;
   font-style: italic;
 }
 
@@ -142,7 +143,7 @@
 }
 
 .delete-action-btn {
-  background-color: #ffe5e0;
+  background-color: var(--color-primary-light);
   color: var(--color-primary);
   border: var(--border-medium);
   border-radius: var(--radius-sm);
@@ -167,8 +168,8 @@
 }
 
 .edit-action-btn {
-  background-color: #e6fcf5;
-  color: #0ca678;
+  background-color: var(--color-secondary-light);
+  color: var(--color-secondary);
   border: var(--border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 12px;
@@ -180,7 +181,7 @@
 }
 
 .edit-action-btn:hover {
-  background-color: #0ca678;
+  background-color: var(--color-secondary);
   color: var(--color-white);
   transform: translate(-1px, -1px);
   box-shadow: var(--shadow-thin);
@@ -202,5 +203,61 @@
 .admin-access-denied .error-card {
   border: 3px solid var(--color-primary) !important;
   box-shadow: 6px 6px 0px var(--color-primary) !important;
-  background-color: #fffaf9;
+  background-color: var(--color-white);
+}
+
+/* Dark Mode overrides for inline background colors and text colors inside Admin CMS */
+
+/* 1. Form Section Title Badge ("Tổng cộng") */
+.form-section-title span:last-child {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-black) !important;
+  border: 1px solid var(--color-black) !important;
+}
+
+/* 2. Upload file button inside levels/textbooks forms */
+.admin-form-card button[style*="backgroundColor: '#edf2f7'"],
+.admin-form-card button[style*="backgroundColor: #edf2f7"],
+.admin-form-card button.neo-btn {
+  background-color: var(--color-white) !important;
+  color: var(--color-black) !important;
+  border: var(--border-thick) !important;
+}
+
+.admin-form-card button.neo-btn:hover {
+  background-color: var(--color-primary-light) !important;
+}
+
+/* 3. Helper subtexts in tables (like pinyin italic div) */
+.admin-table td div[style*="color: '#666'"],
+.admin-table td div[style*="color: #666"],
+.admin-table td span[style*="color: '#666'"],
+.admin-table td span[style*="color: #666"] {
+  color: var(--color-black) !important;
+  opacity: 0.6;
+}
+
+/* 4. Table cell texts that might have hardcoded colors */
+.admin-table td span[style*="color: '#aaa'"],
+.admin-table td span[style*="color: #aaa"] {
+  color: var(--color-black) !important;
+  opacity: 0.5;
+}
+
+/* 5. Vocabularies helper subtext */
+.admin-form-card p[style*="color: '#555'"],
+.admin-form-card p[style*="color: #555"] {
+  color: var(--color-black) !important;
+  opacity: 0.7;
+}
+
+/* 6. Form preview image wrapper border */
+.admin-form-card div[style*="border: '2px solid #000'"],
+.admin-form-card div[style*="border: 2px solid #000"] {
+  border: 2px solid var(--color-black) !important;
+}
+
+.admin-form-card img[style*="border: '2px solid #000'"],
+.admin-form-card img[style*="border: 2px solid #000"] {
+  border: 2px solid var(--color-black) !important;
 }
