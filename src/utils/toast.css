@@ -1,5 +1,38 @@
 /* Neo-Brutalism Toast Stylesheet */
 
+:root {
+    --toast-color-success: #2a9d8f;
+    --toast-color-success-light: #e6f6f4;
+    --toast-color-error: #e55b44;
+    --toast-color-error-light: #ffedea;
+    --toast-color-warning: #f4a261;
+    --toast-color-warning-light: #fef4ec;
+    --toast-color-info: #3d84b8;
+    --toast-color-info-light: #ebf3f9;
+}
+
+body.theme-dark {
+    --toast-color-success: #2a9d8f;
+    --toast-color-success-light: #123330;
+    --toast-color-error: #e55b44;
+    --toast-color-error-light: #3f221e;
+    --toast-color-warning: #f4a261;
+    --toast-color-warning-light: #3e2e21;
+    --toast-color-info: #3d84b8;
+    --toast-color-info-light: #1c2d3a;
+}
+
+body.theme-cyber {
+    --toast-color-success: #06b6d4;
+    --toast-color-success-light: #07343e;
+    --toast-color-error: #f43f5e;
+    --toast-color-error-light: #3c1420;
+    --toast-color-warning: #facc15;
+    --toast-color-warning-light: #3e380e;
+    --toast-color-info: #3b82f6;
+    --toast-color-info-light: #0e203e;
+}
+
 #neo-toast-container {
     position: fixed;
     top: 24px;
@@ -26,6 +59,22 @@
     animation: neoToastSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.25) forwards;
 }
 
+.neo-toast-error {
+    background-color: var(--toast-color-error-light);
+}
+
+.neo-toast-warning {
+    background-color: var(--toast-color-warning-light);
+}
+
+.neo-toast-success {
+    background-color: var(--toast-color-success-light);
+}
+
+.neo-toast-info {
+    background-color: var(--toast-color-info-light);
+}
+
 .neo-toast:hover {
     transform: translate(-2px, -2px);
     box-shadow: var(--shadow-hover);
@@ -48,22 +97,22 @@
 }
 
 .neo-toast-error .neo-toast-icon-wrapper {
-    background-color: var(--color-primary);
+    background-color: var(--toast-color-error);
     color: white;
 }
 
 .neo-toast-warning .neo-toast-icon-wrapper {
-    background-color: var(--color-accent);
+    background-color: var(--toast-color-warning);
     color: var(--color-black);
 }
 
 .neo-toast-success .neo-toast-icon-wrapper {
-    background-color: var(--color-secondary);
+    background-color: var(--toast-color-success);
     color: white;
 }
 
 .neo-toast-info .neo-toast-icon-wrapper {
-    background-color: var(--color-blue);
+    background-color: var(--toast-color-info);
     color: white;
 }
 
@@ -91,19 +140,19 @@
 }
 
 .neo-toast-error .neo-toast-title {
-    color: var(--color-primary);
+    color: var(--toast-color-error);
 }
 
 .neo-toast-warning .neo-toast-title {
-    color: #b25e00;
+    color: var(--toast-color-warning);
 }
 
 .neo-toast-success .neo-toast-title {
-    color: var(--color-secondary);
+    color: var(--toast-color-success);
 }
 
 .neo-toast-info .neo-toast-title {
-    color: var(--color-blue);
+    color: var(--toast-color-info);
 }
 
 .neo-toast-message {
@@ -160,19 +209,19 @@ body.theme-cyber .neo-toast-progress {
 }
 
 .neo-toast-error .neo-toast-progress-fill {
-    background-color: var(--color-primary);
+    background-color: var(--toast-color-error);
 }
 
 .neo-toast-warning .neo-toast-progress-fill {
-    background-color: var(--color-accent);
+    background-color: var(--toast-color-warning);
 }
 
 .neo-toast-success .neo-toast-progress-fill {
-    background-color: var(--color-secondary);
+    background-color: var(--toast-color-success);
 }
 
 .neo-toast-info .neo-toast-progress-fill {
-    background-color: var(--color-blue);
+    background-color: var(--toast-color-info);
 }
 
 /* Animations */

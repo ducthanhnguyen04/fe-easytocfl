@@ -1,0 +1,395 @@
+/* Personal Vocabulary page styles */
+.my-vocab-page {
+  padding-bottom: 60px;
+}
+
+/* Loading & Empty Cards */
+.loading-card, .login-required-card, .empty-vocab-card {
+  padding: 40px;
+  text-align: center;
+  margin: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+.login-required-card h3, .empty-vocab-card h3 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.login-required-card p, .empty-vocab-card p {
+  font-size: 15px;
+  color: #666;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+.login-icon-large, .empty-icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Lists view */
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.list-select-card {
+  padding: 20px;
+  background-color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  cursor: pointer;
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+}
+
+.list-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.folder-icon {
+  font-size: 32px;
+}
+
+.list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.list-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-black);
+  word-break: break-word;
+}
+
+.list-date {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+}
+
+.list-card-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.small-btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: var(--radius-sm);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-thin);
+}
+
+/* Detail view */
+.back-btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.list-summary-card {
+  padding: 20px;
+  margin-bottom: 25px;
+  background-color: var(--color-yellow-light);
+}
+
+.summary-info h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.summary-info p {
+  font-size: 13px;
+  color: #555;
+  font-weight: 600;
+}
+
+.my-vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.my-vocab-card {
+  background-color: var(--color-white);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+}
+
+.vocab-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--color-black);
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+}
+
+.word-pinyin {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.word-text {
+  font-size: 26px;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: color 0.15s ease;
+  color: var(--color-black);
+}
+
+.word-text:hover {
+  color: var(--color-primary);
+}
+
+.word-pinyin-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.vocab-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: var(--color-white);
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-thin);
+  transition: all 0.1s ease;
+}
+
+.icon-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--color-black);
+}
+
+.icon-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--color-black);
+}
+
+.icon-btn.delete:hover {
+  background-color: var(--color-primary-light);
+}
+
+.vocab-card-body {
+  font-size: 14px;
+  color: var(--color-black);
+}
+
+.word-meaning {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.word-example-section {
+  background-color: var(--bg-grid);
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.example-title {
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.example-text {
+  font-weight: 700;
+  font-family: 'Noto Sans TC', sans-serif;
+  color: var(--color-black);
+}
+
+.example-meaning-text {
+  font-weight: 600;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 450px;
+  max-width: 100%;
+  padding: 30px;
+  position: relative;
+  box-shadow: 8px 8px 0px var(--color-black);
+  background-color: var(--color-white);
+  animation: modalEnter 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-card.item-modal {
+  width: 550px;
+}
+
+@keyframes modalEnter {
+  0% {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--color-black);
+}
+
+.modal-card h3 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--color-black);
+  letter-spacing: 0.5px;
+}
+
+.neo-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--color-black);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  outline: none;
+  background-color: white;
+  color: black;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.neo-input:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--color-black);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+/* Dark Mode Adjustments */
+body.theme-dark .login-required-card p,
+body.theme-dark .empty-vocab-card p,
+body.theme-dark .list-date,
+body.theme-dark .example-title,
+body.theme-dark .example-meaning-text,
+body.theme-dark .summary-info p {
+  color: #bbb;
+}
+
+body.theme-dark .neo-input {
+  background-color: #262626;
+  color: #fff;
+}
+
+body.theme-dark .word-meaning {
+  color: #fff;
+}
+
+body.theme-cyber .login-required-card p,
+body.theme-cyber .empty-vocab-card p,
+body.theme-cyber .list-date,
+body.theme-cyber .example-title,
+body.theme-cyber .example-meaning-text,
+body.theme-cyber .summary-info p {
+  color: #ddd;
+}
+
+body.theme-cyber .neo-input {
+  background-color: #2d1822;
+  color: #fff;
+}

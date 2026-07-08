@@ -10,6 +10,7 @@ import Settings from '../pages/Settings/Settings';
 import Admin from '../pages/Admin/Admin';
 import AdminRoute from '../adminRoutes/adminRoute';
 import Radicals from '../pages/Radicals/Radicals';
+import MyVocabulary from '../pages/MyVocabulary/MyVocabulary';
 
 const AppRoutes = ({
   dailyWord,
@@ -79,6 +80,11 @@ const AppRoutes = ({
       <Route
         path="/radicals"
         element={<Radicals />}
+      />
+
+      <Route
+        path="/my-vocabularies"
+        element={<MyVocabulary playAudio={playAudio} />}
       />
 
       {/* Grammar Module Subroutes */}

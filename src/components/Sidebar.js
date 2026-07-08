@@ -14,11 +14,11 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [vocabExpanded, setVocabExpanded] = useState(
-    location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals')
+    location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals') || location.pathname.startsWith('/my-vocabularies')
   );
 
   React.useEffect(() => {
-    if (location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals')) {
+    if (location.pathname.startsWith('/vocab') || location.pathname.startsWith('/radicals') || location.pathname.startsWith('/my-vocabularies')) {
       setVocabExpanded(true);
     }
   }, [location.pathname]);
@@ -225,7 +225,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                 e.preventDefault();
                 setVocabExpanded(!vocabExpanded);
               }}
-              className={`sidebar-link ${isActive('/vocab') || isActive('/radicals') ? 'active' : ''}`}
+              className={`sidebar-link ${isActive('/vocab') || isActive('/radicals') || isActive('/my-vocabularies') ? 'active' : ''}`}
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -257,6 +257,14 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     className={`sidebar-sublink ${location.pathname.startsWith('/radicals') ? 'active' : ''}`}
                   >
                     🧩 Học bộ thủ chữ Hán
+                  </Link>
+                </li>
+                <li className="sidebar-subitem">
+                  <Link
+                    to="/my-vocabularies"
+                    className={`sidebar-sublink ${location.pathname.startsWith('/my-vocabularies') ? 'active' : ''}`}
+                  >
+                    ➕ Bộ từ vựng cá nhân
                   </Link>
                 </li>
               </ul>
