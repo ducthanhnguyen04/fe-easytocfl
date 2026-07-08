@@ -4,9 +4,9 @@
 }
 
 .filter-container {
-  border: 3px solid #000;
+  border: var(--border-thick);
   border-radius: var(--radius-md);
-  box-shadow: 5px 5px 0px #000;
+  box-shadow: var(--shadow-thick);
 }
 
 .filter-row {
@@ -33,7 +33,7 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #000;
+  color: var(--color-black);
   margin-bottom: 8px;
 }
 
@@ -42,17 +42,23 @@
   padding: 12px 16px;
   font-size: 14px;
   font-weight: 700;
-  border: 3px solid #000;
+  border: var(--border-thick);
   border-radius: var(--radius-sm);
   outline: none;
-  background-color: #fff;
-  box-shadow: 3px 3px 0px #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  box-shadow: var(--shadow-thin);
   transition: all 0.15s ease;
+}
+
+.search-input::placeholder {
+  color: var(--color-black);
+  opacity: 0.5;
 }
 
 .search-input:focus {
   transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px #000;
+  box-shadow: var(--shadow-medium);
 }
 
 .stroke-filter-wrapper {
@@ -69,26 +75,27 @@
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 700;
-  background-color: #fff;
-  border: 2px solid #000;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border: var(--border-medium);
   border-radius: var(--radius-sm);
-  box-shadow: 2px 2px 0px #000;
+  box-shadow: var(--shadow-thin);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .stroke-btn:hover {
   transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: var(--shadow-medium);
   background-color: var(--color-primary-light);
 }
 
 .stroke-btn.active {
   background-color: var(--color-primary);
   color: #fff;
-  border-color: #000;
+  border-color: var(--color-black);
   transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px #000;
+  box-shadow: var(--shadow-medium);
 }
 
 .radicals-grid {
@@ -98,26 +105,27 @@
 }
 
 .radical-card {
-  border: 3px solid #000;
+  border: var(--border-thick);
   border-radius: var(--radius-md);
-  box-shadow: 5px 5px 0px #000;
+  box-shadow: var(--shadow-thick);
   padding: 25px;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--color-white);
+  color: var(--color-black);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .radical-card:hover {
   transform: translate(-4px, -4px);
-  box-shadow: 9px 9px 0px #000;
+  box-shadow: var(--shadow-hover);
 }
 
 .radical-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #000;
+  border-bottom: var(--border-medium);
   padding-bottom: 12px;
   margin-bottom: 15px;
 }
@@ -131,9 +139,9 @@
 
 .stroke-badge {
   background-color: var(--color-yellow-light);
-  color: #000;
+  color: var(--color-black);
   font-weight: 800;
-  border: 2px solid #000;
+  border: var(--border-medium);
 }
 
 .radical-pinyin {
@@ -146,21 +154,22 @@
 .radical-meaning {
   font-size: 20px;
   font-weight: 900;
-  color: #000;
+  color: var(--color-black);
   margin-bottom: 12px;
 }
 
 .radical-desc {
   font-size: 13px;
-  color: #555;
+  color: var(--color-black);
+  opacity: 0.8;
   line-height: 1.5;
   margin-bottom: 15px;
   font-weight: 600;
 }
 
 .radical-examples {
-  background-color: #f7f9fa;
-  border: 2px solid #000;
+  background-color: var(--bg-primary);
+  border: var(--border-medium);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: 13px;
@@ -171,13 +180,14 @@
   font-weight: 800;
   font-size: 11px;
   text-transform: uppercase;
-  color: #666;
+  color: var(--color-black);
+  opacity: 0.6;
   margin-bottom: 4px;
 }
 
 .examples-list {
   font-weight: 700;
-  color: #000;
+  color: var(--color-black);
   font-family: 'Noto Sans TC', sans-serif;
   letter-spacing: 0.5px;
 }

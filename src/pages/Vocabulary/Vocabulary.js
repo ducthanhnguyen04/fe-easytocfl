@@ -11,7 +11,6 @@ import { cacheService } from '../../utils/cacheService';
 import FlashcardMode from './components/FlashcardMode';
 import QuizMode from './components/QuizMode';
 import TypingMode from './components/TypingMode';
-import ReadingMode from './components/ReadingMode';
 import DictationMode from './components/DictationMode';
 import VocabList from './components/VocabList';
 
@@ -92,9 +91,20 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   console.log("currentLessonObj:", currentLessonObj);
   console.log("isLessonPremium:", isLessonPremium);
 
-  const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'reading', 'dictation'
+  const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'dictation'
   const [localLessonVocabs, setLocalLessonVocabs] = useState([]);
   const [vocabLoading, setVocabLoading] = useState(false);
+  const [examplesList, setExamplesList] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${beUrl}/examples/get-all`)
+      .then(res => {
+        setExamplesList(res.data.examples || []);
+      })
+      .catch(err => {
+        console.error("Error fetching examples in Vocabulary page:", err);
+      });
+  }, []);
 
   // Review states
   const [isReviewMode, setIsReviewMode] = useState(false);
@@ -491,6 +501,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       vocabWords={vocabWords}
                       toggleVocabLearned={toggleVocabLearned}
                       handlePlayAudio={handlePlayAudio}
+                      examplesList={examplesList}
                     />
                   );
                 }
@@ -512,14 +523,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   );
                 }
 
-                if (vocabMode === 'reading') {
-                  return (
-                    <ReadingMode
-                      currentLessonWords={currentLessonWords}
-                      vocabWords={vocabWords}
-                    />
-                  );
-                }
 
                 if (vocabMode === 'dictation') {
                   return (
@@ -562,13 +565,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div className="mode-card-title">⌨️ Gõ từ vựng</div>
                         <div className="mode-card-status">Luyện viết</div>
                       </div>
-                      <div
-                        className={`neo-card mode-card ${vocabMode === 'reading' ? 'active-reading' : ''}`}
-                        onClick={() => setVocabMode('reading')}
-                      >
-                        <div className="mode-card-title">📖 Đọc hiểu</div>
-                        <div className="mode-card-status">Ngữ cảnh</div>
-                      </div>
+
                       <div
                         className={`neo-card mode-card ${vocabMode === 'dictation' ? 'active-dictation' : ''}`}
                         onClick={() => setVocabMode('dictation')}

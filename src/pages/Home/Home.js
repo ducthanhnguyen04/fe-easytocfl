@@ -176,7 +176,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
 
         <div className="comments-list">
           {commentsList.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '30px', color: '#666', fontWeight: 'bold' }}>
+            <div style={{ textAlign: 'center', padding: '30px', color: 'var(--color-black)', opacity: 0.6, fontWeight: 'bold' }}>
               📭 Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ!
             </div>
           ) : (
@@ -204,49 +204,6 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
               </div>
             ))
           )}
-        </div>
-      </section>
-
-      {/* Daily Challenge Component */}
-      <section className="neo-card daily-widget">
-        <h3 className="daily-title">
-          <span role="img" aria-label="word">💡</span> Từ vựng mỗi ngày (Phồn Thể)
-        </h3>
-        <div className="chinese-character-display">
-          <div className="character-card">
-            {dailyWord.word}
-          </div>
-          <div className="character-details">
-            <div className="character-pinyin">
-              {dailyWord.pinyin}
-              <button
-                className="audio-play-btn"
-                style={{ display: 'inline-flex', marginLeft: '10px', verticalAlign: 'middle' }}
-                onClick={() => playAudio(dailyWord.word)}
-              >
-                🔊
-              </button>
-            </div>
-            <h4 className="character-meaning">Ý nghĩa: {dailyWord.meaning}</h4>
-            <p className="character-example"><strong>Ví dụ:</strong> {dailyWord.exampleCn} ({dailyWord.exampleVn})</p>
-            <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
-              <button
-                className="neo-btn neo-btn-primary"
-                style={{ padding: '8px 16px', fontSize: '12px' }}
-                onClick={handleWordLearned}
-                disabled={dailyWord.learned}
-              >
-                {dailyWord.learned ? '✓ Đã lưu từ' : 'Đánh dấu đã học'}
-              </button>
-              <button
-                className="neo-btn"
-                style={{ padding: '8px 16px', fontSize: '12px' }}
-                onClick={() => showToast('Đang chuyển hướng tới phần viết chữ Hán...', 'info')}
-              >
-                Xem hướng dẫn tập viết
-              </button>
-            </div>
-          </div>
         </div>
       </section>
     </div>

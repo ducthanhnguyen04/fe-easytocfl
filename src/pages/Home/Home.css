@@ -409,6 +409,7 @@
   margin-bottom: 12px;
   resize: vertical;
   background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 .comment-textarea:focus {
@@ -503,7 +504,7 @@
 
 .login-to-comment-box {
   padding: 20px;
-  background-color: #ffe8e8;
+  background-color: var(--color-primary-light);
   border: var(--border-thin);
   border-color: var(--color-primary);
   border-radius: var(--radius-sm);
@@ -515,4 +516,27 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+/* Dark Mode Adjustments for Comments */
+body.theme-dark .comment-text,
+body.theme-cyber .comment-text {
+  color: var(--color-black);
+}
+
+body.theme-dark .comment-input-area,
+body.theme-cyber .comment-input-area {
+  background-color: var(--bg-grid);
+}
+
+body.theme-dark .comment-email,
+body.theme-cyber .comment-email {
+  color: var(--color-black);
+  opacity: 0.65;
+}
+
+body.theme-dark .comment-time,
+body.theme-cyber .comment-time {
+  color: var(--color-black);
+  opacity: 0.5;
 }

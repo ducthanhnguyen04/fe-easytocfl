@@ -287,3 +287,10 @@ body.theme-dark hr {
     right: 30px;
   }
 }
+
+/* Global Dark Mode adjustments for Page Title Banner subtitle */
+body.theme-dark .page-title-banner p,
+body.theme-cyber .page-title-banner p {
+  color: var(--color-black);
+  opacity: 0.7;
+}
