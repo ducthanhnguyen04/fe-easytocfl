@@ -13,6 +13,7 @@ import QuizMode from './components/QuizMode';
 import TypingMode from './components/TypingMode';
 import DictationMode from './components/DictationMode';
 import VocabList from './components/VocabList';
+import ConversationMode from './components/ConversationMode';
 
 const getBookColor = (bookId) => {
   const colors = {
@@ -172,10 +173,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       const audio = new Audio(audioUrl);
       audio.play().catch(err => {
         console.error("Error playing audio from db:", err);
-        playAudio(vocabObj.word);
+        playAudio(vocabObj.word || vocabObj.example || wordOrObj);
       });
     } else {
-      playAudio(vocabObj ? vocabObj.word : wordOrObj);
+      playAudio(vocabObj ? (vocabObj.word || vocabObj.example) : wordOrObj);
     }
   };
 
@@ -506,6 +507,18 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   );
                 }
 
+                if (vocabMode === 'conversation') {
+                  return (
+                    <ConversationMode
+                      bookId={selectedBook}
+                      lessonId={selectedLesson}
+                      currentLessonWords={currentLessonWords}
+                      lessonTitle={currentLessonObj ? currentLessonObj.title : ""}
+                      beUrl={beUrl}
+                    />
+                  );
+                }
+
                 if (vocabMode === 'quiz') {
                   return (
                     <QuizMode
@@ -550,6 +563,13 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div className="mode-card-status">
                           {currentLessonWords.every(v => v.learned) ? 'Đã thuộc' : 'Đang học'}
                         </div>
+                      </div>
+                      <div
+                        className={`neo-card mode-card ${vocabMode === 'conversation' ? 'active-conversation' : ''}`}
+                        onClick={() => setVocabMode('conversation')}
+                      >
+                        <div className="mode-card-title">💬 Bài khóa</div>
+                        <div className="mode-card-status">Hội thoại</div>
                       </div>
                       <div
                         className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}

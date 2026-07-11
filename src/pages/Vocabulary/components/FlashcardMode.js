@@ -77,15 +77,23 @@ const FlashcardMode = ({
     return () => clearTimeout(timer);
   }, [isAutoPlayActive, flashFlipped, flashIndex, flipDuration, nextDuration, currentLessonWords.length]);
 
-  // Autoplay vocabulary audio when card flips to front in slideshow mode
+  // Autoplay vocabulary / example audio when card flips in slideshow mode
   useEffect(() => {
-    if (isAutoPlayActive && !flashFlipped && currentLessonWords.length > 0) {
-      const activeWord = currentLessonWords[flashIndex % currentLessonWords.length];
-      if (activeWord) {
-        handlePlayAudio(activeWord);
+    if (isAutoPlayActive && currentLessonWords.length > 0) {
+      if (!flashFlipped) {
+        // Front side: play vocabulary audio
+        const activeWord = currentLessonWords[flashIndex % currentLessonWords.length];
+        if (activeWord) {
+          handlePlayAudio(activeWord);
+        }
+      } else {
+        // Back side: play example audio if in example mode
+        if (flashContentType === 'example' && activeExample) {
+          handlePlayAudio(activeExample);
+        }
       }
     }
-  }, [flashIndex, flashFlipped, isAutoPlayActive, currentLessonWords, handlePlayAudio]);
+  }, [flashIndex, flashFlipped, isAutoPlayActive, currentLessonWords, flashContentType, activeExample, handlePlayAudio]);
 
   // Keyboard navigation effect
   useEffect(() => {
@@ -273,7 +281,7 @@ const FlashcardMode = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (flashContentType === 'example' && activeExample) {
-                    handlePlayAudio(activeExample.example);
+                    handlePlayAudio(activeExample);
                   } else {
                     handlePlayAudio(activeFlashWord);
                   }

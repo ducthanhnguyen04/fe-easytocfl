@@ -101,7 +101,32 @@ function App() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   const playAudio = (text) => {
-    showToast(`🔊 Đang phát âm thanh mô phỏng cho: "${text}"`, 'info');
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Attempt to get a Chinese voice, prioritizing Taiwan (zh-TW)
+      const voices = window.speechSynthesis.getVoices();
+      const zhVoice = voices.find(v => v.lang === 'zh-TW') || 
+                      voices.find(v => v.lang.includes('zh-TW')) ||
+                      voices.find(v => v.lang.includes('zh-HK')) ||
+                      voices.find(v => v.lang.includes('zh-CN')) || 
+                      voices.find(v => v.lang.startsWith('zh'));
+                      
+      if (zhVoice) {
+        utterance.voice = zhVoice;
+      } else {
+        utterance.lang = 'zh-TW';
+      }
+      
+      // Slower rate for learners
+      utterance.rate = 0.85;
+      
+      window.speechSynthesis.speak(utterance);
+    }
+    showToast(`🔊 Đang phát âm thanh cho: "${text}"`, 'info');
   };
 
   const toggleVocabLearned = (index) => {

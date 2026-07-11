@@ -770,3 +770,199 @@
 .flashcard-container.slide-prev {
   animation: slideInLeft 0.28s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
+
+/* Active conversation mode card styling */
+.mode-card.active-conversation {
+  background-color: #f3e5f5 !important;
+  border-color: #ba68c8 !important;
+  transform: translateY(-2px);
+  color: #1a1a1a !important;
+}
+
+.mode-card.active-conversation .mode-card-status {
+  color: #555 !important;
+  border-color: #999 !important;
+  opacity: 1 !important;
+}
+
+/* Conversation Mode Layout */
+.dialogue-layout-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 25px;
+  margin-top: 15px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .dialogue-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dialogue-chat-container {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.dialogue-header-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #666;
+  text-align: center;
+  border-bottom: 2px dashed #ddd;
+  padding-bottom: 10px;
+}
+
+.dialogue-chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dialogue-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 85%;
+}
+
+.dialogue-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: var(--border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+.dialogue-bubble {
+  background-color: var(--color-white);
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-thin);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dialogue-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+.dialogue-bubble.highlighted {
+  border-color: var(--color-primary) !important;
+  background-color: var(--color-primary-light) !important;
+  box-shadow: var(--shadow-thick) !important;
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+
+.bubble-left {
+  background-color: var(--bg-primary);
+  border-top-left-radius: 0;
+}
+
+.bubble-right {
+  background-color: var(--color-blue-light);
+  border-top-right-radius: 0;
+}
+
+.dialogue-speaker-name {
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.dialogue-text-cn {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.dialogue-inline-play {
+  font-size: 13px;
+  opacity: 0.6;
+  margin-left: 8px;
+  transition: opacity 0.2s;
+}
+
+.dialogue-bubble:hover .dialogue-inline-play {
+  opacity: 1;
+}
+
+.dialogue-text-pinyin {
+  font-size: 13px;
+  color: var(--color-secondary);
+  font-weight: 700;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+.dialogue-text-vn {
+  font-size: 13px;
+  color: #333;
+  font-weight: 600;
+  margin-top: 5px;
+  opacity: 0.9;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 4px;
+}
+
+/* Graphic Panel styles */
+.dialogue-graphic-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background-color: var(--color-white);
+  align-items: center;
+}
+
+.dialogue-illustration-img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-medium);
+}
+
+.dialogue-caption-card {
+  font-size: 12px;
+  color: var(--color-black);
+  opacity: 0.8;
+  font-weight: 600;
+  background-color: var(--color-yellow-light);
+  border: var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  width: 100%;
+  line-height: 1.5;
+}
