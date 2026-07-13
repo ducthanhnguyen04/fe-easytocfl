@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Home from '../pages/Home/Home';
 import Roadmap from '../pages/Roadmap/Roadmap';
 import Vocabulary from '../pages/Vocabulary/Vocabulary';
@@ -24,6 +24,13 @@ const AppRoutes = ({
   activeTheme,
   handleThemeChange
 }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (typeof refreshGlobalData === 'function') {
+      refreshGlobalData();
+    }
+  }, [location.pathname, refreshGlobalData]);
   return (
     <Routes>
       <Route

@@ -137,7 +137,7 @@
     flex-direction: column;
   }
   .main-panel {
-    padding: 20px;
+    padding: 80px 20px 20px 20px;
     height: auto;
   }
 }

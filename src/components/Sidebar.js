@@ -13,6 +13,11 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
   const navigate = useNavigate();
   const [showUserModal, setShowUserModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  React.useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
 
   const getLocalDateString = () => {
     const d = new Date();
@@ -201,13 +206,35 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
 
   return (
     <>
-      <aside className="sidebar">
-        <div className="sidebar-logo" onClick={() => navigate('/')}>
-          <div className="logo-icon">台</div>
-          <div className="logo-text">
-            <span className="logo-title">EASY TOCFL <span style={{ color: 'var(--color-primary)' }}>輕鬆學</span></span>
-            <span className="logo-subtitle">Tiếng Trung Phồn Thể</span>
+      <button 
+        className="mobile-menu-btn" 
+        onClick={() => setIsMobileOpen(true)}
+        aria-label="Open menu"
+      >
+        <span className="hamburger-bar"></span>
+        <span className="hamburger-bar"></span>
+        <span className="hamburger-bar"></span>
+      </button>
+
+      {isMobileOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <aside className={`sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-logo">
+          <div className="logo-brand-clicker" onClick={() => { navigate('/'); setIsMobileOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+            <div className="logo-icon">台</div>
+            <div className="logo-text">
+              <span className="logo-title">EASY TOCFL <span style={{ color: 'var(--color-primary)' }}>輕鬆學</span></span>
+              <span className="logo-subtitle">Tiếng Trung Phồn Thể</span>
+            </div>
           </div>
+          <button className="sidebar-close-btn" onClick={() => setIsMobileOpen(false)} aria-label="Close menu">
+            ✕
+          </button>
         </div>
 
         <span className="sidebar-section-title">Học tập chính</span>

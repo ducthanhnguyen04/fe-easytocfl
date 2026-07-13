@@ -38,6 +38,18 @@ function App() {
 
   const fetchBackendData = useCallback(async () => {
     try {
+      try {
+        const versionRes = await axios.get(`${beUrl}/cache-version`);
+        const serverVersion = versionRes.data.version;
+        const clientVersion = sessionStorage.getItem('client_cache_version');
+        if (clientVersion !== String(serverVersion)) {
+          cacheService.clear();
+          sessionStorage.setItem('client_cache_version', String(serverVersion));
+        }
+      } catch (versionErr) {
+        console.error("Failed to fetch or validate cache version:", versionErr);
+      }
+
       let dbLevels = cacheService.get('levels_all');
       if (!dbLevels) {
         const levelsRes = await axios.get(`${beUrl}/levels/get-all`);
