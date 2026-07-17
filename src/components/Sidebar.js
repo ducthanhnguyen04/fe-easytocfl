@@ -374,7 +374,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
             <div className="user-profile-widget" onClick={() => setShowUserModal(true)}>
               <div className="user-avatar">
                 {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   getInitials(user.name)
                 )}
@@ -382,7 +382,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               <div className="user-info" style={{ flex: 1, minWidth: 0 }}>
                 <span className="user-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '4px' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</span>
-                  {user.streakCount > 0 && (
+                  {user.streakCount !== undefined && (
                     <span 
                       className={`streak-badge ${streakCompletedToday ? 'completed' : 'pending'}`} 
                       title={streakCompletedToday ? `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay đã hoàn thành!)` : `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay chưa hoàn thành, hãy học 5 phút!)`}
@@ -402,7 +402,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                         flexShrink: 0
                       }}
                     >
-                      🔥 {user.streakCount}
+                      🔥 {user.streakCount} {streakCompletedToday ? '✔️' : ''}
                     </span>
                   )}
                 </span>
@@ -434,17 +434,17 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '3px solid #000', backgroundColor: 'var(--color-primary-light)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: '900', margin: '0 auto 10px auto', boxShadow: '3px 3px 0px #000', overflow: 'hidden' }}>
                 {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   getInitials(user.name)
                 )}
               </div>
               <h3 style={{ margin: '0 0 5px 0', fontSize: '18px', fontWeight: '900' }}>{user.name}</h3>
               <p style={{ margin: 0, fontSize: '12px', color: '#666', fontWeight: '700' }}>{user.email}</p>
-              {user.streakCount > 0 && (
+              {user.streakCount !== undefined && (
                 <div style={{ margin: '10px 0 0 0', fontSize: '13px', fontWeight: '800', color: 'var(--color-black)' }}>
                   {streakCompletedToday ? (
-                    <span style={{ color: '#e65100' }}>🔥 Chuỗi: <strong>{user.streakCount} ngày</strong> (Đã hoàn thành!)</span>
+                    <span style={{ color: '#e65100' }}>🔥 Chuỗi: <strong>{user.streakCount} ngày</strong> (Đã hoàn thành! ✔️)</span>
                   ) : (
                     <span style={{ color: 'var(--color-black)', opacity: 0.7 }}>🔥 Chuỗi: <strong>{user.streakCount} ngày</strong> ({Math.round(Math.min(300, user.studyTimeToday || 0) / 60)}/5p hôm nay)</span>
                   )}

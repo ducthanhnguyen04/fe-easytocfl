@@ -245,7 +245,7 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
                 }}
               >
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={avatarUrl} alt="Avatar" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                   getInitials(name)
                 )}

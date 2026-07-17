@@ -141,7 +141,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
             <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
               <div className="comment-avatar">
                 {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="Avatar" className="comment-avatar-img" />
+                  <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="comment-avatar-img" />
                 ) : (
                   user.name ? user.name[0].toUpperCase() : 'U'
                 )}
@@ -184,7 +184,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
               <div key={c.id} className="comment-card">
                 <div className="comment-avatar">
                   {c.user?.avatarUrl ? (
-                    <img src={c.user.avatarUrl} alt={c.user.userName} className="comment-avatar-img" />
+                    <img src={c.user.avatarUrl} alt={c.user.userName} referrerPolicy="no-referrer" className="comment-avatar-img" />
                   ) : (
                     c.user?.userName ? c.user.userName[0].toUpperCase() : '?'
                   )}

@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { showToast } from "../utils/toast";
+import beUrl from "../api-url/api-backend";
 
 export const AuthContext = createContext();
 
@@ -10,7 +11,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const checkLogin = async () => {
             try {
-                const res = await fetch("http://localhost:3008/auth/check", {
+                const res = await fetch(`${beUrl}/auth/check`, {
                     credentials: "include",
                 });
 
@@ -57,7 +58,7 @@ export function AuthProvider({ children }) {
                 };
 
                 const localDate = getLocalDateString();
-                const res = await fetch("http://localhost:3008/users/streak-heartbeat", {
+                const res = await fetch(`${beUrl}/users/streak-heartbeat`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -76,6 +77,13 @@ export function AuthProvider({ children }) {
                         if (prev.streakCount === data.streakCount && prev.studyTimeToday === data.studyTimeToday) {
                             return prev;
                         }
+
+                        // Check if the streak has just been completed today
+                        const wasCompletedJustNow = prev.lastStudyDate !== localDate && data.lastStudyDate === localDate;
+                        if (wasCompletedJustNow) {
+                            showToast(`🔥 Tuyệt vời! Bạn đã hoàn thành chuỗi học tập ${data.streakCount} ngày!`, 'success');
+                        }
+
                         return {
                             ...prev,
                             streakCount: data.streakCount,
@@ -94,7 +102,7 @@ export function AuthProvider({ children }) {
             window.removeEventListener('focus', handleFocus);
             window.removeEventListener('blur', handleBlur);
         };
-    }, [user]);
+    }, [user?.id]);
 
     return (
         <AuthContext.Provider value={{ user, setUser, loading }}>

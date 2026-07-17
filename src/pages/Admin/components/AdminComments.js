@@ -133,6 +133,7 @@ const AdminComments = ({
                           <img
                             src={c.user?.avatarUrl || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
                             alt="Avatar"
+                            referrerPolicy="no-referrer"
                             style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid var(--color-black)' }}
                           />
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
