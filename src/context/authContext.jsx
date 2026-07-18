@@ -74,7 +74,11 @@ export function AuthProvider({ children }) {
                     const data = await res.json();
                     setUser(prev => {
                         if (!prev) return prev;
-                        if (prev.streakCount === data.streakCount && prev.studyTimeToday === data.studyTimeToday) {
+                        if (
+                            prev.streakCount === data.streakCount &&
+                            prev.studyTimeToday === data.studyTimeToday &&
+                            prev.longestStreak === data.longestStreak
+                        ) {
                             return prev;
                         }
 
@@ -87,6 +91,7 @@ export function AuthProvider({ children }) {
                         return {
                             ...prev,
                             streakCount: data.streakCount,
+                            longestStreak: data.longestStreak,
                             studyTimeToday: data.studyTimeToday,
                             lastStudyDate: data.lastStudyDate,
                         };

@@ -201,6 +201,56 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
         </div>
       </div>
 
+      {/* Streak statistics & record card */}
+      <div className="streak-stats-card">
+        <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px', marginBottom: '15px' }}>
+          🔥 Thống Kê & Kỷ Lục Chuỗi Học Tập
+        </h3>
+        <div className="streak-stats-grid">
+          {/* Longest streak record */}
+          <div className="streak-stat-box highlight-record">
+            <div className="streak-stat-icon">🏆</div>
+            <div className="streak-stat-info">
+              <span className="streak-stat-label">Kỷ lục chuỗi dài nhất</span>
+              <span className="streak-stat-value">
+                {Math.max(user?.longestStreak || 0, user?.streakCount || 0)} ngày
+              </span>
+              <span className="streak-stat-subtext">Thành tích cao nhất đạt được</span>
+            </div>
+          </div>
+
+          {/* Current streak */}
+          <div className="streak-stat-box highlight-streak">
+            <div className="streak-stat-icon">🔥</div>
+            <div className="streak-stat-info">
+              <span className="streak-stat-label">Chuỗi học hiện tại</span>
+              <span className="streak-stat-value">
+                {user?.streakCount || 0} ngày
+              </span>
+              <span className="streak-stat-subtext">
+                {user?.lastStudyDate === (function() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })() 
+                  ? '✔️ Hôm nay đã hoàn thành!' 
+                  : '⏳ Cần học 5 phút hôm nay'}
+              </span>
+            </div>
+          </div>
+
+          {/* Today's study time */}
+          <div className="streak-stat-box">
+            <div className="streak-stat-icon">⏱️</div>
+            <div className="streak-stat-info">
+              <span className="streak-stat-label">Hôm nay đã học</span>
+              <span className="streak-stat-value">
+                {Math.round(Math.min(300, user?.studyTimeToday || 0) / 60)} / 5 phút
+              </span>
+              <span className="streak-stat-subtext">
+                {(user?.studyTimeToday || 0) >= 300 ? '🎉 Đạt mục tiêu ngày!' : `Còn ${Math.max(0, 5 - Math.round((user?.studyTimeToday || 0) / 60))} phút`}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="settings-grid-layout">
         {/* Left Column: Account Info & Preferences */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
