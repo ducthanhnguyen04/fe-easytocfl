@@ -45,8 +45,26 @@ const Grammar = ({ playAudio }) => {
   console.log("level:", levels);
   const navigate = useNavigate();
 
-  const selectedGrammarBook = bookId ? parseInt(bookId) : null;
-  const selectedGrammarLesson = lessonId ? parseInt(lessonId) : null;
+  const currentBook = useMemo(() => {
+    if (!bookId) return null;
+    return levels.find(b => b.slug === bookId || String(b.id) === String(bookId)) ||
+           textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
+  }, [levels, bookId]);
+
+  const selectedGrammarBook = currentBook ? currentBook.id : (bookId && !isNaN(bookId) ? parseInt(bookId) : null);
+
+  const lessonsList = useMemo(() => {
+    if (!currentBook) return [];
+    const list = Array.isArray(currentBook.lessons) ? currentBook.lessons : (bookLessons[selectedGrammarBook] || []);
+    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
+  }, [currentBook, selectedGrammarBook]);
+
+  const currentLesson = useMemo(() => {
+    if (!lessonId) return null;
+    return lessonsList.find(l => l.slug === lessonId || String(l.id) === String(lessonId));
+  }, [lessonsList, lessonId]);
+
+  const selectedGrammarLesson = currentLesson ? currentLesson.id : (lessonId && !isNaN(lessonId) ? parseInt(lessonId) : null);
   const selectedGrammarPointId = grammarPointId ? parseInt(grammarPointId) : null;
 
   const { user } = useAuth();
@@ -58,19 +76,6 @@ const Grammar = ({ playAudio }) => {
       user.isPremium === '1' ||
       String(user.isPremium).toLowerCase() === 'true';
   }, [user]);
-
-  const currentBook = useMemo(() => {
-    return levels.find(b => Number(b.id) === Number(selectedGrammarBook)) || textbooks.find(b => Number(b.id) === Number(selectedGrammarBook));
-  }, [levels, selectedGrammarBook]);
-
-  const lessonsList = useMemo(() => {
-    const list = Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedGrammarBook] || []);
-    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
-  }, [currentBook, selectedGrammarBook]);
-
-  const currentLesson = useMemo(() => {
-    return lessonsList.find(l => Number(l.id) === Number(selectedGrammarLesson));
-  }, [lessonsList, selectedGrammarLesson]);
 
   const isLessonPremium = useMemo(() => {
     if (!currentLesson) return false;
@@ -157,7 +162,7 @@ const Grammar = ({ playAudio }) => {
                 key={book.id}
                 className="neo-card book-select-card"
                 onClick={() => {
-                  navigate(`/grammar/${book.id}`);
+                  navigate(`/grammar/${book.slug || book.id}`);
                 }}
               >
                 <div className="book-image">
@@ -214,7 +219,7 @@ const Grammar = ({ playAudio }) => {
                         showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
                         navigate('/settings');
                       } else {
-                        navigate(`/grammar/${selectedGrammarBook}/${lesson.id}`);
+                        navigate(`/grammar/${currentBook?.slug || bookId}/${lesson.slug || lesson.id}`);
                       }
                     }}
                   >
@@ -241,7 +246,7 @@ const Grammar = ({ playAudio }) => {
           <div style={{ marginBottom: '15px' }}>
             <button
               className="neo-btn"
-              onClick={() => navigate(`/grammar/${selectedGrammarBook}`)}
+              onClick={() => navigate(`/grammar/${currentBook?.slug || bookId}`)}
             >
               ← Danh sách bài học
             </button>
@@ -279,7 +284,7 @@ const Grammar = ({ playAudio }) => {
             <div style={{ marginBottom: '15px' }}>
               <button
                 className="neo-btn"
-                onClick={() => navigate(`/grammar/${selectedGrammarBook}`)}
+                onClick={() => navigate(`/grammar/${currentBook?.slug || bookId}`)}
               >
                 ← Danh sách bài học
               </button>
@@ -307,7 +312,7 @@ const Grammar = ({ playAudio }) => {
                     className="neo-card grammar-card"
                     style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                     onClick={() => {
-                      navigate(`/grammar/${selectedGrammarBook}/${selectedGrammarLesson}/${gp.id}`);
+                      navigate(`/grammar/${currentBook?.slug || bookId}/${currentLesson?.slug || lessonId}/${gp.id}`);
                     }}
                   >
                     <div className="grammar-header">
@@ -338,7 +343,7 @@ const Grammar = ({ playAudio }) => {
           return (
             <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold' }}>
               Không tìm thấy cấu trúc ngữ pháp này.
-              <button className="neo-btn" style={{ marginLeft: '10px' }} onClick={() => navigate(`/grammar/${selectedGrammarBook}/${selectedGrammarLesson}`)}>Quay lại</button>
+              <button className="neo-btn" style={{ marginLeft: '10px' }} onClick={() => navigate(`/grammar/${currentBook?.slug || bookId}/${currentLesson?.slug || lessonId}`)}>Quay lại</button>
             </div>
           );
         }
@@ -351,7 +356,7 @@ const Grammar = ({ playAudio }) => {
             <div style={{ marginBottom: '15px' }}>
               <button
                 className="neo-btn"
-                onClick={() => navigate(`/grammar/${selectedGrammarBook}/${selectedGrammarLesson}`)}
+                onClick={() => navigate(`/grammar/${currentBook?.slug || bookId}/${currentLesson?.slug || lessonId}`)}
               >
                 ← Quay lại danh sách cấu trúc
               </button>

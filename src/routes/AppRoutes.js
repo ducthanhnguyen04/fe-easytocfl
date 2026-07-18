@@ -11,6 +11,7 @@ import Admin from '../pages/Admin/Admin';
 import AdminRoute from '../adminRoutes/adminRoute';
 import Radicals from '../pages/Radicals/Radicals';
 import MyVocabulary from '../pages/MyVocabulary/MyVocabulary';
+import WritingPractice from '../pages/Vocabulary/components/WritingPractice';
 
 const AppRoutes = ({
   dailyWord,
@@ -62,6 +63,10 @@ const AppRoutes = ({
             playAudio={playAudio}
           />
         }
+      />
+      <Route
+        path="/vocab/writing-practice"
+        element={<WritingPractice />}
       />
       <Route
         path="/vocab/:bookId"

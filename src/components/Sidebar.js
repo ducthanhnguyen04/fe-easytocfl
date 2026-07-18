@@ -206,8 +206,8 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
 
   return (
     <>
-      <button 
-        className="mobile-menu-btn" 
+      <button
+        className="mobile-menu-btn"
         onClick={() => setIsMobileOpen(true)}
         aria-label="Open menu"
       >
@@ -217,8 +217,8 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
       </button>
 
       {isMobileOpen && (
-        <div 
-          className="sidebar-overlay" 
+        <div
+          className="sidebar-overlay"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -229,7 +229,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
             <div className="logo-icon">台</div>
             <div className="logo-text">
               <span className="logo-title">EASY TOCFL <span style={{ color: 'var(--color-primary)' }}>輕鬆學</span></span>
-              <span className="logo-subtitle">Tiếng Trung Phồn Thể</span>
+              {/* <span className="logo-subtitle">Tiếng Trung Phồn Thể</span> */}
             </div>
           </div>
           <button className="sidebar-close-btn" onClick={() => setIsMobileOpen(false)} aria-label="Close menu">
@@ -268,9 +268,9 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Icon name="vocab" /> Từ vựng
               </div>
-              <span style={{ 
-                fontSize: '10px', 
-                transition: 'transform 0.2s', 
+              <span style={{
+                fontSize: '10px',
+                transition: 'transform 0.2s',
                 transform: vocabExpanded ? 'rotate(90deg)' : 'none',
                 display: 'inline-block'
               }}>
@@ -283,7 +283,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                 <li className="sidebar-subitem">
                   <Link
                     to="/vocab"
-                    className={`sidebar-sublink ${location.pathname.startsWith('/vocab') ? 'active' : ''}`}
+                    className={`sidebar-sublink ${location.pathname === '/vocab' || (location.pathname.startsWith('/vocab/') && !location.pathname.startsWith('/vocab/writing-practice')) ? 'active' : ''}`}
                   >
                     📖 Từ vựng chính khóa
                   </Link>
@@ -302,6 +302,14 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     className={`sidebar-sublink ${location.pathname.startsWith('/my-vocabularies') ? 'active' : ''}`}
                   >
                     ➕ Bộ từ vựng cá nhân
+                  </Link>
+                </li>
+                <li className="sidebar-subitem">
+                  <Link
+                    to="/vocab/writing-practice"
+                    className={`sidebar-sublink ${location.pathname === '/vocab/writing-practice' ? 'active' : ''}`}
+                  >
+                    ✍️ Tạo file luyện viết
                   </Link>
                 </li>
               </ul>
@@ -383,8 +391,8 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                 <span className="user-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '4px' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</span>
                   {user.streakCount !== undefined && (
-                    <span 
-                      className={`streak-badge ${streakCompletedToday ? 'completed' : 'pending'}`} 
+                    <span
+                      className={`streak-badge ${streakCompletedToday ? 'completed' : 'pending'}`}
                       title={streakCompletedToday ? `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay đã hoàn thành!)` : `Chuỗi học tập: ${user.streakCount} ngày liên tiếp (Hôm nay chưa hoàn thành, hãy học 5 phút!)`}
                       style={{
                         display: 'inline-flex',

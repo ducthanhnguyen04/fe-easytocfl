@@ -221,13 +221,14 @@ const AdminLevels = ({
                 <th>Hình ảnh</th>
                 <th>Tên Giáo Trình</th>
                 <th>Mã Cấp Độ</th>
+                <th>Slug URL</th>
                 <th style={{ width: '150px' }}>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {levels.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-table-row">Chưa có giáo trình nào</td>
+                  <td colSpan="6" className="empty-table-row">Chưa có giáo trình nào</td>
                 </tr>
               ) : (
                 levels.map((lvl) => (
@@ -242,6 +243,7 @@ const AdminLevels = ({
                     </td>
                     <td style={{ fontWeight: '800' }}>{lvl.levelName}</td>
                     <td><span className="level-code-badge">{lvl.level}</span></td>
+                    <td><code style={{ fontSize: '12px', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' }}>{lvl.slug || '-'}</code></td>
                     <td>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button

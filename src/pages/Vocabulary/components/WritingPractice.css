@@ -1,0 +1,376 @@
+/* Writing Practice Component Styling */
+.writing-practice-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.writing-editor-card {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+  padding: 25px;
+}
+
+@media (max-width: 600px) {
+  .writing-editor-card {
+    padding: 16px;
+  }
+}
+
+/* Selector Bar for File Management */
+.writing-sheet-selector-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px dashed #ccc;
+}
+
+.writing-sheet-select-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.writing-sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .writing-sheet-select-group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .writing-sheet-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .writing-sheet-actions button {
+    flex: 1;
+  }
+}
+
+/* Form Grid */
+.writing-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr auto;
+  gap: 15px;
+  align-items: flex-end;
+  margin-top: 15px;
+}
+
+@media (max-width: 900px) {
+  .writing-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .writing-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .writing-form-grid button {
+    width: 100%;
+  }
+}
+
+/* Table Card & Responsive Table */
+.writing-table-card {
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-thick);
+  padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .writing-table-card {
+    padding: 16px;
+  }
+}
+
+.writing-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .writing-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .writing-card-header button {
+    width: 100%;
+  }
+}
+
+.writing-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 15px;
+}
+
+.writing-vocab-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+}
+
+.writing-vocab-table th,
+.writing-vocab-table td {
+  padding: 12px 16px;
+  border: var(--border-thin);
+  text-align: left;
+}
+
+.writing-vocab-table th {
+  background-color: #f7fafc;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.writing-vocab-table td {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.writing-vocab-char {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--color-black);
+}
+
+/* Control Bar for Sheet Preview */
+.writing-sheet-control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .writing-sheet-control-bar {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .writing-sheet-control-bar button {
+    width: 100%;
+  }
+}
+
+/* Printable A4 Paper Layout */
+.writing-paper-document {
+  background-color: #ffffff;
+  border: 2px solid #111;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 40px 45px;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #111;
+}
+
+@media (max-width: 768px) {
+  .writing-paper-document {
+    padding: 20px 14px;
+    border: 1.5px solid #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+}
+
+.writing-paper-header {
+  margin-bottom: 25px;
+  border-bottom: 2.5px solid #111;
+  padding-bottom: 15px;
+}
+
+.writing-paper-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0 0 4px 0;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+
+@media (max-width: 600px) {
+  .writing-paper-title {
+    font-size: 22px;
+  }
+}
+
+.writing-paper-domain {
+  font-size: 13px;
+  font-weight: 700;
+  color: #666;
+  margin: 0;
+}
+
+/* Vocabulary Block in Document */
+.writing-item-block {
+  margin-bottom: 28px;
+  page-break-inside: avoid;
+}
+
+.writing-item-vocab-line {
+  font-size: 20px;
+  font-weight: 900;
+  color: #111;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .writing-item-vocab-line {
+    font-size: 17px;
+  }
+}
+
+.writing-item-pinyin {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.writing-item-meaning {
+  font-size: 12px;
+  font-weight: 800;
+  color: #444;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Tian Zi Ge Grid (田字格 / 米字格) Row */
+.tianzige-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tianzige-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1.5px solid #222;
+  margin-right: -1.5px;
+  margin-bottom: -1.5px;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+/* Dashed Center Crosslines in Grid Square */
+.tianzige-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  border-left: 1px dashed #c0c0c0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.tianzige-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dashed #c0c0c0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Faint Trace Character Inside Grid Square */
+.tianzige-char {
+  font-size: min(34px, 5.2vw);
+  color: #cccccc; /* Light gray for tracing */
+  font-family: 'KaiTi', 'STKaiti', 'DFKai-SB', 'AR PL UKai TW', 'Noto Serif TC', serif, sans-serif;
+  line-height: 1;
+  user-select: none;
+  z-index: 1;
+}
+
+/* Print CSS Styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sidebar-container,
+  .main-panel > header,
+  .page-title-banner,
+  .contact-fab-wrapper,
+  .writing-sheet-control-bar,
+  .back-btn-container,
+  .neo-btn-group,
+  .contact-fab-trigger {
+    display: none !important;
+  }
+
+  .main-panel {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .writing-paper-document {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .tianzige-box {
+    border-color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tianzige-box::before,
+  .tianzige-box::after {
+    border-color: #bbb !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tianzige-char {
+    font-size: 34px !important;
+    color: #c0c0c0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

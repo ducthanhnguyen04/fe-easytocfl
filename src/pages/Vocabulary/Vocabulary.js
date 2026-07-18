@@ -51,8 +51,26 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   console.log("level:", levels);
   const navigate = useNavigate();
 
-  const selectedBook = bookId ? parseInt(bookId) : null;
-  const selectedLesson = lessonId ? parseInt(lessonId) : null;
+  const currentBook = useMemo(() => {
+    if (!bookId) return null;
+    return levels.find(b => b.slug === bookId || String(b.id) === String(bookId)) ||
+           textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
+  }, [levels, bookId]);
+
+  const selectedBook = currentBook ? currentBook.id : (bookId && !isNaN(bookId) ? parseInt(bookId) : null);
+
+  const lessonsList = useMemo(() => {
+    if (!currentBook) return [];
+    const list = Array.isArray(currentBook.lessons) ? currentBook.lessons : (bookLessons[selectedBook] || []);
+    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
+  }, [currentBook, selectedBook]);
+
+  const currentLessonObj = useMemo(() => {
+    if (!lessonId) return null;
+    return lessonsList.find(l => l.slug === lessonId || String(l.id) === String(lessonId));
+  }, [lessonsList, lessonId]);
+
+  const selectedLesson = currentLessonObj ? currentLessonObj.id : (lessonId && !isNaN(lessonId) ? parseInt(lessonId) : null);
 
   const { user } = useAuth();
   const hasPremiumAccess = useMemo(() => {
@@ -63,19 +81,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       user.isPremium === '1' ||
       String(user.isPremium).toLowerCase() === 'true';
   }, [user]);
-
-  const currentBook = useMemo(() => {
-    return levels.find(b => Number(b.id) === Number(selectedBook)) || textbooks.find(b => Number(b.id) === Number(selectedBook));
-  }, [levels, selectedBook]);
-
-  const lessonsList = useMemo(() => {
-    const list = Array.isArray(currentBook?.lessons) ? currentBook.lessons : (bookLessons[selectedBook] || []);
-    return [...list].sort((a, b) => Number(a.id) - Number(b.id));
-  }, [currentBook, selectedBook]);
-
-  const currentLessonObj = useMemo(() => {
-    return lessonsList.find(l => Number(l.id) === Number(selectedLesson));
-  }, [lessonsList, selectedLesson]);
 
   const isLessonPremium = useMemo(() => {
     if (!currentLessonObj) return false;
@@ -230,6 +235,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }
   };
 
+
+
   return (
     <div>
       {selectedBook === null ? (
@@ -240,8 +247,19 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
               <h2>Từ vựng tiếng Trung Phồn thể</h2>
               <p>Chọn giáo trình thời đại TOCFL để bắt đầu học từ vựng</p>
             </div>
-            <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
-              {vocabWords.filter(v => v.learned).length} / {vocabWords.length} Từ Đã Học
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <button
+                className="neo-btn neo-btn-primary"
+                style={{ backgroundColor: 'var(--color-accent)', padding: '10px 16px', fontSize: '13px' }}
+                onClick={() => {
+                  navigate('/vocab/writing-practice');
+                }}
+              >
+                📝 Tạo file viết từ vựng
+              </button>
+              <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
+                {vocabWords.filter(v => v.learned).length} / {vocabWords.length} Từ Đã Học
+              </div>
             </div>
           </div>
 
@@ -252,7 +270,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   key={book.id}
                   className="neo-card book-select-card"
                   onClick={() => {
-                    navigate(`/vocab/${book.id}`);
+                    navigate(`/vocab/${book.slug || book.id}`);
                   }}
                 >
                   <div className="book-image">
@@ -379,7 +397,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                                 setSelectedLessonIdsForReview(prev => [...prev, lesson.id]);
                               }
                             } else {
-                              navigate(`/vocab/${selectedBook}/${lesson.id}`);
+                              navigate(`/vocab/${currentBook?.slug || bookId}/${lesson.slug || lesson.id}`);
                             }
                           }
                         }}
@@ -424,7 +442,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   setLocalLessonVocabs([]);
                   setReviewSelecting(true);
                 } else {
-                  navigate(`/vocab/${selectedBook}`);
+                  navigate(`/vocab/${currentBook?.slug || bookId}`);
                 }
               }}
             >
@@ -592,6 +610,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       >
                         <div className="mode-card-title">🎧 Nghe chép</div>
                         <div className="mode-card-status">Nghe nói</div>
+                      </div>
+
+                      <div
+                        className="neo-card mode-card"
+                        style={{ borderColor: 'var(--color-accent)' }}
+                        onClick={() => {
+                          navigate('/vocab/writing-practice', { state: { initialVocabs: currentLessonWords } });
+                        }}
+                      >
+                        <div className="mode-card-title">✍️ In tập viết</div>
+                        <div className="mode-card-status">Ô chữ Mắt Cáo</div>
                       </div>
                     </div>
                   </div>
