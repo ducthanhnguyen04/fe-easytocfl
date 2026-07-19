@@ -616,7 +616,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         className="neo-card mode-card"
                         style={{ borderColor: 'var(--color-accent)' }}
                         onClick={() => {
-                          navigate('/vocab/writing-practice', { state: { initialVocabs: currentLessonWords } });
+                          const lessonTitle = isReviewMode
+                            ? 'Luyện viết - Tổng ôn tập'
+                            : (currentLessonObj
+                                ? `Luyện viết - ${currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`}`
+                                : `Luyện viết - Bài ${selectedLesson}`);
+                          navigate('/vocab/writing-practice', {
+                            state: {
+                              initialVocabs: currentLessonWords,
+                              lessonTitle: lessonTitle
+                            }
+                          });
                         }}
                       >
                         <div className="mode-card-title">✍️ In tập viết</div>

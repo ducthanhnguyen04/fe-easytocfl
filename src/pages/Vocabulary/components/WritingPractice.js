@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import beUrl from '../../../api-url/api-backend';
@@ -10,6 +10,7 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
   const { user } = useAuth();
   const location = useLocation();
   const effectiveInitialVocabs = location.state?.initialVocabs || initialVocabs;
+  const hasProcessedRef = useRef(false);
 
   const [savedSheets, setSavedSheets] = useState([]);
   const [currentSheetId, setCurrentSheetId] = useState(null);
@@ -24,33 +25,94 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
   const [meaningInput, setMeaningInput] = useState('');
   const [editingId, setEditingId] = useState(null);
 
-  // Fetch writing sheets from backend database on mount
+  // Fetch writing sheets from backend database on mount and handle lesson state
   useEffect(() => {
     const fetchSheets = async () => {
       try {
         setLoading(true);
         const res = await axios.get(`${beUrl}/writing-sheets`, { withCredentials: true });
         const list = res.data.sheets || [];
-        setSavedSheets(list);
 
-        if (list.length > 0) {
-          const firstSheet = list[0];
-          setCurrentSheetId(firstSheet.id);
-          setSheetTitle(firstSheet.title);
-          const sorted = [...(firstSheet.items || [])].sort((a, b) => Number(a.id) - Number(b.id));
-          setItems(sorted);
-        } else {
-          // Auto create first sheet in DB
+        const targetTitle = location.state?.lessonTitle || (location.state?.initialVocabs?.length > 0 ? 'Luyện viết từ vựng' : null);
+        const navVocabs = location.state?.initialVocabs || initialVocabs;
+
+        if (targetTitle && !hasProcessedRef.current) {
+          hasProcessedRef.current = true;
+
+          // Ask backend to find or create sheet atomically by title
           const createRes = await axios.post(
             `${beUrl}/writing-sheets`,
-            { title: 'File luyện viết #1' },
+            { title: targetTitle, findIfExists: true },
             { withCredentials: true }
           );
-          const created = createRes.data.sheet;
-          setSavedSheets([created]);
-          setCurrentSheetId(created.id);
-          setSheetTitle(created.title);
-          setItems([]);
+
+          const { sheet, isNew } = createRes.data;
+
+          if (sheet) {
+            if (isNew) {
+              // Newly created sheet -> add vocabulary items once
+              const newItems = [];
+              if (navVocabs && navVocabs.length > 0) {
+                for (const v of navVocabs) {
+                  const vocab = v.word || v.vocab || v.vocabulary || '';
+                  const pinyin = v.pinyin || '';
+                  const meaning = v.trans || v.meaning || '';
+                  if (vocab && pinyin && meaning) {
+                    const itemRes = await axios.post(
+                      `${beUrl}/writing-sheets/${sheet.id}/items`,
+                      { vocab, pinyin, meaning },
+                      { withCredentials: true }
+                    );
+                    if (itemRes.data.item) {
+                      newItems.push(itemRes.data.item);
+                    }
+                  }
+                }
+              }
+              sheet.items = newItems;
+              const updatedSheets = [sheet, ...list.filter(s => s.id !== sheet.id)];
+              setSavedSheets(updatedSheets);
+              setCurrentSheetId(sheet.id);
+              setSheetTitle(sheet.title);
+              setItems(newItems.sort((a, b) => Number(a.id) - Number(b.id)));
+              showToast(`Đã tạo file luyện viết "${sheet.title}" với ${newItems.length} từ vựng!`, 'success');
+            } else {
+              // Sheet already existed in DB -> Open it without adding duplicate items
+              const updatedSheets = list.some(s => s.id === sheet.id) ? list : [sheet, ...list];
+              setSavedSheets(updatedSheets);
+              setCurrentSheetId(sheet.id);
+              setSheetTitle(sheet.title);
+              const sorted = [...(sheet.items || [])].sort((a, b) => Number(a.id) - Number(b.id));
+              setItems(sorted);
+              showToast(`Đã mở file luyện viết "${sheet.title}"`, 'info');
+            }
+          }
+
+          // Clear router state to prevent re-triggering on subsequent renders
+          window.history.replaceState({}, document.title);
+        } else {
+          // Standard load (no targetTitle passed or already processed)
+          setSavedSheets(list);
+          if (list.length > 0) {
+            const firstSheet = list[0];
+            setCurrentSheetId(firstSheet.id);
+            setSheetTitle(firstSheet.title);
+            const sorted = [...(firstSheet.items || [])].sort((a, b) => Number(a.id) - Number(b.id));
+            setItems(sorted);
+          } else {
+            // Auto create first sheet in DB if no sheets exist
+            const createRes = await axios.post(
+              `${beUrl}/writing-sheets`,
+              { title: 'File luyện viết #1' },
+              { withCredentials: true }
+            );
+            const created = createRes.data.sheet;
+            created.items = [];
+            setSavedSheets([created]);
+            setCurrentSheetId(created.id);
+            setSheetTitle(created.title);
+            setItems([]);
+          }
         }
       } catch (err) {
         console.error("Error fetching writing sheets from DB:", err);
@@ -61,39 +123,6 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
 
     fetchSheets();
   }, []);
-
-  // Handle passed initialVocabs (e.g. from lesson "In tập viết")
-  useEffect(() => {
-    if (effectiveInitialVocabs && effectiveInitialVocabs.length > 0 && currentSheetId) {
-      const saveLessonVocabsToDb = async () => {
-        try {
-          const newItems = [];
-          for (const v of effectiveInitialVocabs) {
-            const vocab = v.word || v.vocab || v.vocabulary || '';
-            const pinyin = v.pinyin || '';
-            const meaning = v.trans || v.meaning || '';
-            if (vocab && pinyin && meaning) {
-              const res = await axios.post(
-                `${beUrl}/writing-sheets/${currentSheetId}/items`,
-                { vocab, pinyin, meaning },
-                { withCredentials: true }
-              );
-              if (res.data.item) {
-                newItems.push(res.data.item);
-              }
-            }
-          }
-          if (newItems.length > 0) {
-            setItems(prev => [...prev, ...newItems].sort((a, b) => Number(a.id) - Number(b.id)));
-            showToast(`Đã lưu ${newItems.length} từ vựng bài học!`, 'success');
-          }
-        } catch (err) {
-          console.error("Error saving lesson vocabs to DB:", err);
-        }
-      };
-      saveLessonVocabsToDb();
-    }
-  }, [effectiveInitialVocabs, currentSheetId]);
 
   // Select writing sheet from dropdown
   const handleSelectSheet = async (sheetId) => {
