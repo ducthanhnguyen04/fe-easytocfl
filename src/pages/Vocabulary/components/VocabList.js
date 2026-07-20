@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import AudioButton from '../../../components/AudioButton';
 
 const VocabList = ({
   currentLessonWords,
@@ -44,7 +45,7 @@ const VocabList = ({
                 <div className="vocab-headword">
                   <span className="vocab-word">{item.word}</span>
                   <span className="vocab-pinyin">({item.pinyin})</span>
-                  <button className="audio-play-btn" onClick={() => handlePlayAudio(item)}>🔊</button>
+                  <AudioButton onClick={() => handlePlayAudio(item)} showLabel={true} label="Nghe" />
                 </div>
                 <p className="vocab-translation">{item.trans}</p>
                 {item.englishMeaning && (

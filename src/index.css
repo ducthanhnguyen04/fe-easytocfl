@@ -1,6 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+TW+Beginner:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
 :root {
+  --font-kaiti: 'Edu TW Beginner', 'TW-Kai', 'Kaiti TC', 'Kaiti SC', '標楷體', 'BiauKai', 'DFKai-SB', 'KaiTi', 'AR PL UKai TW', 'Noto Serif TC', serif;
+
   --bg-primary: #fcf9f5;
   --bg-grid: #faf4eb;
   --grid-line: rgba(229, 91, 68, 0.08);
@@ -51,6 +53,28 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
   color: var(--color-black);
   line-height: 1.2;
+}
+
+/* Chinese KaiTi / Calligraphic Font Styling */
+.font-kaiti,
+.chinese-text,
+.hanzi-text,
+:lang(zh),
+[lang="zh"],
+.vocab-symbol,
+.vocab-word,
+.flashcard-word,
+.word-text,
+.example-text,
+.examples-list,
+.radical-glyph,
+.writing-vocab-char,
+.tianzige-char,
+.grammar-structure,
+.grammar-ex-cn,
+.grammar-example-cn,
+.dialogue-zh {
+  font-family: var(--font-kaiti);
 }
 
 /* Custom Scrollbar */
@@ -294,3 +318,116 @@ body.theme-cyber .page-title-banner p {
   color: var(--color-black);
   opacity: 0.7;
 }
+
+/* Modern Audio Speaker Button styling matching user design */
+.audio-modern-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: var(--color-blue-light);
+  color: var(--color-blue);
+  border: 1.5px solid rgba(61, 132, 184, 0.35);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  user-select: none;
+  line-height: 1;
+  outline: none;
+}
+
+.audio-modern-btn:hover {
+  background-color: #d0e4f5;
+  color: #2b6b98;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(61, 132, 184, 0.25);
+}
+
+.audio-modern-btn:active {
+  transform: scale(0.95);
+}
+
+.audio-modern-btn.icon-only {
+  padding: 8px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+.audio-modern-label {
+  font-weight: 800;
+  font-size: 13px;
+}
+
+/* Clean Book Cover Grid Layout (6 books per row) */
+.books-grid-cover {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.book-cover-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.book-cover-item-card:hover {
+  transform: translateY(-5px);
+}
+
+.book-cover-img-wrapper {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--color-white);
+  border: var(--border-medium);
+  box-shadow: var(--shadow-medium);
+  transition: box-shadow 0.2s ease;
+}
+
+.book-cover-item-card:hover .book-cover-img-wrapper {
+  box-shadow: var(--shadow-thick);
+}
+
+.book-cover-full-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-cover-item-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-black);
+  margin-top: 10px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+@media (max-width: 1024px) {
+  .books-grid-cover {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .books-grid-cover {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+

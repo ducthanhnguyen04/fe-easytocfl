@@ -314,7 +314,7 @@
 .tianzige-char {
   font-size: min(34px, 5.2vw);
   color: #cccccc; /* Light gray for tracing */
-  font-family: 'KaiTi', 'STKaiti', 'DFKai-SB', 'AR PL UKai TW', 'Noto Serif TC', serif, sans-serif;
+  font-family: var(--font-kaiti);
   line-height: 1;
   user-select: none;
   z-index: 1;

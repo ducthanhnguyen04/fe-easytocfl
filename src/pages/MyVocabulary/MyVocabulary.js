@@ -367,8 +367,8 @@ const MyVocabulary = ({ playAudio }) => {
                 <div key={item.id} className="neo-card my-vocab-card">
                   <div className="vocab-card-header">
                     <div className="word-pinyin">
-                      <span className="word-text" onClick={() => playAudio(item.vocab)} title="Nhấp để nghe">
-                        {item.vocab} 🔊
+                      <span className="word-text">
+                        {item.vocab}
                       </span>
                       <span className="word-pinyin-text">{item.pinyin}</span>
                     </div>

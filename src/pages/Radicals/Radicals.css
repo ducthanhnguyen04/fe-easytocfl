@@ -134,7 +134,7 @@
   font-size: 32px;
   font-weight: 900;
   color: var(--color-black);
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: var(--font-kaiti);
 }
 
 .stroke-badge {
@@ -188,6 +188,6 @@
 .examples-list {
   font-weight: 700;
   color: var(--color-black);
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: var(--font-kaiti);
   letter-spacing: 0.5px;
 }

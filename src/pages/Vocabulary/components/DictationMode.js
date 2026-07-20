@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AudioButton from '../../../components/AudioButton';
 
 const DictationMode = ({
   currentLessonWords,
@@ -127,9 +128,13 @@ const DictationMode = ({
       <div className="workspace-card dictation-yellow">
         <div style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>Bấm nút nghe rồi gõ lại chữ Hán / Pinyin bạn nghe được</div>
 
-        <button className="dictation-speaker-btn" onClick={() => handlePlayAudio(activeDictationWord)}>
-          🔊
-        </button>
+        <AudioButton
+          onClick={() => handlePlayAudio(activeDictationWord)}
+          showLabel={true}
+          label="Nghe lại phát âm"
+          size={20}
+          style={{ padding: '10px 22px', fontSize: '15px' }}
+        />
 
         {showDictationHint && (
           <div style={{ fontSize: '24px', fontWeight: '800', letterSpacing: '4px', margin: '10px 0', color: 'var(--color-primary)' }}>

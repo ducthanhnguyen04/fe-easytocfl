@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import AudioButton from '../../../components/AudioButton';
 
 const FlashcardMode = ({
   currentLessonWords,
@@ -207,32 +208,13 @@ const FlashcardMode = ({
         <div className={`flashcard-inner ${flashFlipped ? 'flipped' : ''}`}>
           <div className="flashcard-face flashcard-front">
             {(flashContentType === 'example' || flashTranslationMode === 'ZH-VI') && (
-              <button
-                className="neo-btn"
-                style={{
-                  position: 'absolute',
-                  top: '15px',
-                  right: '15px',
-                  padding: '0',
-                  fontSize: '16px',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 10,
-                  backgroundColor: 'var(--color-white)',
-                  border: '2px solid var(--color-black)'
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePlayAudio(activeFlashWord);
-                }}
+              <AudioButton
+                onClick={() => handlePlayAudio(activeFlashWord)}
+                showLabel={true}
+                label="Nghe"
+                style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}
                 title="Phát âm từ vựng"
-              >
-                🔊
-              </button>
+              />
             )}
             {flashContentType === 'example' ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
@@ -260,36 +242,19 @@ const FlashcardMode = ({
 
           <div className="flashcard-face flashcard-back">
             {(flashContentType === 'example' || flashTranslationMode === 'VI-ZH') && (
-              <button
-                className="neo-btn"
-                style={{
-                  position: 'absolute',
-                  top: '15px',
-                  right: '15px',
-                  padding: '0',
-                  fontSize: '16px',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 10,
-                  backgroundColor: 'var(--color-white)',
-                  border: '2px solid var(--color-black)'
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
+              <AudioButton
+                onClick={() => {
                   if (flashContentType === 'example' && activeExample) {
                     handlePlayAudio(activeExample);
                   } else {
                     handlePlayAudio(activeFlashWord);
                   }
                 }}
+                showLabel={true}
+                label="Nghe"
+                style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}
                 title={flashContentType === 'example' ? "Phát âm câu ví dụ" : "Phát âm từ vựng"}
-              >
-                🔊
-              </button>
+              />
             )}
             {flashContentType === 'example' ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', padding: '10px' }}>

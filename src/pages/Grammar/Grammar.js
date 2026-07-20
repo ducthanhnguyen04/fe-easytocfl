@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import AudioButton from '../../components/AudioButton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons, grammarPoints } from '../../data/db';
 import { getAIEvaluationFeedback } from '../../utils/feedback';
@@ -157,7 +158,7 @@ const Grammar = ({ playAudio }) => {
           </div>
 
           <div className="books-grid">
-            {levels.map((book) => /* const bookGrammarPoints = grammarPoints.filter(g => g.bookId === book.id);*/(
+            {levels.map((book) => (
               <div
                 key={book.id}
                 className="neo-card book-select-card"
@@ -173,10 +174,7 @@ const Grammar = ({ playAudio }) => {
                   <span className="book-select-level">{book.level}</span>
                   <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
                   <div className="book-select-stats">
-                    <span>📖 {book?.lessons.length} bài học</span>
-                    {/* <span>📖 {book.lessons}</span> */}
-                    {/* <span>🔓 {book.status}</span> */}
-                    {/* <span style={{ color: 'var(--color-primary)' }}>💡 {bookGrammarPoints.length} cấu trúc</span> */}
+                    <span>📖 {book?.lessons?.length || 0} bài học</span>
                   </div>
                 </div>
               </div>
@@ -441,13 +439,12 @@ const Grammar = ({ playAudio }) => {
                         → {ex.vn}
                       </div>
                     </div>
-                    <button
-                      className="grammar-audio-btn"
+                    <AudioButton
                       onClick={() => playAudio(ex.cn)}
+                      showLabel={true}
+                      label="Nghe"
                       title="Nghe phát âm"
-                    >
-                      🔊
-                    </button>
+                    />
                   </div>
                 ))}
               </div>
@@ -501,13 +498,13 @@ const Grammar = ({ playAudio }) => {
                         {questionText}
                       </div>
                       {grammarExerciseType === 'zhToVi' && (
-                        <button
-                          className="grammar-audio-btn"
-                          style={{ width: '32px', height: '32px', fontSize: '12px' }}
+                        <AudioButton
                           onClick={() => playAudio(exe.cn)}
-                        >
-                          🔊
-                        </button>
+                          showLabel={false}
+                          size={14}
+                          style={{ width: '32px', height: '32px', padding: 0 }}
+                          title="Nghe phát âm"
+                        />
                       )}
                     </div>
 

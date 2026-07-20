@@ -5,14 +5,39 @@ import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Home.css';
 import { showToast } from '../../utils/toast';
+import { cacheService } from '../../utils/cacheService';
 
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
+  const [levels, setLevels] = useState([]);
+  const [levelsLoading, setLevelsLoading] = useState(false);
   const [commentsList, setCommentsList] = useState([]);
   const [newCommentText, setNewCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      setLevelsLoading(true);
+      try {
+        let data = cacheService.get('levels_all');
+        if (!data) {
+          const response = await axios.get(`${beUrl}/levels/get-all`);
+          data = response.data.levels || [];
+          cacheService.set('levels_all', data);
+        }
+        const sorted = [...data].sort((a, b) => Number(a.id) - Number(b.id));
+        setLevels(sorted);
+      } catch (err) {
+        console.error("Error fetching levels in Home page:", err);
+        setLevels([]);
+      } finally {
+        setLevelsLoading(false);
+      }
+    };
+    fetchLevels();
+  }, []);
 
   const fetchComments = async () => {
     try {
@@ -99,32 +124,34 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
         </div>
       </section> */}
 
-      {/* Hero Section with Custom Taiwan/Taipei 101 content */}
-      <section className="hero-section">
-        <div className="neo-card hero-banner-card">
-          <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white', marginBottom: '15px', width: 'fit-content' }}>
-            Lộ trình Phồn Thể 🇹🇼
-          </div>
-          <h2 className="hero-banner-title">Học Tiếng Trung Đài Loan Hiệu Quả & Vui Vẻ!</h2>
-          <p className="hero-banner-desc">
-            Hệ thống bài học chuẩn khung năng lực TOCFL của Đài Loan. Tập trung sâu vào chữ viết Phồn thể thanh lịch, từ vựng đời sống Đài Loan (MRT, Chợ đêm, Trà sữa) cùng ngữ pháp ứng dụng cực dễ nhớ.
-          </p>
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <button className="neo-btn neo-btn-primary" onClick={() => navigate('/vocab')}>Học từ vựng ngay</button>
-            <button className="neo-btn" onClick={() => navigate('/exam')}>Luyện thi thử</button>
-          </div>
+      {/* Textbook Levels Section */}
+      <section className="section-container">
+        <div className="section-header-container">
+          <h3 className="section-title">📚 Danh sách giáo trình học Phồn thể</h3>
         </div>
 
-        {/* Taipei 101 image card */}
-        <div className="neo-card taipei-showcase-card">
-          <img src="/taipei101.png" alt="Taipei 101 Neo-brutalist Illustration" className="taipei-image" />
-          <div className="taipei-caption">
-            <div className="taipei-caption-text">
-              <h4>Taipei 101 - Biểu tượng Đài Loan</h4>
-              <p>Học chữ Phồn thể, mở khoá cuộc sống Đài Loan</p>
-            </div>
+        {levelsLoading ? (
+          <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold' }}>
+            🔄 Đang tải danh sách giáo trình...
           </div>
-        </div>
+        ) : (
+          <div className="books-grid-cover">
+            {levels.map((book) => (
+              <div
+                key={book.id}
+                className="book-cover-item-card"
+                onClick={() => {
+                  navigate(`/vocab/${book.slug || book.id}`);
+                }}
+              >
+                <div className="book-cover-img-wrapper">
+                  <img src={book.image} alt={book.levelName || book.title} className="book-cover-full-img" />
+                </div>
+                <h4 className="book-cover-item-title">{book.levelName || book.title}</h4>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Comments Board Section */}

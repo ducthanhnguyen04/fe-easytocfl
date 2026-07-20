@@ -325,6 +325,15 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
           </li>
           <li className="sidebar-item">
             <Link
+              to="/roleplay"
+              className={`sidebar-link ${isActive('/roleplay') ? 'active' : ''}`}
+            >
+              <Icon name="conversation" /> Hội thoại nhập vai
+              <span className="demo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>NEW</span>
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
               to="/exam"
               className={`sidebar-link ${isActive('/exam') ? 'active' : ''}`}
             >

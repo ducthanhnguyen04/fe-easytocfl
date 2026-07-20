@@ -169,15 +169,9 @@
 .word-text {
   font-size: 26px;
   font-weight: 800;
-  cursor: pointer;
   user-select: none;
-  font-family: 'Noto Sans TC', sans-serif;
-  transition: color 0.15s ease;
+  font-family: var(--font-kaiti);
   color: var(--color-black);
-}
-
-.word-text:hover {
-  color: var(--color-primary);
 }
 
 .word-pinyin-text {
@@ -248,7 +242,7 @@
 
 .example-text {
   font-weight: 700;
-  font-family: 'Noto Sans TC', sans-serif;
+  font-family: var(--font-kaiti);
   color: var(--color-black);
 }
 

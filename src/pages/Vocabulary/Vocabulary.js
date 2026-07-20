@@ -281,7 +281,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     <span className="book-select-level">{book.level}</span>
                     <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
                     <div className="book-select-stats">
-                      <span>📖 {book?.lessons.length} bài học</span>
+                      <span>📖 {book?.lessons?.length || 0} bài học</span>
                     </div>
                   </div>
                 </div>

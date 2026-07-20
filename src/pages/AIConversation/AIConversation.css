@@ -1,0 +1,657 @@
+/* AI Roleplay Conversation Styling */
+.roleplay-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* Setup Screen */
+.roleplay-setup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.roleplay-banner-card {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  padding: 30px;
+  border-radius: var(--radius-md);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-thick);
+  position: relative;
+  overflow: hidden;
+}
+
+.roleplay-badge-row {
+  margin-bottom: 12px;
+}
+
+.roleplay-badge-new {
+  background-color: #000000;
+  color: #38ef7d;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.roleplay-banner-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.roleplay-banner-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.95;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.roleplay-form-card {
+  padding: 30px;
+  background-color: var(--color-white);
+  border: var(--border-thick);
+  box-shadow: var(--shadow-thick);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.field-label-bold {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-black);
+  margin-bottom: 8px;
+}
+
+.label-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.required-star {
+  color: var(--color-primary);
+  font-weight: 900;
+}
+
+.quick-suggestions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.suggestion-pill-btn {
+  background-color: #ffffff;
+  border: var(--border-medium);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-black);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-medium);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+}
+
+.suggestion-pill-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-thick);
+  background-color: #f8fafc;
+}
+
+.roleplay-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  border: var(--border-thick);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+.level-options-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.level-select-btn {
+  flex: 1;
+  min-width: 130px;
+  padding: 12px;
+  border: var(--border-thick);
+  border-radius: 12px;
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--color-black);
+  box-shadow: var(--shadow-medium);
+  transition: all 0.15s ease;
+}
+
+.level-btn-badge {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-black);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.level-select-btn.active {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #000000;
+  box-shadow: var(--shadow-thick);
+}
+
+.level-select-btn.active .level-btn-badge {
+  background-color: #ffffff;
+  color: #3b82f6;
+}
+
+.start-roleplay-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 900;
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+.form-footer-tip {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666666;
+  text-align: center;
+  margin: 0;
+}
+
+/* Chat Layout Screen */
+.roleplay-chat-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 25px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .roleplay-chat-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Main Chat Box */
+.roleplay-chat-box {
+  display: flex;
+  flex-direction: column;
+  height: 700px;
+  padding: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-thick);
+}
+
+.chat-box-header {
+  padding: 16px 20px;
+  border-bottom: var(--border-thick);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8fafc;
+}
+
+.chat-partner-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.partner-avatar {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  background-color: #fef08a;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partner-name {
+  font-size: 16px;
+  font-weight: 900;
+  margin: 0 0 2px 0;
+}
+
+.partner-status {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.end-chat-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  background-color: #ffffff;
+}
+
+.chat-messages-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #f1f5f9;
+}
+
+.chat-msg-row {
+  display: flex;
+  width: 100%;
+}
+
+.chat-msg-row.ai-row {
+  justify-content: flex-start;
+}
+
+.chat-msg-row.user-row {
+  justify-content: flex-end;
+}
+
+.ai-msg-container {
+  display: flex;
+  gap: 12px;
+  max-width: 85%;
+}
+
+.ai-avatar {
+  font-size: 22px;
+  width: 38px;
+  height: 38px;
+  background-color: #fef08a;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-bubble-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grammar-correction-alert {
+  background-color: #fef2f2;
+  border: 2px solid #ef4444;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #991b1b;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.correction-icon {
+  font-size: 16px;
+}
+
+.ai-msg-bubble {
+  padding: 16px 20px;
+  background-color: #ffffff;
+  border: var(--border-thick);
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+}
+
+.ai-chinese-text {
+  font-family: var(--font-kaiti);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-black);
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.ai-pinyin-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.ai-bubble-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.translation-toggle-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  background-color: #f8fafc;
+}
+
+.ai-vietnamese-translation {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1.5px dashed #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.user-msg-bubble {
+  padding: 14px 18px;
+  background-color: #3b82f6;
+  color: #ffffff;
+  border: var(--border-thick);
+  border-radius: 16px;
+  border-top-right-radius: 4px;
+  max-width: 75%;
+  box-shadow: var(--shadow-medium);
+}
+
+.user-text-content {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.loading-bubble {
+  padding: 12px 18px;
+  background-color: #ffffff;
+}
+
+.typing-indicator {
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+/* Suggested Responses */
+.suggested-responses-container {
+  padding: 10px 16px;
+  background-color: #f8fafc;
+  border-top: var(--border-medium);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggested-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.suggested-pills-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.suggested-pill {
+  font-family: var(--font-kaiti);
+  font-size: 14px;
+  font-weight: 800;
+  background-color: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0px #000000;
+  transition: transform 0.1s ease;
+}
+
+.suggested-pill:hover {
+  transform: translateY(-2px);
+  background-color: #eff6ff;
+}
+
+/* Input Area */
+.chat-input-area {
+  padding: 16px;
+  border-top: var(--border-thick);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+.voice-mic-btn {
+  padding: 10px 14px;
+  font-size: 18px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+.voice-mic-btn.recording {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  animation: pulseMic 1s infinite alternate;
+}
+
+@keyframes pulseMic {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.chat-text-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  border: var(--border-thick);
+  border-radius: 12px;
+}
+
+.send-msg-btn {
+  padding: 10px 18px;
+  font-size: 18px;
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  flex-shrink: 0;
+}
+
+/* Right Sidebar Support Panel */
+.roleplay-sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-widget-card {
+  padding: 20px;
+  background-color: #ffffff;
+  border: var(--border-thick);
+  box-shadow: var(--shadow-thick);
+}
+
+.widget-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #475569;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 8px;
+  margin: 0 0 14px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topic-summary-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.5px solid #000000;
+}
+
+.topic-summary-icon {
+  font-size: 22px;
+}
+
+.topic-summary-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Support Toggles */
+.toggles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+/* Switch UI */
+.neo-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.neo-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  border: 2px solid #000000;
+  transition: 0.2s;
+  border-radius: 24px;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  border: 1.5px solid #000000;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+input:checked + .switch-slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* Vocabulary List */
+.vocab-count-badge {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.empty-vocab-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 700;
+  margin: 0;
+}
+
+.accumulated-vocab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.vocab-mini-item {
+  background-color: #f8fafc;
+  border: 1.5px solid #000000;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.vocab-mini-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.vocab-mini-word {
+  font-family: var(--font-kaiti);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--color-black);
+}
+
+.vocab-mini-pinyin {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.vocab-mini-meaning {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}

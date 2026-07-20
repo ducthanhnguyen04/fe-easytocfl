@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import AudioButton from '../../../components/AudioButton';
 import axios from 'axios';
 
 const ConversationMode = ({
@@ -240,7 +241,12 @@ const ConversationMode = ({
                     {/* Chinese Text */}
                     <div className="dialogue-text-cn">
                       {line.text}
-                      <span className="dialogue-inline-play">🔊</span>
+                      <AudioButton
+                        showLabel={false}
+                        size={14}
+                        style={{ width: '28px', height: '28px', padding: '0', marginLeft: '8px', display: 'inline-flex', verticalAlign: 'middle' }}
+                        onClick={() => playLine(idx, line.text)}
+                      />
                     </div>
 
                     {/* Pinyin (Conditional) */}
