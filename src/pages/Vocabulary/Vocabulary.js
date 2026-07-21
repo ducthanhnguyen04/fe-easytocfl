@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { textbooks, bookLessons } from '../../data/db';
 import beUrl from '../../api-url/api-backend';
@@ -30,6 +30,9 @@ const getBookColor = (bookId) => {
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const { bookId, lessonId } = useParams();
   const [levels, setLevels] = useState([]);
+  
+  const [lessonSubmittedMap, setLessonSubmittedMap] = useState({});
+  const lessonStartTimeRef = useRef(Date.now());
   useEffect(() => {
     const fecthLevel = async () => {
       try {
@@ -162,6 +165,40 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       return propMatch ? { ...dbVocab, learned: propMatch.learned } : dbVocab;
     });
   }, [localLessonVocabs, vocabWords]);
+
+  // Reset start time when selected lesson changes
+  useEffect(() => {
+    lessonStartTimeRef.current = Date.now();
+  }, [selectedLesson]);
+
+  // Automatically submit lesson completion to backend
+  useEffect(() => {
+    if (selectedLesson && currentLessonWords.length > 0) {
+      const allLearned = currentLessonWords.every(v => v.learned);
+      const alreadySubmitted = lessonSubmittedMap[selectedLesson];
+
+      if (allLearned && !alreadySubmitted) {
+        setLessonSubmittedMap(prev => ({ ...prev, [selectedLesson]: true }));
+        const timeSpent = Math.round((Date.now() - lessonStartTimeRef.current) / 1000);
+
+        axios.post(`${beUrl}/score/lesson`, {
+          lessonId: selectedLesson,
+          timeSpent: timeSpent
+        }, { withCredentials: true })
+        .then(res => {
+          const points = res.data.data.pointsEarned;
+          showToast(`🎉 Chúc mừng! Bạn đã học hết từ vựng của bài học này. Cộng +${points} XP!`, 'success');
+        })
+        .catch(err => {
+          console.error("Gửi điểm hoàn thành bài học thất bại:", err);
+          // Don't show toast error if user already completed this lesson (to avoid noisy duplicate toasts)
+          if (err.response?.status !== 400 || !err.response?.data?.message?.includes('đã nhận')) {
+            showToast(err.response?.data?.message || 'Không thể gửi điểm bài học.', 'error');
+          }
+        });
+      }
+    }
+  }, [currentLessonWords, selectedLesson, lessonSubmittedMap]);
 
   const handlePlayAudio = (wordOrObj) => {
     let vocabObj = null;

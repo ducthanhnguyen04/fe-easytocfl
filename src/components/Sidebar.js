@@ -247,15 +247,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               <Icon name="home" /> Trang chủ
             </Link>
           </li>
-          <li className="sidebar-item">
-            <Link
-              to="/roadmap"
-              className={`sidebar-link ${isActive('/roadmap') ? 'active' : ''}`}
-            >
-              <Icon name="route" /> Lộ trình
-              <span className="demo-badge">Hot</span>
-            </Link>
-          </li>
+
           <li className="sidebar-item">
             <button
               onClick={(e) => {
@@ -329,7 +321,6 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               className={`sidebar-link ${isActive('/roleplay') ? 'active' : ''}`}
             >
               <Icon name="conversation" /> Hội thoại nhập vai
-              <span className="demo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>NEW</span>
             </Link>
           </li>
           <li className="sidebar-item">

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Home from '../pages/Home/Home';
-import Roadmap from '../pages/Roadmap/Roadmap';
 import Vocabulary from '../pages/Vocabulary/Vocabulary';
 import Grammar from '../pages/Grammar/Grammar';
 import Exam from '../pages/Exam/Exam';
@@ -49,10 +48,7 @@ const AppRoutes = ({
         path="/home"
         element={<Navigate to="/" replace />}
       />
-      <Route
-        path="/roadmap"
-        element={<Roadmap startQuiz={startQuiz} />}
-      />
+
 
       {/* Vocabulary Module Subroutes */}
       <Route

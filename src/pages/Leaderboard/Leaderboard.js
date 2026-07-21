@@ -1,7 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import beUrl from '../../api-url/api-backend';
+import { useAuth } from '../../context/authContext';
 import './Leaderboard.css';
 
 const Leaderboard = () => {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    axios.get(`${beUrl}/score/leaderboard`)
+      .then(res => {
+        setLeaderboard(res.data.leaderboard || []);
+      })
+      .catch(err => {
+        console.error("Lỗi khi tải bảng xếp hạng:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const getInitials = (name) => {
+    if (!name) return 'UN';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const getAvatarBg = (rank) => {
+    const colors = ['var(--color-yellow)', 'var(--color-secondary)', 'var(--color-primary)', 'var(--color-blue)', 'var(--color-accent)'];
+    return colors[(rank - 1) % colors.length];
+  };
+
   return (
     <div>
       <div className="page-title-banner">
@@ -15,69 +50,78 @@ const Leaderboard = () => {
       </div>
 
       <div className="neo-card" style={{ padding: '20px' }}>
-        <div className="leaderboard-list">
-          
-          <div className="neo-card leaderboard-row" style={{ backgroundColor: '#fffdf4', borderStyle: 'solid' }}>
-            <span className="rank-number rank-1">🏆 1</span>
-            <div className="leaderboard-user">
-              <div className="user-avatar" style={{ backgroundColor: 'var(--color-yellow)' }}>AH</div>
-              <div>
-                <strong>Anh Hoang Nguyen</strong>
-                <div style={{ fontSize: '11px', color: '#666' }}>Đã học 840 từ vựng • 24 Đề thi</div>
-              </div>
-            </div>
-            <span className="leaderboard-score" style={{ color: 'var(--color-primary)' }}>4,820 XP</span>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', fontWeight: '800', color: '#666' }}>
+            🔄 Đang tải bảng xếp hạng...
           </div>
-
-          <div className="neo-card leaderboard-row" style={{ backgroundColor: '#f9f9f9' }}>
-            <span className="rank-number rank-2">🥈 2</span>
-            <div className="leaderboard-user">
-              <div className="user-avatar" style={{ backgroundColor: 'var(--color-secondary)' }}>VT</div>
-              <div>
-                <strong>Vu Tran Tuan</strong>
-                <div style={{ fontSize: '11px', color: '#666' }}>Đã học 510 từ vựng • 18 Đề thi</div>
-              </div>
-            </div>
-            <span className="leaderboard-score">3,150 XP</span>
+        ) : leaderboard.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', fontWeight: '800', color: '#666' }}>
+            Chưa có dữ liệu xếp hạng nào. Hãy bắt đầu học để đứng đầu bảng!
           </div>
+        ) : (
+          <div className="leaderboard-list">
+            {leaderboard.map((item, idx) => {
+              const rank = idx + 1;
+              const isCurrentUser = user && item.id === user.id;
+              
+              let rowStyle = {};
+              let rankBadge = `${rank}`;
+              let rowClass = "neo-card leaderboard-row";
 
-          <div className="neo-card leaderboard-row" style={{ backgroundColor: 'var(--color-primary-light)', borderColor: 'var(--color-primary)' }}>
-            <span className="rank-number rank-3">🥉 3</span>
-            <div className="leaderboard-user">
-              <div className="user-avatar" style={{ backgroundColor: 'var(--color-primary)' }}>TN</div>
-              <div>
-                <strong>Thanh Nguyen Duc (Bạn)</strong>
-                <div style={{ fontSize: '11px', color: '#666' }}>Đã học 216 từ vựng • 4 Đề thi</div>
-              </div>
-            </div>
-            <span className="leaderboard-score" style={{ color: 'var(--color-primary)' }}>2,180 XP</span>
+              if (rank === 1) {
+                rankBadge = "🏆 1";
+                rowStyle = { backgroundColor: '#fffdf4', borderStyle: 'solid' };
+              } else if (rank === 2) {
+                rankBadge = "🥈 2";
+                rowStyle = { backgroundColor: '#f9f9f9' };
+              } else if (rank === 3) {
+                rankBadge = "🥉 3";
+              }
+
+              if (isCurrentUser) {
+                rowStyle = { 
+                  ...rowStyle, 
+                  backgroundColor: 'var(--color-primary-light)', 
+                  borderColor: 'var(--color-primary)',
+                  borderWidth: '2.5px'
+                };
+              }
+
+              return (
+                <div key={item.id} className={rowClass} style={rowStyle}>
+                  <span className={`rank-number ${rank <= 3 ? `rank-${rank}` : ''}`}>
+                    {rankBadge}
+                  </span>
+                  <div className="leaderboard-user">
+                    <div className="user-avatar" style={{ backgroundColor: getAvatarBg(rank), overflow: 'hidden' }}>
+                      {item.avatarUrl ? (
+                        <img 
+                          src={item.avatarUrl} 
+                          alt="Avatar" 
+                          referrerPolicy="no-referrer"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                      ) : (
+                        getInitials(item.userName)
+                      )}
+                    </div>
+                    <div>
+                      <strong>
+                        {item.userName} {isCurrentUser ? '(Bạn)' : ''}
+                      </strong>
+                      <div style={{ fontSize: '11px', color: '#666' }}>
+                        Đã học {item.vocabCount || 0} từ vựng • {item.examCount || 0} Đề thi
+                      </div>
+                    </div>
+                  </div>
+                  <span className="leaderboard-score" style={{ color: rank === 1 || isCurrentUser ? 'var(--color-primary)' : 'inherit' }}>
+                    {item.score.toLocaleString()} XP
+                  </span>
+                </div>
+              );
+            })}
           </div>
-
-          <div className="neo-card leaderboard-row">
-            <span className="rank-number">4</span>
-            <div className="leaderboard-user">
-              <div className="user-avatar" style={{ backgroundColor: 'var(--color-blue)' }}>LH</div>
-              <div>
-                <strong>Le Huynh Lam</strong>
-                <div style={{ fontSize: '11px', color: '#666' }}>Đã học 195 từ vựng • 8 Đề thi</div>
-              </div>
-            </div>
-            <span className="leaderboard-score">1,940 XP</span>
-          </div>
-
-          <div className="neo-card leaderboard-row">
-            <span className="rank-number">5</span>
-            <div className="leaderboard-user">
-              <div className="user-avatar" style={{ backgroundColor: 'var(--color-accent)' }}>KP</div>
-              <div>
-                <strong>Kim Phuong</strong>
-                <div style={{ fontSize: '11px', color: '#666' }}>Đã học 120 từ vựng • 2 Đề thi</div>
-              </div>
-            </div>
-            <span className="leaderboard-score">1,210 XP</span>
-          </div>
-
-        </div>
+        )}
       </div>
     </div>
   );

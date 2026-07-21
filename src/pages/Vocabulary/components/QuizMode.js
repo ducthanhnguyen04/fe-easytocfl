@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import beUrl from '../../../api-url/api-backend';
+import { showToast } from '../../../utils/toast';
 
 const QuizMode = ({
   currentLessonWords,
@@ -9,6 +12,11 @@ const QuizMode = ({
   const [quizChecked, setQuizChecked] = useState(false);
   const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
   const [quizOptions, setQuizOptions] = useState([]);
+  
+  const [quizAnswers, setQuizAnswers] = useState([]);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [xpEarned, setXpEarned] = useState(null);
+  const startTimeRef = useRef(Date.now());
 
   // Generate quiz options on quizIndex change
   useEffect(() => {
@@ -42,6 +50,12 @@ const QuizMode = ({
         correct: prev.correct + (isCorrect ? 1 : 0),
         total: prev.total + 1
       }));
+
+      // Record answer for backend verification
+      setQuizAnswers(prev => [...prev, {
+        vocabId: correctWord.id,
+        chosenTranslation: quizOptions[idx]
+      }]);
     }
   };
 
@@ -71,6 +85,28 @@ const QuizMode = ({
 
   const isCompleted = quizIndex >= currentLessonWords.length;
 
+  useEffect(() => {
+    if (isCompleted && !hasSubmitted && quizAnswers.length > 0) {
+      setHasSubmitted(true);
+      const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
+      
+      axios.post(`${beUrl}/score/quiz`, {
+        lessonId: currentLessonWords[0]?.lessonId,
+        answers: quizAnswers,
+        timeSpent: timeSpent
+      }, { withCredentials: true })
+      .then(res => {
+        const points = res.data.data.pointsEarned;
+        setXpEarned(points);
+        showToast(`🎉 Chúc mừng! Bạn được cộng +${points} XP điểm học tập!`, 'success');
+      })
+      .catch(err => {
+        console.error("Gửi điểm thất bại:", err);
+        showToast(err.response?.data?.message || 'Không thể cộng điểm quiz.', 'error');
+      });
+    }
+  }, [isCompleted, hasSubmitted, quizAnswers, currentLessonWords]);
+
   if (isCompleted) {
     const correctCount = quizScore.correct;
     const totalCount = currentLessonWords.length;
@@ -81,7 +117,14 @@ const QuizMode = ({
       <div className="learning-workspace">
         <div className="workspace-card quiz-green" style={{ minHeight: '300px' }}>
           <div style={{ fontSize: '24px', fontWeight: '800', marginBottom: '15px' }}>🎉 Hoàn thành Trắc nghiệm!</div>
-          <div style={{ display: 'flex', gap: '25px', margin: '20px 0', fontSize: '16px', fontWeight: '800' }}>
+          
+          {xpEarned !== null && (
+            <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '14px', padding: '6px 14px', marginBottom: '15px', display: 'inline-block' }}>
+              🔥 XP Nhận Được: +{xpEarned}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '25px', margin: '20px 0', fontSize: '16px', fontWeight: '800', justifyContent: 'center' }}>
             <div style={{ color: 'var(--color-secondary)' }}>✓ Đúng: {correctCount} câu</div>
             <div style={{ color: 'var(--color-primary)' }}>✗ Sai: {incorrectCount} câu</div>
             <div>⭐ Tỉ lệ: {scorePercent}%</div>
@@ -97,6 +140,10 @@ const QuizMode = ({
             onClick={() => {
               setQuizIndex(0);
               setQuizScore({ correct: 0, total: 0 });
+              setQuizAnswers([]);
+              setHasSubmitted(false);
+              setXpEarned(null);
+              startTimeRef.current = Date.now();
             }}
           >
             🔄 Làm lại trắc nghiệm

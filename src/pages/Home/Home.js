@@ -10,7 +10,6 @@ import { cacheService } from '../../utils/cacheService';
 const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-
   const [levels, setLevels] = useState([]);
   const [levelsLoading, setLevelsLoading] = useState(false);
   const [commentsList, setCommentsList] = useState([]);
@@ -99,32 +98,6 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
           <p className="welcome-subtitle">Chúc bạn một ngày học tập đầy hứng khởi! Cùng chinh phục TOCFL nào.</p>
         </div>
       </header>
-
-      {/* Stats Dashboard Row */}
-      {/* <section className="stats-grid">
-        <div className="neo-card stat-card" style={{ borderLeft: '8px solid var(--color-primary)' }}>
-          <span className="stat-card-title">Xếp hạng của bạn</span>
-          <span className="stat-card-value">3 / #3442</span>
-          <span className="stat-card-desc">Cố gắng giữ vững top 3 nhé!</span>
-        </div>
-        <div className="neo-card stat-card" style={{ borderLeft: '8px solid var(--color-secondary)' }}>
-          <span className="stat-card-title">Từ vựng đã thuộc</span>
-          <span className="stat-card-value">18%</span>
-          <span className="stat-card-desc">216 / 1200 từ vựng cốt lõi</span>
-        </div>
-        <div className="neo-card stat-card" style={{ borderLeft: '8px solid var(--color-accent)' }}>
-          <span className="stat-card-title">Đề thi đã luyện</span>
-          <span className="stat-card-value">4 đề</span>
-          <span className="stat-card-desc">Trung bình đạt: 72 điểm</span>
-        </div>
-        <div className="neo-card stat-card" style={{ borderLeft: '8px solid var(--color-blue)' }}>
-          <span className="stat-card-title">Trình độ ước tính</span>
-          <span className="stat-card-value">Band A2</span>
-          <span className="stat-card-desc">Sắp sửa lên tới Band B1!</span>
-        </div>
-      </section> */}
-
-      {/* Textbook Levels Section */}
       <section className="section-container">
         <div className="section-header-container">
           <h3 className="section-title">📚 Danh sách giáo trình học Phồn thể</h3>

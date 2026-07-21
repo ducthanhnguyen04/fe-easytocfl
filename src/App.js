@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
@@ -111,6 +111,7 @@ function App() {
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const examStartTimeRef = useRef(Date.now());
 
   const playAudio = (text) => {
     if ('speechSynthesis' in window) {
@@ -161,12 +162,28 @@ function App() {
 
   const submitQuiz = () => {
     setQuizSubmitted(true);
+    const timeSpent = Math.round((Date.now() - examStartTimeRef.current) / 1000);
+    
+    axios.post(`${beUrl}/score/exam`, {
+      examId: activeQuiz.id,
+      answers: selectedAnswers,
+      timeSpent: timeSpent
+    }, { withCredentials: true })
+    .then(res => {
+      const points = res.data.data.pointsEarned;
+      showToast(`🎉 Chúc mừng! Bạn được cộng +${points} XP điểm học tập!`, 'success');
+    })
+    .catch(err => {
+      console.error("Gửi kết quả thi thử thất bại:", err);
+      showToast(err.response?.data?.message || 'Không thể cộng điểm thi thử.', 'error');
+    });
   };
 
   const startQuiz = (key) => {
-    setActiveQuiz(quizzes[key]);
+    setActiveQuiz({ ...quizzes[key], id: key });
     setSelectedAnswers({});
     setQuizSubmitted(false);
+    examStartTimeRef.current = Date.now();
   };
 
   const resetVocabProgress = () => {
