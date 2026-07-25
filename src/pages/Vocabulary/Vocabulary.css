@@ -814,6 +814,7 @@
 }
 
 .dialogue-header-title {
+  font-family: var(--font-kaiti);
   font-size: 14px;
   font-weight: 800;
   color: #666;
@@ -897,6 +898,7 @@
 }
 
 .dialogue-text-cn {
+  font-family: var(--font-kaiti);
   font-size: 17px;
   font-weight: 800;
   color: var(--color-black);

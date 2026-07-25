@@ -38,9 +38,16 @@ const DictationMode = ({
       if (isCorrect) {
         playCorrectSound();
       }
-      setDictationFeedback(
-        isCorrect ? "🎉 Chính xác!" : `❌ Chưa đúng! Từ phát âm là: ${activeDictationWord.word} (${activeDictationWord.pinyin})`
-      );
+      setDictationFeedback({
+        success: isCorrect,
+        msg: isCorrect ? (
+          "🎉 Chính xác!"
+        ) : (
+          <span>
+            ❌ Chưa đúng! Từ phát âm là: <strong className="font-kaiti" style={{ fontSize: '20px' }}>{activeDictationWord.word}</strong> ({activeDictationWord.pinyin})
+          </span>
+        )
+      });
       setDictationScore(prev => ({
         correct: prev.correct + (isCorrect ? 1 : 0),
         total: prev.total + 1
@@ -147,8 +154,8 @@ const DictationMode = ({
         )}
 
         {dictationFeedback && (
-          <div className="typing-feedback" style={{ color: dictationFeedback.startsWith('🎉') ? 'var(--color-secondary)' : 'var(--color-primary)' }}>
-            {dictationFeedback}
+          <div className="typing-feedback" style={{ color: dictationFeedback.success ? 'var(--color-secondary)' : 'var(--color-primary)' }}>
+            {dictationFeedback.msg}
           </div>
         )}
       </div>

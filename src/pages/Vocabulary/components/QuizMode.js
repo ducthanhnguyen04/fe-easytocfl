@@ -175,7 +175,7 @@ const QuizMode = ({
 
       <div className="workspace-card quiz-green">
         <div style={{ fontSize: '15px', color: '#555', marginBottom: '10px' }}>Nghĩa của từ này là gì?</div>
-        <div style={{ fontSize: '38px', fontWeight: '800', margin: '15px 0' }}>{activeQuizWord?.word}</div>
+        <div className="font-kaiti" style={{ fontSize: '38px', fontWeight: '800', margin: '15px 0' }}>{activeQuizWord?.word}</div>
         <div style={{ fontSize: '18px', color: '#666' }}>({activeQuizWord?.pinyin})</div>
       </div>
 

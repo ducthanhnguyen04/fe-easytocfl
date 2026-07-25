@@ -146,7 +146,7 @@ const ReadingMode = ({
       </div>
 
       <div className="workspace-card reading-blue">
-        <div style={{ fontSize: '26px', fontWeight: '800', letterSpacing: '2px', marginBottom: '15px' }}>
+        <div className="font-kaiti" style={{ fontSize: '26px', fontWeight: '800', letterSpacing: '2px', marginBottom: '15px' }}>
           {readingSentence.cn}
         </div>
         <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>
@@ -172,7 +172,7 @@ const ReadingMode = ({
               disabled={readingChecked}
             >
               <span className="option-idx">{idx + 1}</span>
-              <span>{opt}</span>
+              <span className="font-kaiti">{opt}</span>
             </button>
           );
         })}

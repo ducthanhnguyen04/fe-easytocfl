@@ -23,7 +23,13 @@ const TypingMode = ({ currentLessonWords }) => {
       }
       setTypingFeedback({
         success: isCorrect,
-        msg: isCorrect ? "🎉 Chính xác!" : `❌ Sai rồi! Chữ đúng là: ${activeTypingWord.word} (${activeTypingWord.pinyin})`
+        msg: isCorrect ? (
+          "🎉 Chính xác!"
+        ) : (
+          <span>
+            ❌ Sai rồi! Chữ đúng là: <strong className="font-kaiti" style={{ fontSize: '20px' }}>{activeTypingWord.word}</strong> ({activeTypingWord.pinyin})
+          </span>
+        )
       });
       setTypingScore(prev => ({
         correct: prev.correct + (isCorrect ? 1 : 0),
