@@ -72,7 +72,7 @@ const ConversationMode = ({
       } else {
         utterance.lang = 'zh-TW';
       }
-      utterance.rate = 0.85; // Natural speed for learners
+      utterance.rate = 1.1; // Comfortable learning speed (1.1x)
 
       utterance.onend = () => {
         setCurrentPlayingIndex(-1);

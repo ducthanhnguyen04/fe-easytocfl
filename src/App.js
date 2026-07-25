@@ -113,33 +113,61 @@ function App() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const examStartTimeRef = useRef(Date.now());
 
-  const playAudio = (text) => {
-    if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Attempt to get a Chinese voice, prioritizing Taiwan (zh-TW)
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find(v => v.lang === 'zh-TW') || 
-                      voices.find(v => v.lang.includes('zh-TW')) ||
-                      voices.find(v => v.lang.includes('zh-HK')) ||
-                      voices.find(v => v.lang.includes('zh-CN')) || 
-                      voices.find(v => v.lang.startsWith('zh'));
-                      
-      if (zhVoice) {
-        utterance.voice = zhVoice;
-      } else {
-        utterance.lang = 'zh-TW';
+  // Memory cache to store blob URLs of loaded audio for instant replay
+  const ttsAudioCacheRef = useRef({});
+  // Track in-progress fetch promises to prevent duplicate concurrent network requests
+  const ttsFetchPromisesRef = useRef({});
+
+  const playAudio = async (text) => {
+    if (!text) return;
+    const trimmedText = text.trim();
+    try {
+      if (window.currentAudioElement) {
+        window.currentAudioElement.pause();
       }
-      
-      // Slower rate for learners
-      utterance.rate = 0.85;
-      
-      window.speechSynthesis.speak(utterance);
+
+      let audioSrc = ttsAudioCacheRef.current[trimmedText];
+
+      if (!audioSrc) {
+        // If a fetch is already in progress for this word, reuse that promise
+        if (!ttsFetchPromisesRef.current[trimmedText]) {
+          const audioUrl = `${beUrl}/tts/pronounce?text=${encodeURIComponent(trimmedText)}`;
+          ttsFetchPromisesRef.current[trimmedText] = fetch(audioUrl)
+            .then(async (response) => {
+              if (!response.ok) {
+                throw new Error(`Failed to fetch audio: ${response.statusText}`);
+              }
+              const blob = await response.blob();
+              const url = URL.createObjectURL(blob);
+              ttsAudioCacheRef.current[trimmedText] = url;
+              return url;
+            })
+            .finally(() => {
+              // Delete the promise tracker once resolved or rejected
+              delete ttsFetchPromisesRef.current[trimmedText];
+            });
+        }
+        audioSrc = await ttsFetchPromisesRef.current[trimmedText];
+      }
+
+      const audio = new Audio(audioSrc);
+      audio.playbackRate = 1.8; // Speed up audio to be very fast (1.8x)
+      window.currentAudioElement = audio;
+      audio.play().catch(err => {
+        console.error("Audio playback error:", err);
+      });
+    } catch (err) {
+      console.error("TTS audio play failed, falling back to direct stream:", err);
+      try {
+        const audioUrl = `${beUrl}/tts/pronounce?text=${encodeURIComponent(trimmedText)}`;
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = 1.8;
+        window.currentAudioElement = audio;
+        audio.play().catch(e => console.error("Fallback play error:", e));
+      } catch (fallbackErr) {
+        console.error("Fallback audio play failed:", fallbackErr);
+      }
     }
-    showToast(`🔊 Đang phát âm thanh cho: "${text}"`, 'info');
   };
 
   const toggleVocabLearned = (index) => {

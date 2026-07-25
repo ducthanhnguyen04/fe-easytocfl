@@ -236,7 +236,7 @@ const AdminVocabularies = ({
           <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '2px dashed var(--color-black)' }}>
             <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '10px' }}>📥 Nhập danh sách từ Excel</h4>
             <p style={{ fontSize: '11px', color: '#555', marginBottom: '15px' }}>
-              Chọn bài học ở trên trước khi import (Tùy chọn). File cần có các cột tương ứng: vocabulary, meaning, englishMeaning, pinyin, audioUrl.
+              Chọn bài học ở trên trước khi import (Tùy chọn). File cần có các cột tương ứng: vocabulary, meaning, englishMeaning, pinyin.
             </p>
             <input
               type="file"
