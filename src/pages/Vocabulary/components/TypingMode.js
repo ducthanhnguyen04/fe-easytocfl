@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { playCorrectSound } from '../../../utils/sound';
 
 const TypingMode = ({ currentLessonWords }) => {
   const [typingIndex, setTypingIndex] = useState(0);
@@ -17,6 +18,9 @@ const TypingMode = ({ currentLessonWords }) => {
     const activeTypingWord = currentLessonWords[typingIndex % currentLessonWords.length];
     if (activeTypingWord) {
       const isCorrect = typingInput.trim() === activeTypingWord.word;
+      if (isCorrect) {
+        playCorrectSound();
+      }
       setTypingFeedback({
         success: isCorrect,
         msg: isCorrect ? "🎉 Chính xác!" : `❌ Sai rồi! Chữ đúng là: ${activeTypingWord.word} (${activeTypingWord.pinyin})`

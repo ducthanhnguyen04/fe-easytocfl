@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import beUrl from '../../../api-url/api-backend';
 import { showToast } from '../../../utils/toast';
+import { playCorrectSound } from '../../../utils/sound';
 
 const QuizMode = ({
   currentLessonWords,
@@ -46,6 +47,9 @@ const QuizMode = ({
     const correctWord = currentLessonWords[quizIndex % currentLessonWords.length];
     if (correctWord) {
       const isCorrect = quizOptions[idx] === correctWord.trans;
+      if (isCorrect) {
+        playCorrectSound();
+      }
       setQuizScore(prev => ({
         correct: prev.correct + (isCorrect ? 1 : 0),
         total: prev.total + 1

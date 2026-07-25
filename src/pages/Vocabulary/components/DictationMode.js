@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AudioButton from '../../../components/AudioButton';
+import { playCorrectSound } from '../../../utils/sound';
 
 const DictationMode = ({
   currentLessonWords,
@@ -34,6 +35,9 @@ const DictationMode = ({
     if (activeDictationWord) {
       const isCorrect = dictationInput.trim().toLowerCase() === activeDictationWord.word ||
         dictationInput.trim().toLowerCase() === activeDictationWord.pinyin.toLowerCase();
+      if (isCorrect) {
+        playCorrectSound();
+      }
       setDictationFeedback(
         isCorrect ? "🎉 Chính xác!" : `❌ Chưa đúng! Từ phát âm là: ${activeDictationWord.word} (${activeDictationWord.pinyin})`
       );
