@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Edu+TW+Beginner:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+TW+Beginner:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Zhi+Mang+Xing&display=swap');
 
 :root {
   --font-kaiti: 'Edu TW Beginner', 'TW-Kai', 'Kaiti TC', 'Kaiti SC', '標楷體', 'BiauKai', 'DFKai-SB', 'KaiTi', 'AR PL UKai TW', 'Noto Serif TC', serif;
+  --font-chinese-brush: 'Ma Shan Zheng', 'Zhi Mang Xing', cursive;
+  --font-chinese-elegant: 'ZCOOL XiaoWei', serif;
+  --font-chinese-modern: 'ZCOOL QingKe HuangYou', sans-serif;
 
   --bg-primary: #fcf9f5;
   --bg-grid: #faf4eb;

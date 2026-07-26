@@ -228,8 +228,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
           <div className="logo-brand-clicker" onClick={() => { navigate('/'); setIsMobileOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
             <div className="logo-icon">台</div>
             <div className="logo-text">
-              <span className="logo-title">EASY TOCFL <span style={{ color: 'var(--color-primary)' }}>輕鬆學</span></span>
-              {/* <span className="logo-subtitle">Tiếng Trung Phồn Thể</span> */}
+              <span className="logo-title">EASY TOCFL</span>
             </div>
           </div>
           <button className="sidebar-close-btn" onClick={() => setIsMobileOpen(false)} aria-label="Close menu">
