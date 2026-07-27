@@ -92,10 +92,14 @@ const QuizMode = ({
   useEffect(() => {
     if (isCompleted && !hasSubmitted && quizAnswers.length > 0) {
       setHasSubmitted(true);
+      const lessonId = currentLessonWords[0]?.lessonId;
+      if (lessonId === undefined || lessonId === null) {
+        return; // Skip submission for personal vocab lists
+      }
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
       
       axios.post(`${beUrl}/score/quiz`, {
-        lessonId: currentLessonWords[0]?.lessonId,
+        lessonId: lessonId,
         answers: quizAnswers,
         timeSpent: timeSpent
       }, { withCredentials: true })

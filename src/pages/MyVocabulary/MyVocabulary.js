@@ -1,17 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import { useAuth } from '../../context/authContext';
 import { showToast } from '../../utils/toast';
 import './MyVocabulary.css';
+import '../Vocabulary/Vocabulary.css';
+
+import FlashcardMode from '../Vocabulary/components/FlashcardMode';
+import QuizMode from '../Vocabulary/components/QuizMode';
+import TypingMode from '../Vocabulary/components/TypingMode';
+import DictationMode from '../Vocabulary/components/DictationMode';
+import VocabList from '../Vocabulary/components/VocabList';
 
 const MyVocabulary = ({ playAudio }) => {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedList, setSelectedList] = useState(null);
   const [listDetails, setListDetails] = useState(null);
   const [itemsLoading, setItemsLoading] = useState(false);
+
+  const [isLearning, setIsLearning] = useState(false);
+  const [vocabMode, setVocabMode] = useState('flashcard');
 
   // Modals / Form states
   const [showListModal, setShowListModal] = useState(false);
@@ -74,6 +86,8 @@ const MyVocabulary = ({ playAudio }) => {
     } else {
       setListDetails(null);
     }
+    setIsLearning(false);
+    setVocabMode('flashcard');
   }, [selectedList, fetchListDetails]);
 
   // Create or Update List
@@ -327,81 +341,270 @@ const MyVocabulary = ({ playAudio }) => {
       </div>
 
       {selectedList ? (
-        // DETAIL VIEW FOR SELECTED VOCABULARY LIST
-        <div className="detail-view-container">
-          <div className="back-btn-row">
-            <button className="neo-btn" onClick={() => setSelectedList(null)}>
-              ← Quay lại danh sách bộ
-            </button>
-            <button className="neo-btn neo-btn-primary" onClick={openCreateItemModal}>
-              ➕ Thêm từ mới
-            </button>
-          </div>
+        isLearning ? (
+          // LEARNING WORKSPACE VIEW FOR PERSONAL VOCABULARY
+          (() => {
+            const mappedVocab = (listDetails?.vocabularies || []).map((item) => ({
+              id: item.id,
+              word: item.vocab,
+              pinyin: item.pinyin,
+              trans: item.meaning,
+              example: item.example,
+              exampleMeaning: item.exampleMeaning,
+              learned: item.learned || false,
+              tag: 'Cá nhân'
+            }));
 
-          <div className="neo-card list-summary-card">
-            <div className="summary-info">
-              <h3>📂 Bộ: {selectedList.name}</h3>
-              <p>
-                Tạo ngày {formatDate(selectedList.createdAt)} | Tổng số từ:{' '}
-                <strong>{listDetails?.vocabularies?.length || 0} từ</strong>
-              </p>
-            </div>
-          </div>
+            const handleToggleVocabLearned = (index) => {
+              const targetWord = mappedVocab[index];
+              if (!targetWord) return;
+              setListDetails(prev => {
+                if (!prev) return null;
+                return {
+                  ...prev,
+                  vocabularies: prev.vocabularies.map(v =>
+                    v.id === targetWord.id ? { ...v, learned: !v.learned } : v
+                  )
+                };
+              });
+            };
 
-          {itemsLoading ? (
-            <div className="neo-card loading-card">
-              <span className="spinner">🔄</span> Đang tải từ vựng trong bộ...
-            </div>
-          ) : !listDetails?.vocabularies || listDetails.vocabularies.length === 0 ? (
-            <div className="neo-card empty-vocab-card">
-              <div className="empty-icon">📭</div>
-              <h3>Bộ từ vựng này chưa có từ nào</h3>
-              <p>Hãy thêm từ vựng đầu tiên của bạn để bắt đầu ôn tập!</p>
-              <button className="neo-btn neo-btn-primary" style={{ marginTop: '15px' }} onClick={openCreateItemModal}>
-                Thêm từ vựng ngay
-              </button>
-            </div>
-          ) : (
-            <div className="my-vocab-grid">
-              {listDetails.vocabularies.map((item) => (
-                <div key={item.id} className="neo-card my-vocab-card">
-                  <div className="vocab-card-header">
-                    <div className="word-pinyin">
-                      <span className="word-text">
-                        {item.vocab}
-                      </span>
-                      <span className="word-pinyin-text">{item.pinyin}</span>
-                    </div>
-                    <div className="vocab-card-actions">
-                      <button className="icon-btn edit" onClick={() => openEditItemModal(item)} title="Sửa từ vựng">
-                        ✏️
-                      </button>
-                      <button className="icon-btn delete" onClick={() => handleDeleteItem(item.id)} title="Xóa từ vựng">
-                        🗑️
-                      </button>
-                    </div>
+            const handlePlayAudioLocal = (wordOrObj) => {
+              if (!wordOrObj) return;
+              const text = typeof wordOrObj === 'string'
+                ? wordOrObj
+                : (wordOrObj.word || wordOrObj.vocab || wordOrObj.example);
+              playAudio(text);
+            };
+
+            return (
+              <div className="learning-view-container">
+                <div className="back-btn-row">
+                  <button className="neo-btn" onClick={() => setIsLearning(false)}>
+                    ← Quay lại chi tiết bộ
+                  </button>
+                </div>
+
+                <div className="page-title-banner" style={{ borderLeft: '10px solid var(--color-primary)' }}>
+                  <div>
+                    <h2>Học từ vựng: {selectedList.name}</h2>
+                    <p>Bộ từ vựng cá nhân của bạn</p>
                   </div>
-
-                  <div className="vocab-card-body">
-                    <div className="word-meaning">
-                      <strong>Nghĩa:</strong> {item.meaning}
-                    </div>
-
-                    {item.example && (
-                      <div className="word-example-section">
-                        <div className="example-title">Ví dụ:</div>
-                        <div className="example-text">{item.example}</div>
-                        {item.exampleMeaning && (
-                          <div className="example-meaning-text">{item.exampleMeaning}</div>
-                        )}
-                      </div>
-                    )}
+                  <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
+                    Đã học: {mappedVocab.filter(v => v.learned).length} / {mappedVocab.length} Từ
                   </div>
                 </div>
-              ))}
+
+                {/* Render study mode workspace */}
+                {(() => {
+                  if (mappedVocab.length === 0) {
+                    return (
+                      <div className="neo-card" style={{ padding: '30px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0' }}>
+                        Chưa có từ vựng nào để học
+                      </div>
+                    );
+                  }
+
+                  if (vocabMode === 'flashcard') {
+                    return (
+                      <FlashcardMode
+                        currentLessonWords={mappedVocab}
+                        vocabWords={mappedVocab}
+                        toggleVocabLearned={handleToggleVocabLearned}
+                        handlePlayAudio={handlePlayAudioLocal}
+                        examplesList={[]}
+                      />
+                    );
+                  }
+
+                  if (vocabMode === 'quiz') {
+                    return (
+                      <QuizMode
+                        currentLessonWords={mappedVocab}
+                        vocabWords={mappedVocab}
+                      />
+                    );
+                  }
+
+                  if (vocabMode === 'typing') {
+                    return (
+                      <TypingMode
+                        currentLessonWords={mappedVocab}
+                      />
+                    );
+                  }
+
+                  if (vocabMode === 'dictation') {
+                    return (
+                      <DictationMode
+                        currentLessonWords={mappedVocab}
+                        handlePlayAudio={handlePlayAudioLocal}
+                      />
+                    );
+                  }
+
+                  return null;
+                })()}
+
+                {/* Mode Selector Panel */}
+                <div className="mode-selector-panel" style={{ marginTop: '30px' }}>
+                  <div className="mode-selector-title">Chọn chế độ học</div>
+                  <div className="modes-grid">
+                    <div
+                      className={`neo-card mode-card ${vocabMode === 'flashcard' ? 'active-flashcard' : ''}`}
+                      onClick={() => setVocabMode('flashcard')}
+                    >
+                      <div className="mode-card-title">🗂️ Flashcard</div>
+                      <div className="mode-card-status">
+                        {mappedVocab.every(v => v.learned) ? 'Đã thuộc' : 'Đang học'}
+                      </div>
+                    </div>
+                    <div
+                      className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}
+                      onClick={() => setVocabMode('quiz')}
+                    >
+                      <div className="mode-card-title">❓ Trắc nghiệm</div>
+                      <div className="mode-card-status">Luyện tập</div>
+                    </div>
+                    <div
+                      className={`neo-card mode-card ${vocabMode === 'typing' ? 'active-typing' : ''}`}
+                      onClick={() => setVocabMode('typing')}
+                    >
+                      <div className="mode-card-title">⌨️ Gõ từ vựng</div>
+                      <div className="mode-card-status">Luyện viết</div>
+                    </div>
+                    <div
+                      className={`neo-card mode-card ${vocabMode === 'dictation' ? 'active-dictation' : ''}`}
+                      onClick={() => setVocabMode('dictation')}
+                    >
+                      <div className="mode-card-title">🎧 Nghe chép</div>
+                      <div className="mode-card-status">Nghe nói</div>
+                    </div>
+                    <div
+                      className="neo-card mode-card"
+                      style={{ borderColor: 'var(--color-accent)' }}
+                      onClick={() => {
+                        navigate('/vocab/writing-practice', {
+                          state: {
+                            initialVocabs: mappedVocab,
+                            lessonTitle: `Luyện viết - ${selectedList.name}`
+                          }
+                        });
+                      }}
+                    >
+                      <div className="mode-card-title">✍️ In tập viết</div>
+                      <div className="mode-card-status">Ô chữ Mắt Cáo</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vocabulary list below */}
+                <VocabList
+                  currentLessonWords={mappedVocab}
+                  vocabWords={mappedVocab}
+                  toggleVocabLearned={handleToggleVocabLearned}
+                  handlePlayAudio={handlePlayAudioLocal}
+                />
+              </div>
+            );
+          })()
+        ) : (
+          // DETAIL VIEW FOR SELECTED VOCABULARY LIST
+          <div className="detail-view-container">
+            <div className="back-btn-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button className="neo-btn" onClick={() => setSelectedList(null)}>
+                  ← Quay lại danh sách bộ
+                </button>
+                {listDetails?.vocabularies?.length > 0 && (
+                  <button
+                    className="neo-btn"
+                    style={{ backgroundColor: 'var(--color-yellow-light)', fontWeight: 'bold' }}
+                    onClick={() => setIsLearning(true)}
+                  >
+                    🚀 Bắt đầu học
+                  </button>
+                )}
+              </div>
+              <button className="neo-btn neo-btn-primary" onClick={openCreateItemModal}>
+                ➕ Thêm từ mới
+              </button>
             </div>
-          )}
-        </div>
+
+            <div className="neo-card list-summary-card">
+              <div className="summary-info">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px', color: 'var(--color-primary)' }}>
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    <line x1="9" y1="6" x2="15" y2="6" />
+                    <line x1="9" y1="10" x2="15" y2="10" />
+                    <line x1="9" y1="14" x2="15" y2="14" />
+                  </svg>
+                  Bộ: {selectedList.name}
+                </h3>
+                <p>
+                  Tạo ngày {formatDate(selectedList.createdAt)} | Tổng số từ:{' '}
+                  <strong>{listDetails?.vocabularies?.length || 0} từ</strong>
+                </p>
+              </div>
+            </div>
+
+            {itemsLoading ? (
+              <div className="neo-card loading-card">
+                <span className="spinner">🔄</span> Đang tải từ vựng trong bộ...
+              </div>
+            ) : !listDetails?.vocabularies || listDetails.vocabularies.length === 0 ? (
+              <div className="neo-card empty-vocab-card">
+                <div className="empty-icon">📭</div>
+                <h3>Bộ từ vựng này chưa có từ nào</h3>
+                <p>Hãy thêm từ vựng đầu tiên của bạn để bắt đầu ôn tập!</p>
+                <button className="neo-btn neo-btn-primary" style={{ marginTop: '15px' }} onClick={openCreateItemModal}>
+                  Thêm từ vựng ngay
+                </button>
+              </div>
+            ) : (
+              <div className="my-vocab-grid">
+                {listDetails.vocabularies.map((item) => (
+                  <div key={item.id} className="neo-card my-vocab-card">
+                    <div className="vocab-card-header">
+                      <div className="word-pinyin">
+                        <span className="word-text">
+                          {item.vocab}
+                        </span>
+                        <span className="word-pinyin-text">{item.pinyin}</span>
+                      </div>
+                      <div className="vocab-card-actions">
+                        <button className="icon-btn edit" onClick={() => openEditItemModal(item)} title="Sửa từ vựng">
+                          ✏️
+                        </button>
+                        <button className="icon-btn delete" onClick={() => handleDeleteItem(item.id)} title="Xóa từ vựng">
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="vocab-card-body">
+                      <div className="word-meaning">
+                        <strong>Nghĩa:</strong> {item.meaning}
+                      </div>
+
+                      {item.example && (
+                        <div className="word-example-section">
+                          <div className="example-title">Ví dụ:</div>
+                          <div className="example-text">{item.example}</div>
+                          {item.exampleMeaning && (
+                            <div className="example-meaning-text">{item.exampleMeaning}</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
       ) : (
         // LIST VIEW (SHOW ALL LISTS)
         <div className="lists-view-container">
@@ -423,7 +626,15 @@ const MyVocabulary = ({ playAudio }) => {
               {lists.map((list) => (
                 <div key={list.id} className="neo-card list-select-card" onClick={() => setSelectedList(list)}>
                   <div className="list-card-main">
-                    <div className="folder-icon">📂</div>
+                    <div className="folder-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '36px', height: '36px', color: 'var(--color-primary)' }}>
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        <line x1="9" y1="6" x2="15" y2="6" />
+                        <line x1="9" y1="10" x2="15" y2="10" />
+                        <line x1="9" y1="14" x2="15" y2="14" />
+                      </svg>
+                    </div>
                     <div className="list-info">
                       <h4 className="list-name">{list.name}</h4>
                       <span className="list-date">Tạo ngày: {formatDate(list.createdAt)}</span>

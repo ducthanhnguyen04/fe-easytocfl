@@ -30,7 +30,7 @@ const getBookColor = (bookId) => {
 const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const { bookId, lessonId } = useParams();
   const [levels, setLevels] = useState([]);
-  
+
   const [lessonSubmittedMap, setLessonSubmittedMap] = useState({});
   const lessonStartTimeRef = useRef(Date.now());
   useEffect(() => {
@@ -57,7 +57,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   const currentBook = useMemo(() => {
     if (!bookId) return null;
     return levels.find(b => b.slug === bookId || String(b.id) === String(bookId)) ||
-           textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
+      textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
   }, [levels, bookId]);
 
   const selectedBook = currentBook ? currentBook.id : (bookId && !isNaN(bookId) ? parseInt(bookId) : null);
@@ -185,17 +185,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           lessonId: selectedLesson,
           timeSpent: timeSpent
         }, { withCredentials: true })
-        .then(res => {
-          const points = res.data.data.pointsEarned;
-          showToast(`🎉 Chúc mừng! Bạn đã học hết từ vựng của bài học này. Cộng +${points} XP!`, 'success');
-        })
-        .catch(err => {
-          console.error("Gửi điểm hoàn thành bài học thất bại:", err);
-          // Don't show toast error if user already completed this lesson (to avoid noisy duplicate toasts)
-          if (err.response?.status !== 400 || !err.response?.data?.message?.includes('đã nhận')) {
-            showToast(err.response?.data?.message || 'Không thể gửi điểm bài học.', 'error');
-          }
-        });
+          .then(res => {
+            const points = res.data.data.pointsEarned;
+            showToast(`🎉 Chúc mừng! Bạn đã học hết từ vựng của bài học này. Cộng +${points} XP!`, 'success');
+          })
+          .catch(err => {
+            console.error("Gửi điểm hoàn thành bài học thất bại:", err);
+            // Don't show toast error if user already completed this lesson (to avoid noisy duplicate toasts)
+            if (err.response?.status !== 400 || !err.response?.data?.message?.includes('đã nhận')) {
+              showToast(err.response?.data?.message || 'Không thể gửi điểm bài học.', 'error');
+            }
+          });
       }
     }
   }, [currentLessonWords, selectedLesson, lessonSubmittedMap]);
@@ -504,10 +504,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
               {(() => {
                 const currentLearned = currentLessonWords.filter(v => v.learned).length;
                 const bookColor = currentBook?.color || getBookColor(selectedBook);
-                
+
                 let lessonTitleText = '';
                 let lessonSubTitleText = '';
-                
+
                 if (isReviewMode) {
                   const names = selectedLessonIdsForReview.map(id => {
                     const l = lessonsList.find(lesson => lesson.id === id);
@@ -656,8 +656,8 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                           const lessonTitle = isReviewMode
                             ? 'Luyện viết - Tổng ôn tập'
                             : (currentLessonObj
-                                ? `Luyện viết - ${currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`}`
-                                : `Luyện viết - Bài ${selectedLesson}`);
+                              ? `Luyện viết - ${currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`}`
+                              : `Luyện viết - Bài ${selectedLesson}`);
                           navigate('/vocab/writing-practice', {
                             state: {
                               initialVocabs: currentLessonWords,
@@ -678,6 +678,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       vocabWords={vocabWords}
                       toggleVocabLearned={toggleVocabLearned}
                       handlePlayAudio={handlePlayAudio}
+                      examplesList={examplesList}
                     />
                   )}
                 </>

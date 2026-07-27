@@ -404,3 +404,12 @@
   box-shadow: 2px 2px 0px #000;
   font-weight: 800;
 }
+
+.sidebar-sublink svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--color-black);
+  fill: none;
+  stroke-width: 2.5px;
+  transition: stroke 0.15s ease;
+}

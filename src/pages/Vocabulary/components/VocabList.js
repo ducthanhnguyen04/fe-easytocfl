@@ -6,6 +6,7 @@ const VocabList = ({
   vocabWords,
   toggleVocabLearned,
   handlePlayAudio,
+  examplesList = [],
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -35,7 +36,6 @@ const VocabList = ({
       {/* Vocab list grid */}
       <div className="vocab-list">
         {filteredVocab.map((item, index) => {
-          const globalIndex = vocabWords.findIndex(v => v.word === item.word);
           return (
             <div key={index} className="neo-card vocab-card">
               <div className="vocab-symbol">
@@ -51,17 +51,39 @@ const VocabList = ({
                 {item.englishMeaning && (
                   <p className="vocab-translation-en">{item.englishMeaning}</p>
                 )}
-                <div style={{ marginTop: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span className="neo-badge" style={{ fontSize: '9px', padding: '2px 6px', backgroundColor: 'var(--color-blue-light)' }}>
-                    {item.tag}
-                  </span>
-                  <button
-                    className={`neo-btn ${item.learned ? 'neo-btn-primary' : ''}`}
-                    style={{ padding: '4px 10px', fontSize: '10px', borderRadius: '6px', cursor: 'pointer' }}
-                    onClick={() => toggleVocabLearned(globalIndex)}
-                  >
-                    {item.learned ? '✓ Đã thuộc' : 'Chưa thuộc'}
-                  </button>
+
+                {/* Example sentence block */}
+                <div className="vocab-example-block" style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px dashed #e2e8f0', fontSize: '13px' }}>
+                  {(() => {
+                    const activeExample = item.example
+                      ? { example: item.example, pinyin: '', meaning: item.exampleMeaning }
+                      : (examplesList || []).find(e => Number(e.vocabularyId) === Number(item.id));
+
+                    if (activeExample) {
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontWeight: '800', color: 'var(--color-primary)' }}>Ví dụ:</div>
+                          <div className="font-kaiti" style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--color-black)' }}>
+                            {activeExample.example}
+                          </div>
+                          {activeExample.pinyin && (
+                            <div style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
+                              {activeExample.pinyin}
+                            </div>
+                          )}
+                          <div style={{ fontSize: '12px', color: '#555', fontWeight: '500' }}>
+                            {activeExample.meaning}
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div style={{ color: '#a0aec0', fontStyle: 'italic', fontSize: '12px' }}>
+                          Chưa có ví dụ cho từ vựng này
+                        </div>
+                      );
+                    }
+                  })()}
                 </div>
               </div>
             </div>

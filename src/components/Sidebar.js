@@ -276,7 +276,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/vocab"
                     className={`sidebar-sublink ${location.pathname === '/vocab' || (location.pathname.startsWith('/vocab/') && !location.pathname.startsWith('/vocab/writing-practice')) ? 'active' : ''}`}
                   >
-                    📖 Từ vựng chính khóa
+                    <Icon name="vocab" /> Từ vựng
                   </Link>
                 </li>
                 <li className="sidebar-subitem">
@@ -292,7 +292,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/my-vocabularies"
                     className={`sidebar-sublink ${location.pathname.startsWith('/my-vocabularies') ? 'active' : ''}`}
                   >
-                    ➕ Bộ từ vựng cá nhân
+                    ➕ Sổ tay từ vựng
                   </Link>
                 </li>
                 <li className="sidebar-subitem">

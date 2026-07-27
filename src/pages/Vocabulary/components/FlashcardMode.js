@@ -25,6 +25,15 @@ const FlashcardMode = ({
 
   const activeExample = useMemo(() => {
     if (!activeFlashWord) return null;
+    
+    if (activeFlashWord.example) {
+      return {
+        example: activeFlashWord.example,
+        pinyin: '',
+        meaning: activeFlashWord.exampleMeaning || ''
+      };
+    }
+
     const found = examplesList.find(e => Number(e.vocabularyId) === Number(activeFlashWord.id));
     if (found) return found;
 
