@@ -3,10 +3,9 @@ import AudioButton from '../../../components/AudioButton';
 
 const FlashcardMode = ({
   currentLessonWords,
-  vocabWords,
-  toggleVocabLearned,
   handlePlayAudio,
   examplesList = [],
+  isReviewMode = false,
 }) => {
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
@@ -306,36 +305,6 @@ const FlashcardMode = ({
           }}
         >
           ← Trước
-        </button>
-
-        <button
-          className="neo-btn"
-          style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
-          onClick={() => {
-            setIsAutoPlayActive(false);
-            setSlideDirection('next');
-            const globalIdx = vocabWords.findIndex(v => v.word === activeFlashWord.word);
-            if (globalIdx !== -1 && activeFlashWord.learned) toggleVocabLearned(globalIdx);
-            setFlashIndex((flashIndex + 1) % currentLessonWords.length);
-            setFlashFlipped(false);
-          }}
-        >
-          ✘ Chưa thuộc
-        </button>
-
-        <button
-          className="neo-btn"
-          style={{ backgroundColor: 'var(--color-secondary)' }}
-          onClick={() => {
-            setIsAutoPlayActive(false);
-            setSlideDirection('next');
-            const globalIdx = vocabWords.findIndex(v => v.word === activeFlashWord.word);
-            if (globalIdx !== -1 && !activeFlashWord.learned) toggleVocabLearned(globalIdx);
-            setFlashIndex((flashIndex + 1) % currentLessonWords.length);
-            setFlashFlipped(false);
-          }}
-        >
-          ✓ Đã thuộc
         </button>
 
         <button

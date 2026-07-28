@@ -100,7 +100,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   console.log("currentLessonObj:", currentLessonObj);
   console.log("isLessonPremium:", isLessonPremium);
 
-  const [vocabMode, setVocabMode] = useState('flashcard'); // 'flashcard', 'quiz', 'typing', 'dictation'
+  const [vocabMode, setVocabMode] = useState('flashcard');
   const [localLessonVocabs, setLocalLessonVocabs] = useState([]);
   const [vocabLoading, setVocabLoading] = useState(false);
   const [examplesList, setExamplesList] = useState([]);
@@ -158,7 +158,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }).finally(() => setVocabLoading(false));
   }, [selectedLesson, selectedBook]);
 
-  // Chỉ hiển thị từ vựng từ DB
   const currentLessonWords = useMemo(() => {
     return localLessonVocabs.map(dbVocab => {
       const propMatch = vocabWords.find(v => v.word === dbVocab.word);
@@ -166,12 +165,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     });
   }, [localLessonVocabs, vocabWords]);
 
-  // Reset start time when selected lesson changes
   useEffect(() => {
     lessonStartTimeRef.current = Date.now();
   }, [selectedLesson]);
 
-  // Automatically submit lesson completion to backend
   useEffect(() => {
     if (selectedLesson && currentLessonWords.length > 0) {
       const allLearned = currentLessonWords.every(v => v.learned);
@@ -191,7 +188,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           })
           .catch(err => {
             console.error("Gửi điểm hoàn thành bài học thất bại:", err);
-            // Don't show toast error if user already completed this lesson (to avoid noisy duplicate toasts)
             if (err.response?.status !== 400 || !err.response?.data?.message?.includes('đã nhận')) {
               showToast(err.response?.data?.message || 'Không thể gửi điểm bài học.', 'error');
             }
@@ -231,6 +227,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     if (selectedLessonIdsForReview.length === 0) return;
     setVocabLoading(true);
     setIsReviewMode(true);
+    setVocabMode('flashcard');
     setReviewSelecting(false);
 
     try {
@@ -277,7 +274,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
   return (
     <div>
       {selectedBook === null ? (
-        // TEXTBOOK LISTING VIEW
         <div>
           <div className="page-title-banner">
             <div>
@@ -295,7 +291,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                 📝 Tạo file viết từ vựng
               </button>
               <div className="neo-badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
-                {vocabWords.filter(v => v.learned).length} / {vocabWords.length} Từ Đã Học
+                {vocabWords.length} Từ Vựng
               </div>
             </div>
           </div>
@@ -468,7 +464,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
           })()}
         </div>
       ) : (
-        // VOCABULARY DRILL-DOWN VIEW FOR SELECTED LESSON OR REVIEW MODE
         <div>
           <div className="back-btn-container">
             <button
@@ -558,6 +553,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       toggleVocabLearned={toggleVocabLearned}
                       handlePlayAudio={handlePlayAudio}
                       examplesList={examplesList}
+                      isReviewMode={isReviewMode}
                     />
                   );
                 }
@@ -619,13 +615,17 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                           {currentLessonWords.every(v => v.learned) ? 'Đã thuộc' : 'Đang học'}
                         </div>
                       </div>
-                      <div
-                        className={`neo-card mode-card ${vocabMode === 'conversation' ? 'active-conversation' : ''}`}
-                        onClick={() => setVocabMode('conversation')}
-                      >
-                        <div className="mode-card-title">💬 Bài khóa</div>
-                        <div className="mode-card-status">Hội thoại</div>
-                      </div>
+
+                      {!isReviewMode && (
+                        <div
+                          className={`neo-card mode-card ${vocabMode === 'conversation' ? 'active-conversation' : ''}`}
+                          onClick={() => setVocabMode('conversation')}
+                        >
+                          <div className="mode-card-title">💬 Bài khóa</div>
+                          <div className="mode-card-status">Hội thoại</div>
+                        </div>
+                      )}
+
                       <div
                         className={`neo-card mode-card ${vocabMode === 'quiz' ? 'active-quiz' : ''}`}
                         onClick={() => setVocabMode('quiz')}
@@ -633,6 +633,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div className="mode-card-title">❓ Trắc nghiệm</div>
                         <div className="mode-card-status">Luyện tập</div>
                       </div>
+
                       <div
                         className={`neo-card mode-card ${vocabMode === 'typing' ? 'active-typing' : ''}`}
                         onClick={() => setVocabMode('typing')}
@@ -649,26 +650,28 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                         <div className="mode-card-status">Nghe nói</div>
                       </div>
 
-                      <div
-                        className="neo-card mode-card"
-                        style={{ borderColor: 'var(--color-accent)' }}
-                        onClick={() => {
-                          const lessonTitle = isReviewMode
-                            ? 'Luyện viết - Tổng ôn tập'
-                            : (currentLessonObj
-                              ? `Luyện viết - ${currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`}`
-                              : `Luyện viết - Bài ${selectedLesson}`);
-                          navigate('/vocab/writing-practice', {
-                            state: {
-                              initialVocabs: currentLessonWords,
-                              lessonTitle: lessonTitle
-                            }
-                          });
-                        }}
-                      >
-                        <div className="mode-card-title">✍️ In tập viết</div>
-                        <div className="mode-card-status">Ô chữ Mắt Cáo</div>
-                      </div>
+                      {!isReviewMode && (
+                        <div
+                          className="neo-card mode-card"
+                          style={{ borderColor: 'var(--color-accent)' }}
+                          onClick={() => {
+                            const lessonTitle = isReviewMode
+                              ? 'Luyện viết - Tổng ôn tập'
+                              : (currentLessonObj
+                                ? `Luyện viết - ${currentLessonObj.lessonName ? `${currentLessonObj.lessonName}: ${currentLessonObj.title}` : `Bài ${selectedLesson}: ${currentLessonObj.title}`}`
+                                : `Luyện viết - Bài ${selectedLesson}`);
+                            navigate('/vocab/writing-practice', {
+                              state: {
+                                initialVocabs: currentLessonWords,
+                                lessonTitle: lessonTitle
+                              }
+                            });
+                          }}
+                        >
+                          <div className="mode-card-title">✍️ In tập viết</div>
+                          <div className="mode-card-status">Ô chữ Mắt Cáo</div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

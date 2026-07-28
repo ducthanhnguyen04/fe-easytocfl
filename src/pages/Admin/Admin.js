@@ -235,6 +235,8 @@ const Admin = ({ refreshGlobalData }) => {
             beUrl={beUrl}
             showError={showError}
             showSuccess={showSuccess}
+            setLoading={setLoading}
+            loading={loading}
           />
         )}
         {activeTab === 'radicals' && (

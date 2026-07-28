@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
 const AdminExamples = ({
@@ -10,6 +10,8 @@ const AdminExamples = ({
   beUrl,
   showError,
   showSuccess,
+  setLoading,
+  loading,
 }) => {
   const [exampleText, setExampleText] = useState('');
   const [exampleMeaning, setExampleMeaning] = useState('');
@@ -18,6 +20,8 @@ const AdminExamples = ({
   const [exampleGrammarId, setExampleGrammarId] = useState('');
   const [exampleVocabId, setExampleVocabId] = useState('');
   const [editId, setEditId] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   const resetForm = () => {
     setEditId(null);
@@ -63,6 +67,50 @@ const AdminExamples = ({
       onRefresh();
     } catch (error) {
       showError(error.response?.data?.message || 'Có lỗi xảy ra khi lưu câu ví dụ.');
+    }
+  };
+
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
+      showError('Chỉ chấp nhận file Excel (.xlsx, .xls)!');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (exampleGrammarId) {
+      formData.append('grammarId', exampleGrammarId);
+    }
+    if (exampleVocabId) {
+      formData.append('vocabularyId', exampleVocabId);
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(`${beUrl}/examples/import`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      });
+      showSuccess(`Nhập thành công ${response.data.count || response.data.examples?.length || 0} ví dụ từ Excel!`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      onRefresh();
+    } catch (error) {
+      console.error('Import excel error:', error);
+      showError(error.response?.data?.message || 'Có lỗi xảy ra khi nhập file Excel.');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,6 +233,33 @@ const AdminExamples = ({
             )}
           </div>
         </form>
+
+        {/* Excel Importer inside Form card */}
+        {!editId && (
+          <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '2px dashed var(--color-black)' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '10px' }}>📥 Nhập danh sách ví dụ từ Excel</h4>
+            <p style={{ fontSize: '11px', color: '#555', marginBottom: '15px' }}>
+              Liên kết ngữ pháp / từ vựng ở trên trước khi import (Tùy chọn). File cần có các cột tương ứng: example, meaning, pinyin, audioUrl.
+            </p>
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleImportExcel}
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              id="excelImportInput"
+            />
+            <button
+              type="button"
+              className="neo-btn"
+              style={{ backgroundColor: 'var(--color-yellow-light)', width: '100%' }}
+              onClick={() => document.getElementById('excelImportInput').click()}
+              disabled={loading}
+            >
+              {loading ? '⏳ Đang xử lý file...' : '📊 Import từ Excel (.xlsx, .xls)'}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="neo-card admin-list-card" style={{ padding: '25px', maxHeight: '720px', overflowY: 'auto' }}>

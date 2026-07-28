@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import beUrl from '../../../api-url/api-backend';
 import { useAuth } from '../../../context/authContext';
@@ -9,6 +9,7 @@ import './WritingPractice.css';
 const WritingPractice = ({ initialVocabs = [], onBack }) => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const effectiveInitialVocabs = location.state?.initialVocabs || initialVocabs;
   const hasProcessedRef = useRef(false);
 
@@ -417,11 +418,9 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
           <h2>📝 Tạo File Luyện Viết Từ Vựng</h2>
           <p>Tự tạo tập viết chữ Hán Phồn thể chuẩn khung ô Điền Tự Cách (田字格) có nét in mờ & xuất file in/PDF</p>
         </div>
-        {onBack && (
-          <button className="neo-btn" onClick={onBack}>
-            ← Quay lại
-          </button>
-        )}
+        <button className="neo-btn" onClick={onBack || (() => navigate(-1))}>
+          ← Quay lại
+        </button>
       </div>
 
       {/* Editor Form Card */}

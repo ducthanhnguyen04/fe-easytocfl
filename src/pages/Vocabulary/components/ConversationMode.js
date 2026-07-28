@@ -132,13 +132,6 @@ const ConversationMode = ({
     };
   };
 
-  const getIllustrationSrc = (url) => {
-    if (!url) return "/dialogue_generic.png";
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/dialogue')) return url;
-    return `${beUrl}${url.startsWith('/') ? '' : '/'}${url}`;
-  };
-
   if (loading) {
     return (
       <div className="neo-card" style={{ padding: '40px', textAlign: 'center', fontWeight: 'bold', margin: '20px 0', color: '#666' }}>
@@ -203,7 +196,12 @@ const ConversationMode = ({
         </div>
       </div>
 
-      {/* Main Grid: Dialogues on left, Illustration on right */}
+      {/* Tip Caption */}
+      <div className="dialogue-caption-card" style={{ marginBottom: '15px' }}>
+        <span style={{ fontWeight: '800' }}>💡 Mẹo học:</span> Nhấp trực tiếp vào bất kỳ hộp thoại hội thoại nào để nghe phát âm câu nói đó bằng giọng đọc chuẩn!
+      </div>
+
+      {/* Main Grid: Dialogue List */}
       <div className="dialogue-layout-grid">
         {/* Left: Dialogue Scroll View */}
         <div className="dialogue-chat-container">
@@ -272,18 +270,6 @@ const ConversationMode = ({
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Right: Graphic Illustration */}
-        <div className="dialogue-graphic-panel neo-card">
-          <img
-            src={getIllustrationSrc(dialogue.illustrationUrl)}
-            alt="Dialogue illustration"
-            className="dialogue-illustration-img"
-          />
-          <div className="dialogue-caption-card">
-            <span style={{ fontWeight: '800' }}>💡 Mẹo học:</span> Nhấp trực tiếp vào bất kỳ hộp thoại hội thoại nào để nghe phát âm câu nói đó bằng giọng đọc chuẩn!
           </div>
         </div>
       </div>
