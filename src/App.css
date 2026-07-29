@@ -15,7 +15,7 @@
   position: relative;
   /* Calligraphy Grid Background */
   background-color: var(--bg-primary);
-  background-image: 
+  background-image:
     linear-gradient(var(--grid-line) 1.5px, transparent 1.5px),
     linear-gradient(90deg, var(--grid-line) 1.5px, transparent 1.5px);
   background-size: 40px 40px;
@@ -136,6 +136,7 @@
   .app-container {
     flex-direction: column;
   }
+
   .main-panel {
     padding: 80px 20px 20px 20px;
     height: auto;
@@ -151,14 +152,14 @@
 }
 
 .contact-fab-trigger {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+  width: 100px;
+  height: 40px;
+  border-radius: 10%;
   border: 3.5px solid #000;
   box-shadow: 4px 4px 0px #000;
   background-color: var(--color-primary);
   color: white;
-  font-size: 22px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -246,4 +247,3 @@
   transform: scale(1.15) !important;
   box-shadow: 5px 5px 0px #000 !important;
 }
-

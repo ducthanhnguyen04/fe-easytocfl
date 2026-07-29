@@ -176,7 +176,7 @@ const MyVocabulary = ({ playAudio }) => {
           { withCredentials: true }
         );
         showToast('Thêm từ vựng thành công!', 'success');
-        
+
         // Cập nhật state chi tiết bộ từ vựng
         setListDetails((prev) => {
           if (!prev) return null;
@@ -666,7 +666,7 @@ const MyVocabulary = ({ playAudio }) => {
             <button className="close-btn" onClick={() => setShowListModal(false)}>
               ✕
             </button>
-            <h3>{listModalMode === 'create' ? '📂 Tạo bộ từ vựng mới' : '✏️ Đổi tên bộ từ vựng'}</h3>
+            <h3>{listModalMode === 'create' ? 'Tạo bộ từ vựng mới' : 'Đổi tên bộ từ vựng'}</h3>
             <form onSubmit={handleSaveList}>
               <div className="form-group">
                 <label>Tên bộ từ vựng *</label>

@@ -100,7 +100,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
       </header>
       <section className="section-container">
         <div className="section-header-container">
-          <h3 className="section-title">📚 Danh sách giáo trình học Phồn thể</h3>
+          <h3 className="section-title">Danh sách giáo trình học Phồn thể</h3>
         </div>
 
         {levelsLoading ? (

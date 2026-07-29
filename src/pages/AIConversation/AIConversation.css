@@ -14,8 +14,8 @@
 }
 
 .roleplay-banner-card {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-white);
   padding: 30px;
   border-radius: var(--radius-md);
   border: var(--border-thick);
@@ -42,7 +42,7 @@
   font-size: 28px;
   font-weight: 900;
   margin-bottom: 8px;
-  color: #ffffff;
+  color: var(--color-white);
 }
 
 .roleplay-banner-subtitle {
@@ -74,7 +74,8 @@
 .label-hint {
   font-size: 12px;
   font-weight: 600;
-  color: #666;
+  color: var(--color-black);
+  opacity: 0.6;
 }
 
 .required-star {
@@ -89,7 +90,7 @@
 }
 
 .suggestion-pill-btn {
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border: var(--border-medium);
   border-radius: 10px;
   padding: 10px 14px;
@@ -108,7 +109,7 @@
 .suggestion-pill-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-thick);
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
 }
 
 .roleplay-input {
@@ -134,7 +135,7 @@
   padding: 12px;
   border: var(--border-thick);
   border-radius: 12px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -158,15 +159,15 @@
 }
 
 .level-select-btn.active {
-  background-color: #3b82f6;
-  color: #ffffff;
-  border-color: #000000;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-black);
   box-shadow: var(--shadow-thick);
 }
 
 .level-select-btn.active .level-btn-badge {
-  background-color: #ffffff;
-  color: #3b82f6;
+  background-color: var(--color-white);
+  color: var(--color-primary);
 }
 
 .start-roleplay-btn {
@@ -174,8 +175,8 @@
   padding: 16px;
   font-size: 16px;
   font-weight: 900;
-  background-color: #3b82f6 !important;
-  color: #ffffff !important;
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
   border-radius: 12px;
   margin-top: 10px;
 }
@@ -183,7 +184,8 @@
 .form-footer-tip {
   font-size: 12px;
   font-weight: 700;
-  color: #666666;
+  color: var(--color-black);
+  opacity: 0.6;
   text-align: center;
   margin: 0;
 }
@@ -209,7 +211,7 @@
   height: 700px;
   padding: 0;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border: var(--border-thick);
   box-shadow: var(--shadow-thick);
 }
@@ -220,7 +222,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
 }
 
 .chat-partner-info {
@@ -233,8 +235,8 @@
   font-size: 26px;
   width: 44px;
   height: 44px;
-  background-color: #fef08a;
-  border: 2px solid #000000;
+  background-color: var(--color-yellow-light);
+  border: 2px solid var(--color-black);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -249,7 +251,8 @@
 
 .partner-status {
   font-size: 12px;
-  color: #64748b;
+  color: var(--color-black);
+  opacity: 0.6;
   font-weight: 700;
 }
 
@@ -257,7 +260,8 @@
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 800;
-  background-color: #ffffff;
+  background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 .chat-messages-body {
@@ -267,7 +271,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background-color: #f1f5f9;
+  background-color: var(--bg-grid);
 }
 
 .chat-msg-row {
@@ -293,8 +297,8 @@
   font-size: 22px;
   width: 38px;
   height: 38px;
-  background-color: #fef08a;
-  border: 2px solid #000000;
+  background-color: var(--color-yellow-light);
+  border: 2px solid var(--color-black);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -326,10 +330,11 @@
 
 .ai-msg-bubble {
   padding: 16px 20px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border: var(--border-thick);
   border-radius: 16px;
   border-top-left-radius: 4px;
+  color: var(--color-black);
 }
 
 .ai-chinese-text {
@@ -344,7 +349,8 @@
 .ai-pinyin-text {
   font-size: 13px;
   font-weight: 700;
-  color: #475569;
+  color: var(--color-black);
+  opacity: 0.7;
   font-style: italic;
   margin-bottom: 12px;
 }
@@ -359,22 +365,24 @@
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 800;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
+  color: var(--color-black);
 }
 
 .ai-vietnamese-translation {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1.5px dashed #cbd5e1;
+  border-top: 1.5px dashed var(--color-black);
+  opacity: 0.85;
   font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-black);
 }
 
 .user-msg-bubble {
   padding: 14px 18px;
-  background-color: #3b82f6;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-white);
   border: var(--border-thick);
   border-radius: 16px;
   border-top-right-radius: 4px;
@@ -388,23 +396,25 @@
   margin: 0;
   line-height: 1.4;
   word-break: break-word;
+  color: var(--color-white);
 }
 
 .loading-bubble {
   padding: 12px 18px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
 }
 
 .typing-indicator {
   font-size: 13px;
   font-weight: 800;
-  color: #64748b;
+  color: var(--color-black);
+  opacity: 0.6;
 }
 
 /* Suggested Responses */
 .suggested-responses-container {
   padding: 10px 16px;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
   border-top: var(--border-medium);
   display: flex;
   flex-direction: column;
@@ -414,7 +424,8 @@
 .suggested-label {
   font-size: 12px;
   font-weight: 800;
-  color: #475569;
+  color: var(--color-black);
+  opacity: 0.7;
 }
 
 .suggested-pills-row {
@@ -428,19 +439,20 @@
   font-family: var(--font-kaiti);
   font-size: 14px;
   font-weight: 800;
-  background-color: #ffffff;
-  border: 1.5px solid #000000;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-black);
   border-radius: 20px;
   padding: 6px 14px;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow: 2px 2px 0px #000000;
+  color: var(--color-black);
+  box-shadow: 2px 2px 0px var(--color-black);
   transition: transform 0.1s ease;
 }
 
 .suggested-pill:hover {
   transform: translateY(-2px);
-  background-color: #eff6ff;
+  background-color: var(--color-primary-light);
 }
 
 /* Input Area */
@@ -450,19 +462,21 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--color-white);
 }
 
 .voice-mic-btn {
   padding: 10px 14px;
   font-size: 18px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
+  color: var(--color-black);
   flex-shrink: 0;
 }
 
 .voice-mic-btn.recording {
-  background-color: #fee2e2;
-  border-color: #ef4444;
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   animation: pulseMic 1s infinite alternate;
 }
 
@@ -478,13 +492,15 @@
   font-weight: 700;
   border: var(--border-thick);
   border-radius: 12px;
+  background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 .send-msg-btn {
   padding: 10px 18px;
   font-size: 18px;
-  background-color: #3b82f6 !important;
-  color: #ffffff !important;
+  background-color: var(--color-primary) !important;
+  color: var(--color-white) !important;
   flex-shrink: 0;
 }
 
@@ -497,17 +513,19 @@
 
 .sidebar-widget-card {
   padding: 20px;
-  background-color: #ffffff;
+  background-color: var(--color-white);
   border: var(--border-thick);
   box-shadow: var(--shadow-thick);
+  color: var(--color-black);
 }
 
 .widget-title {
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.5px;
-  color: #475569;
-  border-bottom: 2px solid #000000;
+  color: var(--color-black);
+  opacity: 0.7;
+  border-bottom: 2px solid var(--color-black);
   padding-bottom: 8px;
   margin: 0 0 14px 0;
   display: flex;
@@ -519,10 +537,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
   padding: 12px;
   border-radius: 10px;
-  border: 1.5px solid #000000;
+  border: 1.5px solid var(--color-black);
 }
 
 .topic-summary-icon {
@@ -532,7 +550,7 @@
 .topic-summary-text {
   font-size: 14px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--color-black);
 }
 
 /* Support Toggles */
@@ -548,7 +566,7 @@
   justify-content: space-between;
   font-size: 13.5px;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--color-black);
 }
 
 /* Switch UI */
@@ -572,8 +590,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #cbd5e1;
-  border: 2px solid #000000;
+  background-color: var(--bg-primary);
+  border: 2px solid var(--color-black);
   transition: 0.2s;
   border-radius: 24px;
 }
@@ -585,14 +603,14 @@
   width: 14px;
   left: 3px;
   bottom: 3px;
-  background-color: #ffffff;
-  border: 1.5px solid #000000;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-black);
   transition: 0.2s;
   border-radius: 50%;
 }
 
 input:checked + .switch-slider {
-  background-color: #3b82f6;
+  background-color: var(--color-primary);
 }
 
 input:checked + .switch-slider:before {
@@ -602,7 +620,7 @@ input:checked + .switch-slider:before {
 /* Vocabulary List */
 .vocab-count-badge {
   background-color: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-white);
   font-size: 11px;
   padding: 2px 7px;
   border-radius: 10px;
@@ -610,7 +628,8 @@ input:checked + .switch-slider:before {
 
 .empty-vocab-desc {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--color-black);
+  opacity: 0.5;
   font-weight: 700;
   margin: 0;
 }
@@ -624,8 +643,8 @@ input:checked + .switch-slider:before {
 }
 
 .vocab-mini-item {
-  background-color: #f8fafc;
-  border: 1.5px solid #000000;
+  background-color: var(--bg-primary);
+  border: 1.5px solid var(--color-black);
   border-radius: 8px;
   padding: 8px 12px;
 }
@@ -647,11 +666,12 @@ input:checked + .switch-slider:before {
 .vocab-mini-pinyin {
   font-size: 12px;
   font-weight: 700;
-  color: #475569;
+  color: var(--color-black);
+  opacity: 0.7;
 }
 
 .vocab-mini-meaning {
   font-size: 12px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-black);
 }

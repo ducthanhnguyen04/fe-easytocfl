@@ -49,7 +49,7 @@ const Grammar = ({ playAudio }) => {
   const currentBook = useMemo(() => {
     if (!bookId) return null;
     return levels.find(b => b.slug === bookId || String(b.id) === String(bookId)) ||
-           textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
+      textbooks.find(b => b.slug === bookId || String(b.id) === String(bookId));
   }, [levels, bookId]);
 
   const selectedGrammarBook = currentBook ? currentBook.id : (bookId && !isNaN(bookId) ? parseInt(bookId) : null);
@@ -172,7 +172,7 @@ const Grammar = ({ playAudio }) => {
                 <div className="book-select-info">
                   <h4 className="book-select-title">{book.levelName}</h4>
                   <span className="book-select-level">{book.level}</span>
-                  <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
+                  <p className="book-select-desc">{book.description || `Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - ${book.level}`}</p>
                   <div className="book-select-stats">
                     <span>📖 {book?.lessons?.length || 0} bài học</span>
                   </div>
@@ -197,8 +197,8 @@ const Grammar = ({ playAudio }) => {
 
             <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
               <div>
-                <h2>{currentBook?.viTitle || currentBook?.levelName} ({currentBook?.title || currentBook?.level})</h2>
-                <p>{currentBook?.level} — {totalLessons} bài học chính thức</p>
+                <h2>{currentBook?.viTitle || currentBook?.levelName}</h2>
+                <p>{totalLessons} bài học chính thức</p>
               </div>
             </div>
 
@@ -369,7 +369,7 @@ const Grammar = ({ playAudio }) => {
                 <span style={{ fontSize: '18px' }}>🇹🇼</span>
                 <span style={{ fontSize: '14px', fontWeight: '800', color: '#555' }}>TOCFL {currentBook?.level.split(' • ')[1]}</span>
               </div>
-              <h1 style={{ fontSize: '42px', fontWeight: '900', margin: '10px 0', fontFamily: 'Sora, sans-serif' }}>
+              <h1 style={{ fontSize: '42px', fontWeight: '900', margin: '10px 0', fontFamily: 'Itim, cursive' }}>
                 {gp.structure}
               </h1>
               <div style={{ fontSize: '18px', fontWeight: '800', color: '#333' }}>

@@ -12,6 +12,7 @@ import Radicals from '../pages/Radicals/Radicals';
 import MyVocabulary from '../pages/MyVocabulary/MyVocabulary';
 import WritingPractice from '../pages/Vocabulary/components/WritingPractice';
 import AIConversation from '../pages/AIConversation/AIConversation';
+import Shadowing from '../pages/Shadowing/Shadowing';
 
 const AppRoutes = ({
   dailyWord,
@@ -112,6 +113,11 @@ const AppRoutes = ({
       <Route
         path="/grammar/:bookId/:lessonId/:grammarPointId"
         element={<Grammar playAudio={playAudio} />}
+      />
+
+      <Route
+        path="/shadowing"
+        element={<Shadowing />}
       />
 
       <Route

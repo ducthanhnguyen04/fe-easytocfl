@@ -316,6 +316,14 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
           </li>
           <li className="sidebar-item">
             <Link
+              to="/shadowing"
+              className={`sidebar-link ${isActive('/shadowing') ? 'active' : ''}`}
+            >
+              <Icon name="shadowing" /> Shadowing
+            </Link>
+          </li>
+          <li className="sidebar-item">
+            <Link
               to="/roleplay"
               className={`sidebar-link ${isActive('/roleplay') ? 'active' : ''}`}
             >
@@ -469,7 +477,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     setShowUserModal(false);
                   }}
                 >
-                  🛡️ Quản trị (Admin)
+                  Quản trị (Admin)
                 </button>
               )}
               <button
@@ -480,7 +488,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                   setShowUserModal(false);
                 }}
               >
-                ⚙️ Cài đặt tài khoản
+                Cài đặt tài khoản
               </button>
               <button
                 className="neo-btn"
@@ -491,7 +499,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                   showToast('Đăng xuất thành công!', 'success');
                 }} logout
               >
-                🚪 Đăng xuất
+                Đăng xuất
               </button>
             </div>
           </div>
@@ -615,8 +623,8 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
 
                 <div style={{ textAlign: 'center', marginTop: '15px' }}>
                   <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-black)' }}>
-                    Chưa có tài khoản?{' '}
-                    <button
+                    Chưa có tài khoản? Hãy liên hệ Đức Thanh{' '}
+                    {/* <button
                       type="button"
                       style={{
                         background: 'none',
@@ -634,7 +642,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                       }}
                     >
                       Đăng ký ngay
-                    </button>
+                    </button> */}
                   </span>
                 </div>
               </>

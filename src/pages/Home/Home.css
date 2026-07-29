@@ -66,7 +66,7 @@
 }
 
 .stat-card-value {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-size: 24px;
   font-weight: 800;
   color: var(--color-black);
@@ -219,7 +219,7 @@
 }
 
 .course-band {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-size: 32px;
   font-weight: 800;
   line-height: 1;
@@ -309,7 +309,7 @@
 }
 
 .character-pinyin {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-size: 22px;
   font-weight: 700;
   color: var(--color-secondary);

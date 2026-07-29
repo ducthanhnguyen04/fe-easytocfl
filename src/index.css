@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Edu+TW+Beginner:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Zhi+Mang+Xing&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Edu+TW+Beginner:wght@400;500;600;700&family=Itim&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Zhi+Mang+Xing&display=swap');
 
 :root {
   --font-kaiti: 'Edu TW Beginner', 'TW-Kai', 'Kaiti TC', 'Kaiti SC', '標楷體', 'BiauKai', 'DFKai-SB', 'KaiTi', 'AR PL UKai TW', 'Noto Serif TC', serif;
@@ -43,7 +43,7 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Itim', cursive, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-primary);
   color: var(--color-black);
   -webkit-font-smoothing: antialiased;
@@ -52,7 +52,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-weight: 800;
   color: var(--color-black);
   line-height: 1.2;
@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-weight: 700;
   font-size: 14px;
   padding: 12px 24px;
@@ -151,7 +151,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .neo-badge {
   display: inline-block;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-weight: 700;
   font-size: 11px;
   padding: 4px 10px;
@@ -333,7 +333,7 @@ body.theme-cyber .page-title-banner p {
   border: 1.5px solid rgba(61, 132, 184, 0.35);
   border-radius: 20px;
   padding: 6px 14px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -410,7 +410,7 @@ body.theme-cyber .page-title-banner p {
 }
 
 .book-cover-item-title {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Itim', cursive;
   font-size: 14px;
   font-weight: 800;
   color: var(--color-black);

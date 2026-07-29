@@ -11,6 +11,8 @@ const AdminLevels = ({
   const [levelName, setLevelName] = useState('');
   const [levelCode, setLevelCode] = useState('');
   const [levelImage, setLevelImage] = useState('');
+  const [levelDescription, setLevelDescription] = useState('');
+  const [levelSlug, setLevelSlug] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -19,6 +21,8 @@ const AdminLevels = ({
     setLevelName('');
     setLevelCode('');
     setLevelImage('');
+    setLevelDescription('');
+    setLevelSlug('');
   };
 
   const handleImageUpload = async (e) => {
@@ -57,22 +61,22 @@ const AdminLevels = ({
 
   const handleSaveLevel = async (e) => {
     e.preventDefault();
-    if (!levelName || !levelCode) {
-      showError('Vui lòng nhập đầy đủ tên và mã cấp độ!');
+    if (!levelName || !levelCode || !levelSlug) {
+      showError('Vui lòng nhập đầy đủ tên, mã cấp độ và slug URL!');
       return;
     }
     try {
       if (editId) {
         await axios.put(
           `${beUrl}/levels/update/${editId}`,
-          { levelName, level: levelCode, image: levelImage },
+          { levelName, level: levelCode, image: levelImage, description: levelDescription, slug: levelSlug },
           { withCredentials: true }
         );
         showSuccess('Cập nhật giáo trình thành công!');
       } else {
         await axios.post(
           `${beUrl}/levels/create`,
-          { levelName, level: levelCode, image: levelImage },
+          { levelName, level: levelCode, image: levelImage, description: levelDescription, slug: levelSlug },
           { withCredentials: true }
         );
         showSuccess('Thêm giáo trình mới thành công!');
@@ -89,6 +93,8 @@ const AdminLevels = ({
     setLevelName(item.levelName);
     setLevelCode(item.level);
     setLevelImage(item.image || '');
+    setLevelDescription(item.description || '');
+    setLevelSlug(item.slug || '');
   };
 
   const handleDeleteItem = async (id) => {
@@ -136,6 +142,27 @@ const AdminLevels = ({
               value={levelCode}
               onChange={(e) => setLevelCode(e.target.value)}
               required
+            />
+          </div>
+          <div className="settings-input-group">
+            <label className="settings-label">Slug URL (đường dẫn)</label>
+            <input
+              type="text"
+              className="settings-input"
+              placeholder="Ví dụ: giao-trinh-thoi-dai-1"
+              value={levelSlug}
+              onChange={(e) => setLevelSlug(e.target.value)}
+              required
+            />
+          </div>
+          <div className="settings-input-group">
+            <label className="settings-label">Mô tả giáo trình</label>
+            <textarea
+              className="settings-input"
+              placeholder="Ví dụ: Giáo trình dành cho kỳ thi TOCFL..."
+              value={levelDescription}
+              onChange={(e) => setLevelDescription(e.target.value)}
+              style={{ minHeight: '80px', fontFamily: 'inherit', resize: 'vertical' }}
             />
           </div>
           <div className="settings-input-group">
@@ -221,6 +248,7 @@ const AdminLevels = ({
                 <th>Hình ảnh</th>
                 <th>Tên Giáo Trình</th>
                 <th>Mã Cấp Độ</th>
+                <th>Mô tả</th>
                 <th>Slug URL</th>
                 <th style={{ width: '150px' }}>Hành động</th>
               </tr>
@@ -228,7 +256,7 @@ const AdminLevels = ({
             <tbody>
               {levels.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="empty-table-row">Chưa có giáo trình nào</td>
+                  <td colSpan="7" className="empty-table-row">Chưa có giáo trình nào</td>
                 </tr>
               ) : (
                 levels.map((lvl) => (
@@ -243,6 +271,16 @@ const AdminLevels = ({
                     </td>
                     <td style={{ fontWeight: '800' }}>{lvl.levelName}</td>
                     <td><span className="level-code-badge">{lvl.level}</span></td>
+                    <td>
+                      <div style={{
+                        maxWidth: '220px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }} title={lvl.description}>
+                        {lvl.description || <span style={{ color: '#aaa', fontStyle: 'italic' }}>Không có mô tả</span>}
+                      </div>
+                    </td>
                     <td><code style={{ fontSize: '12px', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' }}>{lvl.slug || '-'}</code></td>
                     <td>
                       <div style={{ display: 'flex', gap: '8px' }}>

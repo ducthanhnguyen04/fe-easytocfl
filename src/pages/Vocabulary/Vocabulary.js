@@ -312,7 +312,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   <div className="book-select-info">
                     <h4 className="book-select-title">{book.levelName}</h4>
                     <span className="book-select-level">{book.level}</span>
-                    <p className="book-select-desc">Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - {book.level}</p>
+                    <p className="book-select-desc">{book.description || `Giáo trình dành cho du học sinh quốc tế tại Đài Loan level - ${book.level}`}</p>
                     <div className="book-select-stats">
                       <span>📖 {book?.lessons?.length || 0} bài học</span>
                     </div>
@@ -382,25 +382,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
               <div>
                 <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
                   <div>
-                    <h2>{currentBook?.viTitle || currentBook?.levelName} ({currentBook?.title || currentBook?.level})</h2>
-                    <p>{currentBook?.level} — {totalLessons} bài học chính thức</p>
+                    <h2>{currentBook?.viTitle || currentBook?.levelName}</h2>
+                    <p>{totalLessons} bài học chính thức</p>
                   </div>
                 </div>
-
-                {/* Lesson Progress Card */}
-                <div className="neo-card lesson-progress-card">
-                  <div className="lesson-progress-header">
-                    <span>Tiến độ học</span>
-                    <span>{completedLessonsCount} / {totalLessons} bài</span>
-                  </div>
-                  <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${completionPercentage}%`, backgroundColor: bookColor }}></div>
-                  </div>
-                  <div style={{ marginTop: '8px', fontSize: '11px', fontWeight: 'bold', color: '#666', textAlign: 'right' }}>
-                    {completionPercentage}% hoàn thành
-                  </div>
-                </div>
-
                 {/* Lessons Grid */}
                 <div className="lessons-grid">
                   {lessonsList.map((lesson) => {

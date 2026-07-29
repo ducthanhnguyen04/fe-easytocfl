@@ -96,12 +96,9 @@ const Admin = ({ refreshGlobalData }) => {
     <div className="admin-container">
       <div className="page-title-banner" style={{ marginBottom: '30px' }}>
         <div>
-          <h2>🛡️ Hệ Thống Quản Trị (CMS)</h2>
+          <h2>Hệ Thống Quản Trị (CMS)</h2>
           <p>Thêm và cập nhật nội dung giáo trình, bài học, ngữ pháp và ví dụ cho ứng dụng</p>
         </div>
-        <button className="neo-btn" style={{ backgroundColor: 'var(--color-white)' }} onClick={fetchData} disabled={loading}>
-          {loading ? 'Đang tải...' : '🔄 Làm mới dữ liệu'}
-        </button>
       </div>
 
       {actionSuccess && <div className="settings-alert-success" style={{ marginBottom: '25px' }}>✓ {actionSuccess}</div>}
