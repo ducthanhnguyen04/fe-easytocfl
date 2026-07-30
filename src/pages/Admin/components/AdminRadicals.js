@@ -16,6 +16,7 @@ const AdminRadicals = ({
   const [radicalExample, setRadicalExample] = useState('');
   const [radicalStroke, setRadicalStroke] = useState('');
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -31,7 +32,7 @@ const AdminRadicals = ({
   const handleSaveRadical = async (e) => {
     e.preventDefault();
     if (!radicalText || !radicalPinyin || !radicalMeaning || !radicalEnglishMeaning || !radicalStroke) {
-      showError('Vui lòng điền đầy đủ các trường bắt buộc cho bộ thủ!');
+      showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
@@ -40,9 +41,9 @@ const AdminRadicals = ({
         pinyin: radicalPinyin,
         meaning: radicalMeaning,
         englishMeaning: radicalEnglishMeaning,
-        profoundMeaning: radicalProfoundMeaning || '',
-        example: radicalExample || '',
-        stroke: radicalStroke
+        profoundMeaning: radicalProfoundMeaning,
+        example: radicalExample,
+        stroke: parseInt(radicalStroke),
       };
       if (editId) {
         await axios.put(
@@ -68,17 +69,17 @@ const AdminRadicals = ({
 
   const handleEditClick = (item) => {
     setEditId(item.id);
-    setRadicalText(item.radical);
-    setRadicalPinyin(item.pinyin);
-    setRadicalMeaning(item.meaning);
+    setRadicalText(item.radical || '');
+    setRadicalPinyin(item.pinyin || '');
+    setRadicalMeaning(item.meaning || '');
     setRadicalEnglishMeaning(item.englishMeaning || '');
     setRadicalProfoundMeaning(item.profoundMeaning || '');
     setRadicalExample(item.example || '');
-    setRadicalStroke(item.stroke);
+    setRadicalStroke(item.stroke || '');
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bộ thủ này không? Thao tác này không thể hoàn tác.')) {
       return;
     }
     try {
@@ -95,6 +96,19 @@ const AdminRadicals = ({
     }
   };
 
+  const filteredRadicals = radicals.filter((rd) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      rd.id?.toString().includes(query) ||
+      rd.radical?.toLowerCase().includes(query) ||
+      rd.pinyin?.toLowerCase().includes(query) ||
+      rd.meaning?.toLowerCase().includes(query) ||
+      rd.englishMeaning?.toLowerCase().includes(query) ||
+      rd.example?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <>
       <div className="neo-card admin-form-card" style={{ padding: '25px' }}>
@@ -103,7 +117,7 @@ const AdminRadicals = ({
             {editId ? `✏️ Sửa Bộ Thủ (ID: ${editId})` : '部 Thêm Bộ Thủ Mới'}
           </h3>
           <div className="settings-input-group">
-            <label className="settings-label">Chữ Bộ thủ (Chữ Hán) *</label>
+            <label className="settings-label">Chữ bộ thủ *</label>
             <input
               type="text"
               className="settings-input"
@@ -125,7 +139,7 @@ const AdminRadicals = ({
             />
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Giải nghĩa tiếng Việt *</label>
+            <label className="settings-label">Ý nghĩa tiếng Việt *</label>
             <input
               type="text"
               className="settings-input"
@@ -136,7 +150,7 @@ const AdminRadicals = ({
             />
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Giải nghĩa tiếng Anh (English Meaning) *</label>
+            <label className="settings-label">Ý nghĩa tiếng Anh *</label>
             <input
               type="text"
               className="settings-input"
@@ -194,9 +208,24 @@ const AdminRadicals = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {radicals.length}
+            {searchQuery ? `Tìm thấy: ${filteredRadicals.length} / ${radicals.length}` : `Tổng cộng: ${radicals.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo bộ thủ, pinyin, ý nghĩa, ví dụ..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -211,12 +240,14 @@ const AdminRadicals = ({
               </tr>
             </thead>
             <tbody>
-              {radicals.length === 0 ? (
+              {filteredRadicals.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="empty-table-row">Chưa có bộ thủ nào</td>
+                  <td colSpan="6" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có bộ thủ nào'}
+                  </td>
                 </tr>
               ) : (
-                radicals.map((rd) => (
+                filteredRadicals.map((rd) => (
                   <tr key={rd.id}>
                     <td style={{ fontSize: '20px', fontWeight: '900', color: 'var(--color-primary)' }}>{rd.radical}</td>
                     <td>{rd.pinyin}</td>

@@ -207,7 +207,7 @@ const Grammar = ({ playAudio }) => {
                 const lessonGrammarPoints = grammarPoints.filter(g => g.bookId === selectedGrammarBook && g.lessonId === lesson.id);
                 const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
                 const displayTranslation = lesson.trans || '';
-                const isPremium = lesson.isPremium || lesson.premium;
+                const isPremium = lesson.isPremium !== undefined ? (lesson.isPremium === true || lesson.isPremium === 1 || lesson.isPremium === '1' || String(lesson.isPremium).toLowerCase() === 'true') : lesson.premium;
                 return (
                   <div
                     key={lesson.id}

@@ -160,6 +160,7 @@
   background-color: var(--color-primary);
   color: white;
   font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;

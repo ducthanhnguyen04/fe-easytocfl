@@ -15,6 +15,7 @@ const AdminExercises = ({
   const [excersiseEnglishMeaning, setExcersiseEnglishMeaning] = useState('');
   const [excersiseGrammarId, setExcersiseGrammarId] = useState('');
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -27,7 +28,7 @@ const AdminExercises = ({
   const handleSaveExcersise = async (e) => {
     e.preventDefault();
     if (!excersiseTitle || !excersiseMeaning || !excersiseEnglishMeaning || !excersiseGrammarId) {
-      showError('Vui lòng điền đầy đủ thông tin bài tập!');
+      showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
@@ -68,7 +69,7 @@ const AdminExercises = ({
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bài tập này không? Thao tác này không thể hoàn tác.')) {
       return;
     }
     try {
@@ -85,6 +86,19 @@ const AdminExercises = ({
     }
   };
 
+  const filteredExercises = excersises.filter((ex) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const gm = grammars.find((g) => g.id === ex.grammarId);
+    return (
+      ex.id?.toString().includes(query) ||
+      ex.title?.toLowerCase().includes(query) ||
+      ex.meaning?.toLowerCase().includes(query) ||
+      ex.englishMeaning?.toLowerCase().includes(query) ||
+      (gm && gm.grammar?.toLowerCase().includes(query))
+    );
+  });
+
   return (
     <>
       <div className="neo-card admin-form-card" style={{ padding: '25px' }}>
@@ -93,14 +107,14 @@ const AdminExercises = ({
             {editId ? `✏️ Sửa Bài Tập (ID: ${editId})` : '🎯 Thêm Bài Tập Mới'}
           </h3>
           <div className="settings-input-group">
-            <label className="settings-label">Thuộc Cấu Trúc Ngữ Pháp *</label>
+            <label className="settings-label">Thuộc Ngữ Pháp *</label>
             <select
               className="settings-input"
               value={excersiseGrammarId}
               onChange={(e) => setExcersiseGrammarId(e.target.value)}
               required
             >
-              <option value="">-- Chọn cấu trúc ngữ pháp --</option>
+              <option value="">-- Chọn điểm ngữ pháp --</option>
               {grammars.map((gm) => (
                 <option key={gm.id} value={gm.id}>
                   {gm.grammar} ({lessons.find(ls => ls.id === gm.lessonId)?.lessonName})
@@ -109,33 +123,33 @@ const AdminExercises = ({
             </select>
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Câu hỏi / Đề bài (Tiếng Trung) *</label>
-            <textarea
+            <label className="settings-label">Đề bài (Bài tập tiếng Trung) *</label>
+            <input
+              type="text"
               className="settings-input"
-              placeholder="Ví dụ: 請翻譯這句：我是昨天坐飛機來的。"
-              style={{ minHeight: '60px', fontFamily: 'inherit' }}
+              placeholder="Ví dụ: 我___昨天來的。(填: 是)"
               value={excersiseTitle}
               onChange={(e) => setExcersiseTitle(e.target.value)}
               required
             />
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Đáp án / Giải nghĩa tiếng Việt *</label>
-            <textarea
+            <label className="settings-label">Đáp án / Giải nghĩa Việt *</label>
+            <input
+              type="text"
               className="settings-input"
-              placeholder="Ví dụ: Tôi đi máy bay đến đây ngày hôm qua."
-              style={{ minHeight: '60px', fontFamily: 'inherit' }}
+              placeholder="Ví dụ: 是 (Dịch: Tôi là đến ngày hôm qua)"
               value={excersiseMeaning}
               onChange={(e) => setExcersiseMeaning(e.target.value)}
               required
             />
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Đáp án / Giải nghĩa tiếng Anh *</label>
-            <textarea
+            <label className="settings-label">Đáp án / Giải nghĩa Anh *</label>
+            <input
+              type="text"
               className="settings-input"
-              placeholder="Ví dụ: I came by plane yesterday."
-              style={{ minHeight: '60px', fontFamily: 'inherit' }}
+              placeholder="Ví dụ: 是 (Meaning: I came yesterday)"
               value={excersiseEnglishMeaning}
               onChange={(e) => setExcersiseEnglishMeaning(e.target.value)}
               required
@@ -158,9 +172,24 @@ const AdminExercises = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {excersises.length}
+            {searchQuery ? `Tìm thấy: ${filteredExercises.length} / ${excersises.length}` : `Tổng cộng: ${excersises.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, đề bài, giải nghĩa, cấu trúc ngữ pháp..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -174,12 +203,14 @@ const AdminExercises = ({
               </tr>
             </thead>
             <tbody>
-              {excersises.length === 0 ? (
+              {filteredExercises.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-table-row">Chưa có bài tập nào</td>
+                  <td colSpan="5" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có bài tập nào'}
+                  </td>
                 </tr>
               ) : (
-                excersises.map((ex) => {
+                filteredExercises.map((ex) => {
                   const gm = grammars.find((g) => g.id === ex.grammarId);
                   return (
                     <tr key={ex.id}>

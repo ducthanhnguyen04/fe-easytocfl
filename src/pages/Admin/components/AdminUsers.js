@@ -14,6 +14,7 @@ const AdminUsers = ({
   const [userFormRole, setUserFormRole] = useState('user');
   const [userFormIsPremium, setUserFormIsPremium] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -130,6 +131,17 @@ const AdminUsers = ({
     }
   };
 
+  const filteredUsers = usersList.filter((us) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    return (
+      us.id?.toString().includes(query) ||
+      us.userName?.toLowerCase().includes(query) ||
+      us.email?.toLowerCase().includes(query) ||
+      us.role?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <>
       <div className="neo-card admin-form-card" style={{ padding: '25px' }}>
@@ -215,9 +227,24 @@ const AdminUsers = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {usersList.length}
+            {searchQuery ? `Tìm thấy: ${filteredUsers.length} / ${usersList.length}` : `Tổng cộng: ${usersList.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, tên hiển thị, email, vai trò..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -232,12 +259,15 @@ const AdminUsers = ({
               </tr>
             </thead>
             <tbody>
-              {usersList.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="empty-table-row">Chưa có người dùng nào</td>
+                  <td colSpan="6" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có người dùng nào'}
+                  </td>
                 </tr>
               ) : (
-                usersList.map((us) => (
+                filteredUsers.map((us) => (
+
                   <tr key={us.id}>
                     <td>{us.id}</td>
                     <td style={{ fontWeight: '800' }}>{us.userName}</td>

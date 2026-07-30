@@ -393,7 +393,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                     const learnedInLesson = lessonWords.filter(v => v.learned).length;
                     const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
                     const displayTranslation = lesson.trans || '';
-                    const isPremium = lesson.isPremium || lesson.premium;
+                    const isPremium = lesson.isPremium !== undefined ? (lesson.isPremium === true || lesson.isPremium === 1 || lesson.isPremium === '1' || String(lesson.isPremium).toLowerCase() === 'true') : lesson.premium;
                     const isSelected = selectedLessonIdsForReview.includes(lesson.id);
 
                     return (

@@ -20,6 +20,7 @@ const AdminExamples = ({
   const [exampleGrammarId, setExampleGrammarId] = useState('');
   const [exampleVocabId, setExampleVocabId] = useState('');
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fileInputRef = useRef(null);
 
@@ -31,12 +32,13 @@ const AdminExamples = ({
     setExampleAudioUrl('');
     setExampleGrammarId('');
     setExampleVocabId('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSaveExample = async (e) => {
     e.preventDefault();
     if (!exampleText || !exampleMeaning || !examplePinyin) {
-      showError('Vui lòng điền đầy đủ thông tin ví dụ mẫu!');
+      showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
@@ -44,10 +46,11 @@ const AdminExamples = ({
         example: exampleText,
         meaning: exampleMeaning,
         pinyin: examplePinyin,
-        audioUrl: exampleAudioUrl || null,
+        audioUrl: exampleAudioUrl,
         grammarId: exampleGrammarId ? parseInt(exampleGrammarId) : null,
         vocabularyId: exampleVocabId ? parseInt(exampleVocabId) : null,
       };
+
       if (editId) {
         await axios.put(
           `${beUrl}/examples/update/${editId}`,
@@ -61,7 +64,7 @@ const AdminExamples = ({
           payload,
           { withCredentials: true }
         );
-        showSuccess('Thêm ví dụ mẫu thành công!');
+        showSuccess('Thêm câu ví dụ mới thành công!');
       }
       resetForm();
       onRefresh();
@@ -74,13 +77,6 @@ const AdminExamples = ({
     const file = e.target.files[0];
     if (!file) return;
 
-    const fileExtension = file.name.split('.').pop().toLowerCase();
-    if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
-      showError('Chỉ chấp nhận file Excel (.xlsx, .xls)!');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
     const formData = new FormData();
     formData.append('file', file);
     if (exampleGrammarId) {
@@ -92,40 +88,44 @@ const AdminExamples = ({
 
     setLoading(true);
     try {
-      const response = await axios.post(`${beUrl}/examples/import`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      });
-      showSuccess(`Nhập thành công ${response.data.count || response.data.examples?.length || 0} ví dụ từ Excel!`);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      const response = await axios.post(
+        `${beUrl}/examples/import-excel`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        showSuccess(`Nhập dữ liệu thành công! Đã thêm ${response.data.count || 0} ví dụ.`);
+        onRefresh();
+        resetForm();
+      } else {
+        showError(response.data.message || 'Lỗi khi import file Excel.');
       }
-      onRefresh();
-    } catch (error) {
-      console.error('Import excel error:', error);
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi nhập file Excel.');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    } catch (err) {
+      console.error('Import excel error:', err);
+      showError(err.response?.data?.message || err.response?.data?.error || 'Có lỗi xảy ra khi import file.');
     } finally {
       setLoading(false);
+      e.target.value = '';
     }
   };
 
   const handleEditClick = (item) => {
     setEditId(item.id);
-    setExampleText(item.example);
-    setExampleMeaning(item.meaning);
-    setExamplePinyin(item.pinyin);
+    setExampleText(item.example || '');
+    setExampleMeaning(item.meaning || '');
+    setExamplePinyin(item.pinyin || '');
     setExampleAudioUrl(item.audioUrl || '');
     setExampleGrammarId(item.grammarId || '');
     setExampleVocabId(item.vocabularyId || '');
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa câu ví dụ này không? Thao tác này không thể hoàn tác.')) {
       return;
     }
     try {
@@ -141,6 +141,19 @@ const AdminExamples = ({
       showError(errMsg);
     }
   };
+
+  const filteredExamples = examples.filter((ex) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const gm = grammars.find((g) => g.id === ex.grammarId);
+    return (
+      ex.id?.toString().includes(query) ||
+      ex.example?.toLowerCase().includes(query) ||
+      ex.pinyin?.toLowerCase().includes(query) ||
+      ex.meaning?.toLowerCase().includes(query) ||
+      (gm && gm.grammar?.toLowerCase().includes(query))
+    );
+  });
 
   return (
     <>
@@ -194,7 +207,7 @@ const AdminExamples = ({
             <label className="settings-label">Phiên âm Pinyin tiếng Trung *</label>
             <textarea
               className="settings-input"
-              placeholder="Ví dụ: Wǒ shì zuótiān zuò fēijī lái de."
+              placeholder="Ví dụ: Wǒ - shì zuótiān..."
               style={{ minHeight: '60px', fontFamily: 'inherit' }}
               value={examplePinyin}
               onChange={(e) => setExamplePinyin(e.target.value)}
@@ -234,13 +247,9 @@ const AdminExamples = ({
           </div>
         </form>
 
-        {/* Excel Importer inside Form card */}
         {!editId && (
           <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '2px dashed var(--color-black)' }}>
             <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '10px' }}>📥 Nhập danh sách ví dụ từ Excel</h4>
-            <p style={{ fontSize: '11px', color: '#555', marginBottom: '15px' }}>
-              Liên kết ngữ pháp / từ vựng ở trên trước khi import (Tùy chọn). File cần có các cột tương ứng: example, meaning, pinyin, audioUrl.
-            </p>
             <input
               type="file"
               accept=".xlsx, .xls"
@@ -266,9 +275,24 @@ const AdminExamples = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {examples.length}
+            {searchQuery ? `Tìm thấy: ${filteredExamples.length} / ${examples.length}` : `Tổng cộng: ${examples.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, câu ví dụ, pinyin, dịch nghĩa, ngữ pháp..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -281,12 +305,14 @@ const AdminExamples = ({
               </tr>
             </thead>
             <tbody>
-              {examples.length === 0 ? (
+              {filteredExamples.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="empty-table-row">Chưa có câu ví dụ nào</td>
+                  <td colSpan="4" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có câu ví dụ nào'}
+                  </td>
                 </tr>
               ) : (
-                examples.map((ex) => {
+                filteredExamples.map((ex) => {
                   const gm = grammars.find((g) => g.id === ex.grammarId);
                   return (
                     <tr key={ex.id}>

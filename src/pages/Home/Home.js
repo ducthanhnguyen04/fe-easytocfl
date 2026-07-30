@@ -131,7 +131,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
       <section className="comments-section">
         <div className="comments-header">
           <h3 className="comments-title">
-            💬 Góc Bình Luận & Chia Sẻ
+            Góc Bình Luận & Chia Sẻ
             <span className="comments-count-badge">{commentsList.length}</span>
           </h3>
         </div>
@@ -163,7 +163,7 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
                   style={{ padding: '8px 20px', fontSize: '13px' }}
                   disabled={submittingComment}
                 >
-                  {submittingComment ? 'Đang gửi...' : 'Gửi bình luận 🚀'}
+                  {submittingComment ? 'Đang gửi...' : 'Gửi bình luận'}
                 </button>
               </div>
             </div>

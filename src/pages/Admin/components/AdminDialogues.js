@@ -15,6 +15,7 @@ const AdminDialogues = ({
   const [illustrationUrl, setIllustrationUrl] = useState('');
   const [lines, setLines] = useState([]); // array of { lineOrder, character, text, pinyin, translation, audioUrl }
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -114,6 +115,27 @@ const AdminDialogues = ({
       showError(error.response?.data?.message || 'Có lỗi xảy ra khi xóa bài khóa.');
     }
   };
+
+  const filteredDialogues = dialogues.filter((d) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const lesson = lessons.find((l) => l.id === d.lessonId);
+    
+    const headerMatch = d.header?.toLowerCase().includes(query);
+    const idMatch = d.id?.toString().includes(query);
+    const lessonMatch = lesson && (
+      lesson.lessonName?.toLowerCase().includes(query) ||
+      lesson.title?.toLowerCase().includes(query)
+    );
+    const linesMatch = d.lines?.some(l => 
+      l.character?.toLowerCase().includes(query) ||
+      l.text?.toLowerCase().includes(query) ||
+      l.pinyin?.toLowerCase().includes(query) ||
+      l.translation?.toLowerCase().includes(query)
+    );
+
+    return idMatch || headerMatch || lessonMatch || linesMatch;
+  });
 
   return (
     <>
@@ -298,9 +320,24 @@ const AdminDialogues = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Bài Khóa Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {dialogues.length}
+            {searchQuery ? `Tìm thấy: ${filteredDialogues.length} / ${dialogues.length}` : `Tổng cộng: ${dialogues.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, khung cảnh, bài học, nhân vật, nội dung thoại..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -315,12 +352,14 @@ const AdminDialogues = ({
               </tr>
             </thead>
             <tbody>
-              {dialogues.length === 0 ? (
+              {filteredDialogues.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="empty-table-row">Chưa có bài khóa hội thoại nào</td>
+                  <td colSpan="6" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có bài khóa hội thoại nào'}
+                  </td>
                 </tr>
               ) : (
-                dialogues.map((item) => {
+                filteredDialogues.map((item) => {
                   const lesson = lessons.find((l) => l.id === item.lessonId);
                   return (
                     <tr key={item.id}>
@@ -360,3 +399,4 @@ const AdminDialogues = ({
 };
 
 export default AdminDialogues;
+

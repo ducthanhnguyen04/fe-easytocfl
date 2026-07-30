@@ -15,6 +15,7 @@ const AdminLessons = ({
   const [lessonLevelId, setLessonLevelId] = useState('');
   const [lessonIsPremium, setLessonIsPremium] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -87,6 +88,20 @@ const AdminLessons = ({
       showError(errMsg);
     }
   };
+
+  const filteredLessons = lessons.filter((ls) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const lvl = levels.find((l) => l.id === ls.levelId);
+    return (
+      ls.id?.toString().includes(query) ||
+      ls.lessonName?.toLowerCase().includes(query) ||
+      ls.title?.toLowerCase().includes(query) ||
+      ls.slug?.toLowerCase().includes(query) ||
+      (lvl && lvl.levelName?.toLowerCase().includes(query)) ||
+      (lvl && lvl.level?.toLowerCase().includes(query))
+    );
+  });
 
   return (
     <>
@@ -173,9 +188,24 @@ const AdminLessons = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {lessons.length}
+            {searchQuery ? `Tìm thấy: ${filteredLessons.length} / ${lessons.length}` : `Tổng cộng: ${lessons.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo bài học, tiêu đề, giáo trình..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -190,12 +220,14 @@ const AdminLessons = ({
               </tr>
             </thead>
             <tbody>
-              {lessons.length === 0 ? (
+              {filteredLessons.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="empty-table-row">Chưa có bài học nào</td>
+                  <td colSpan="6" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có bài học nào'}
+                  </td>
                 </tr>
               ) : (
-                lessons.map((ls) => {
+                filteredLessons.map((ls) => {
                   const lvl = levels.find((l) => l.id === ls.levelId);
                   return (
                     <tr key={ls.id}>
@@ -233,3 +265,4 @@ const AdminLessons = ({
 };
 
 export default AdminLessons;
+

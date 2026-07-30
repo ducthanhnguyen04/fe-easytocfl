@@ -17,6 +17,7 @@ const AdminGrammars = ({
   const [grammarNote, setGrammarNote] = useState('');
   const [grammarLessonId, setGrammarLessonId] = useState('');
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const resetForm = () => {
     setEditId(null);
@@ -31,7 +32,7 @@ const AdminGrammars = ({
   const handleSaveGrammar = async (e) => {
     e.preventDefault();
     if (!grammarName || !grammarStructure || !grammarUsage || !grammarDefinition || !grammarLessonId) {
-      showError('Vui lòng điền đầy đủ thông tin cấu trúc ngữ pháp!');
+      showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
@@ -56,7 +57,7 @@ const AdminGrammars = ({
           payload,
           { withCredentials: true }
         );
-        showSuccess('Thêm mẫu ngữ pháp mới thành công!');
+        showSuccess('Thêm ngữ pháp mới thành công!');
       }
       resetForm();
       onRefresh();
@@ -67,16 +68,16 @@ const AdminGrammars = ({
 
   const handleEditClick = (item) => {
     setEditId(item.id);
-    setGrammarName(item.grammar);
-    setGrammarStructure(item.structure);
-    setGrammarUsage(item.usage);
+    setGrammarName(item.grammar || '');
+    setGrammarStructure(item.structure || '');
+    setGrammarUsage(item.usage || '');
     setGrammarDefinition(item.definition || '');
     setGrammarNote(item.note || '');
-    setGrammarLessonId(item.lessonId);
+    setGrammarLessonId(item.lessonId || '');
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa ngữ pháp này không? Thao tác này không thể hoàn tác.')) {
       return;
     }
     try {
@@ -92,6 +93,21 @@ const AdminGrammars = ({
       showError(errMsg);
     }
   };
+
+  const filteredGrammars = grammars.filter((gm) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const ls = lessons.find((l) => l.id === gm.lessonId);
+    return (
+      gm.id?.toString().includes(query) ||
+      gm.grammar?.toLowerCase().includes(query) ||
+      gm.structure?.toLowerCase().includes(query) ||
+      gm.definition?.toLowerCase().includes(query) ||
+      gm.note?.toLowerCase().includes(query) ||
+      (ls && ls.lessonName?.toLowerCase().includes(query)) ||
+      (ls && ls.title?.toLowerCase().includes(query))
+    );
+  });
 
   return (
     <>
@@ -113,7 +129,7 @@ const AdminGrammars = ({
                 const lvl = levels.find((l) => l.id === ls.levelId);
                 return (
                   <option key={ls.id} value={ls.id}>
-                    {ls.lessonName} - {ls.title} ({lvl ? lvl.levelName : `Cấp ${ls.levelId}`})
+                    {lvl ? `${lvl.levelName} - ` : ''}{ls.lessonName}: {ls.title}
                   </option>
                 );
               })}
@@ -124,7 +140,7 @@ const AdminGrammars = ({
             <input
               type="text"
               className="settings-input"
-              placeholder="Ví dụ: 是...的 (Nhấn mạnh)"
+              placeholder="Ví dụ: 是...的 (Thì, chính là...)"
               value={grammarName}
               onChange={(e) => setGrammarName(e.target.value)}
               required
@@ -135,18 +151,18 @@ const AdminGrammars = ({
             <input
               type="text"
               className="settings-input"
-              placeholder="Ví dụ: Chủ ngữ + 是 + [Đối tượng cần nhấn mạnh] + 的"
+              placeholder="Ví dụ: Chủ ngữ + 是 + [Mốc thời gian/Địa điểm/Cách thức] + Động từ + 的"
               value={grammarStructure}
               onChange={(e) => setGrammarStructure(e.target.value)}
               required
             />
           </div>
           <div className="settings-input-group">
-            <label className="settings-label">Cách dùng / Ngữ cảnh *</label>
-            <textarea
+            <label className="settings-label">Cách dùng (Usage) *</label>
+            <input
+              type="text"
               className="settings-input"
-              placeholder="Ví dụ: Dùng để nhấn mạnh thời gian, địa điểm, phương thức của hành động đã xảy ra..."
-              style={{ minHeight: '80px', fontFamily: 'inherit' }}
+              placeholder="Ví dụ: Dùng để nhấn mạnh thời gian, địa điểm..."
               value={grammarUsage}
               onChange={(e) => setGrammarUsage(e.target.value)}
               required
@@ -167,7 +183,7 @@ const AdminGrammars = ({
             <label className="settings-label">Chú ý quan trọng (Note - Tùy chọn)</label>
             <textarea
               className="settings-input"
-              placeholder="Ví dụ: Chú ý chữ '是' có thể lược bỏ trong câu khẳng định nhưng không được bỏ trong câu phủ định..."
+              placeholder="Ví dụ: Chú ý chữ '是' có thể lược bỏ..."
               style={{ minHeight: '60px', fontFamily: 'inherit' }}
               value={grammarNote}
               onChange={(e) => setGrammarNote(e.target.value)}
@@ -190,9 +206,24 @@ const AdminGrammars = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {grammars.length}
+            {searchQuery ? `Tìm thấy: ${filteredGrammars.length} / ${grammars.length}` : `Tổng cộng: ${grammars.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, ngữ pháp, cấu trúc, bài học..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -206,12 +237,14 @@ const AdminGrammars = ({
               </tr>
             </thead>
             <tbody>
-              {grammars.length === 0 ? (
+              {filteredGrammars.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-table-row">Chưa có ngữ pháp nào</td>
+                  <td colSpan="5" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có ngữ pháp nào'}
+                  </td>
                 </tr>
               ) : (
-                grammars.map((gm) => {
+                filteredGrammars.map((gm) => {
                   const ls = lessons.find((l) => l.id === gm.lessonId);
                   return (
                     <tr key={gm.id}>

@@ -19,6 +19,7 @@ const AdminVocabularies = ({
   const [vocabAudioUrl, setVocabAudioUrl] = useState('');
   const [vocabLessonId, setVocabLessonId] = useState('');
   const [editId, setEditId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fileInputRef = useRef(null);
 
@@ -30,12 +31,51 @@ const AdminVocabularies = ({
     setVocabPinyin('');
     setVocabAudioUrl('');
     setVocabLessonId('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleSaveVocabulary = async (e) => {
+  const handleImportExcel = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (vocabLessonId) {
+      formData.append('lessonId', vocabLessonId);
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${beUrl}/vocabularies/import-excel`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        showSuccess(`Nhập dữ liệu thành công! Đã thêm ${response.data.count || 0} từ vựng.`);
+        onRefresh();
+        resetForm();
+      } else {
+        showError(response.data.message || 'Lỗi khi import file Excel.');
+      }
+    } catch (err) {
+      console.error('Import excel error:', err);
+      showError(err.response?.data?.message || err.response?.data?.error || 'Có lỗi xảy ra khi import file.');
+    } finally {
+      setLoading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveVocab = async (e) => {
     e.preventDefault();
     if (!vocabText || !vocabMeaning || !vocabEnglishMeaning || !vocabPinyin || !vocabLessonId) {
-      showError('Vui lòng điền đầy đủ các trường bắt buộc cho từ vựng!');
+      showError('Vui lòng điền đầy đủ các trường bắt buộc!');
       return;
     }
     try {
@@ -44,9 +84,10 @@ const AdminVocabularies = ({
         meaning: vocabMeaning,
         englishMeaning: vocabEnglishMeaning,
         pinyin: vocabPinyin,
-        audioUrl: vocabAudioUrl || null,
+        audioUrl: vocabAudioUrl,
         lessonId: parseInt(vocabLessonId),
       };
+
       if (editId) {
         await axios.put(
           `${beUrl}/vocabularies/update/${editId}`,
@@ -69,59 +110,18 @@ const AdminVocabularies = ({
     }
   };
 
-  const handleImportExcel = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const fileExtension = file.name.split('.').pop().toLowerCase();
-    if (fileExtension !== 'xlsx' && fileExtension !== 'xls') {
-      showError('Chỉ chấp nhận file Excel (.xlsx, .xls)!');
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    if (vocabLessonId) {
-      formData.append('lessonId', vocabLessonId);
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post(`${beUrl}/vocabularies/import`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      });
-      showSuccess(`Nhập thành công ${response.data.count || response.data.vocabularies?.length || 0} từ vựng từ Excel!`);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      onRefresh();
-    } catch (error) {
-      console.error('Import excel error:', error);
-      showError(error.response?.data?.message || 'Có lỗi xảy ra khi nhập file Excel.');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleEditClick = (item) => {
     setEditId(item.id);
-    setVocabText(item.vocabulary);
-    setVocabMeaning(item.meaning);
+    setVocabText(item.vocabulary || '');
+    setVocabMeaning(item.meaning || '');
     setVocabEnglishMeaning(item.englishMeaning || '');
-    setVocabPinyin(item.pinyin);
+    setVocabPinyin(item.pinyin || '');
     setVocabAudioUrl(item.audioUrl || '');
-    setVocabLessonId(item.lessonId);
+    setVocabLessonId(item.lessonId || '');
   };
 
   const handleDeleteItem = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa mục này không? Thao tác này không thể hoàn tác.')) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa từ vựng này không? Thao tác này không thể hoàn tác.')) {
       return;
     }
     try {
@@ -138,10 +138,25 @@ const AdminVocabularies = ({
     }
   };
 
+  const filteredVocabularies = vocabularies.filter((vc) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    const ls = lessons.find((l) => l.id === vc.lessonId);
+    return (
+      vc.id?.toString().includes(query) ||
+      vc.vocabulary?.toLowerCase().includes(query) ||
+      vc.meaning?.toLowerCase().includes(query) ||
+      vc.englishMeaning?.toLowerCase().includes(query) ||
+      vc.pinyin?.toLowerCase().includes(query) ||
+      (ls && ls.lessonName?.toLowerCase().includes(query)) ||
+      (ls && ls.title?.toLowerCase().includes(query))
+    );
+  });
+
   return (
     <>
       <div className="neo-card admin-form-card" style={{ padding: '25px' }}>
-        <form onSubmit={handleSaveVocabulary} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleSaveVocab} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <h3 className="form-section-title">
             {editId ? `✏️ Sửa Từ Vựng (ID: ${editId})` : '🔤 Thêm Từ Vựng Mới'}
           </h3>
@@ -158,7 +173,7 @@ const AdminVocabularies = ({
                 const lvl = levels.find((l) => l.id === ls.levelId);
                 return (
                   <option key={ls.id} value={ls.id}>
-                    {ls.lessonName} - {ls.title} ({lvl ? lvl.levelName : `Cấp ${ls.levelId}`})
+                    {lvl ? `${lvl.levelName} - ` : ''}{ls.lessonName}: {ls.title}
                   </option>
                 );
               })}
@@ -169,7 +184,7 @@ const AdminVocabularies = ({
             <input
               type="text"
               className="settings-input"
-              placeholder="Ví dụ: 臺灣"
+              placeholder="Ví dụ: 台灣"
               value={vocabText}
               onChange={(e) => setVocabText(e.target.value)}
               required
@@ -231,13 +246,9 @@ const AdminVocabularies = ({
           </div>
         </form>
 
-        {/* Excel Importer inside Form card */}
         {!editId && (
           <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '2px dashed var(--color-black)' }}>
             <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '10px' }}>📥 Nhập danh sách từ Excel</h4>
-            <p style={{ fontSize: '11px', color: '#555', marginBottom: '15px' }}>
-              Chọn bài học ở trên trước khi import (Tùy chọn). File cần có các cột tương ứng: vocabulary, meaning, englishMeaning, pinyin.
-            </p>
             <input
               type="file"
               accept=".xlsx, .xls"
@@ -263,9 +274,24 @@ const AdminVocabularies = ({
         <h3 className="form-section-title" style={{ marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span> Danh Sách Hiện Tại</span>
           <span style={{ fontSize: '12px', padding: '2px 8px', backgroundColor: '#e2e8f0', borderRadius: '10px' }}>
-            Tổng cộng: {vocabularies.length}
+            {searchQuery ? `Tìm thấy: ${filteredVocabularies.length} / ${vocabularies.length}` : `Tổng cộng: ${vocabularies.length}`}
           </span>
         </h3>
+
+        <div className="admin-search-container">
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="🔍 Tìm theo ID, từ vựng, pinyin, nghĩa Việt/Anh, bài học..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="admin-search-clear" onClick={() => setSearchQuery('')}>
+              Hủy tìm
+            </button>
+          )}
+        </div>
 
         <div className="data-table-container">
           <table className="admin-table">
@@ -279,12 +305,14 @@ const AdminVocabularies = ({
               </tr>
             </thead>
             <tbody>
-              {vocabularies.length === 0 ? (
+              {filteredVocabularies.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="empty-table-row">Chưa có từ vựng nào</td>
+                  <td colSpan="5" className="empty-table-row">
+                    {searchQuery ? 'Không tìm thấy kết quả phù hợp' : 'Chưa có từ vựng nào'}
+                  </td>
                 </tr>
               ) : (
-                vocabularies.map((vc) => {
+                filteredVocabularies.map((vc) => {
                   const ls = lessons.find((l) => l.id === vc.lessonId);
                   return (
                     <tr key={vc.id}>
