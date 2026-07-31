@@ -89,7 +89,7 @@ const AdminExamples = ({
     setLoading(true);
     try {
       const response = await axios.post(
-        `${beUrl}/examples/import-excel`,
+        `${beUrl}/examples/import`,
         formData,
         {
           headers: {
@@ -98,12 +98,12 @@ const AdminExamples = ({
           withCredentials: true,
         }
       );
-      if (response.data.success) {
+      if (response.status === 200 || response.data) {
         showSuccess(`Nhập dữ liệu thành công! Đã thêm ${response.data.count || 0} ví dụ.`);
         onRefresh();
         resetForm();
       } else {
-        showError(response.data.message || 'Lỗi khi import file Excel.');
+        showError(response.data?.message || 'Lỗi khi import file Excel.');
       }
     } catch (err) {
       console.error('Import excel error:', err);

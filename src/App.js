@@ -203,7 +203,12 @@ function App() {
       })
       .catch(err => {
         console.error("Gửi kết quả thi thử thất bại:", err);
-        showToast(err.response?.data?.message || 'Không thể cộng điểm thi thử.', 'error');
+        const errMsg = err.response?.data?.message || 'Không thể cộng điểm thi thử.';
+        if (errMsg.includes('đã nhận điểm')) {
+          showToast(errMsg, 'warning', 5000, 'THÔNG BÁO');
+        } else {
+          showToast(errMsg, 'error');
+        }
       });
   };
 

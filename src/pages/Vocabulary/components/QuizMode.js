@@ -110,7 +110,12 @@ const QuizMode = ({
       })
       .catch(err => {
         console.error("Gửi điểm thất bại:", err);
-        showToast(err.response?.data?.message || 'Không thể cộng điểm quiz.', 'error');
+        const errMsg = err.response?.data?.message || 'Không thể cộng điểm quiz.';
+        if (errMsg.includes('đã nhận điểm')) {
+          showToast(errMsg, 'warning', 5000, 'THÔNG BÁO');
+        } else {
+          showToast(errMsg, 'error');
+        }
       });
     }
   }, [isCompleted, hasSubmitted, quizAnswers, currentLessonWords]);
