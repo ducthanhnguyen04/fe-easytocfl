@@ -371,10 +371,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
           {(() => {
             const totalLessons = lessonsList.length;
-            const completedLessonsCount = lessonsList.filter(lesson => {
-              const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
-              return lessonWords.length > 0 && lessonWords.every(v => v.learned);
-            }).length;
             const bookColor = currentBook?.color || getBookColor(selectedBook);
 
             return (

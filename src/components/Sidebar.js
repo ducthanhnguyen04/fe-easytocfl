@@ -38,7 +38,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
     }
   }, [location.pathname]);
 
-  const handleGoogleLoginCallback = async (response) => {
+  const handleGoogleLoginCallback = React.useCallback(async (response) => {
     try {
       const { credential } = response;
       const res = await axios.post(`${beUrl}/auth/google-login`, {
@@ -59,7 +59,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
       console.error("Google login error:", error);
       showToast(error.response?.data?.message || 'Đăng nhập Google thất bại. Vui lòng thử lại.', 'error');
     }
-  };
+  }, [setUser]);
 
   React.useEffect(() => {
     if (showLoginModal) {
