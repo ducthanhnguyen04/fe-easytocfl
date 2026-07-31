@@ -1,9 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import './Shadowing.css';
 
 const Shadowing = () => {
-  const navigate = useNavigate();
+
 
   return (
     <div className="shadowing-dev-container">

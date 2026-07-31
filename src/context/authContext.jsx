@@ -107,7 +107,7 @@ export function AuthProvider({ children }) {
             window.removeEventListener('focus', handleFocus);
             window.removeEventListener('blur', handleBlur);
         };
-    }, [user?.id]);
+    }, [user]);
 
     return (
         <AuthContext.Provider value={{ user, setUser, loading }}>

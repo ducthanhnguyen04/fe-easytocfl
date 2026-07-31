@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Icon from './Icon';
@@ -77,7 +77,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [showLoginModal]);
+  }, [showLoginModal, handleGoogleLoginCallback]);
 
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');

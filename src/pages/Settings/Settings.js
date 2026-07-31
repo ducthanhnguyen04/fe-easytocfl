@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Settings.css';
-import { showToast } from '../../utils/toast';
 import { AuthContext } from '../../context/authContext';
 
 const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
@@ -55,10 +54,7 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState('');
 
-  // Preferences state
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [bopomofoEnabled, setBopomofoEnabled] = useState(false);
-  const [devModeEnabled, setDevModeEnabled] = useState(false);
+
 
   // Themes list definition
   const themes = [

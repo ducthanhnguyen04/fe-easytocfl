@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import beUrl from '../../../api-url/api-backend';
-import { useAuth } from '../../../context/authContext';
 import { showToast } from '../../../utils/toast';
 import './WritingPractice.css';
 
 const WritingPractice = ({ initialVocabs = [], onBack }) => {
-  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const effectiveInitialVocabs = location.state?.initialVocabs || initialVocabs;
   const hasProcessedRef = useRef(false);
 
   const [savedSheets, setSavedSheets] = useState([]);
@@ -123,7 +120,7 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
     };
 
     fetchSheets();
-  }, []);
+  }, [initialVocabs, location]);
 
   // Select writing sheet from dropdown
   const handleSelectSheet = async (sheetId) => {
