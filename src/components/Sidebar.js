@@ -387,7 +387,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               🔄 Đang xác thực...
             </div>
           ) : user ? (
-            <div className="user-profile-widget" onClick={() => setShowUserModal(true)}>
+            <div className="user-profile-widget" onClick={() => { setShowUserModal(true); setIsMobileOpen(false); }}>
               <div className="user-avatar">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
