@@ -120,7 +120,7 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
     };
 
     fetchSheets();
-  }, [initialVocabs, location]);
+  }, []);
 
   // Select writing sheet from dropdown
   const handleSelectSheet = async (sheetId) => {
