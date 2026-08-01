@@ -100,6 +100,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
     setRegisterConfirmPassword('');
     setRegisterError('');
     setShowLoginModal(true);
+    setIsMobileOpen(false);
   };
 
   const isActive = (path) => {
