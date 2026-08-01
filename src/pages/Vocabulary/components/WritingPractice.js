@@ -37,51 +37,34 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
         if (targetTitle && !hasProcessedRef.current) {
           hasProcessedRef.current = true;
 
+          const initialItems = (navVocabs || [])
+            .map(v => {
+              const vocab = v.word || v.vocab || v.vocabulary || '';
+              const pinyin = v.pinyin || '';
+              const meaning = v.trans || v.meaning || '';
+              return { vocab, pinyin, meaning };
+            })
+            .filter(item => item.vocab && item.pinyin && item.meaning);
+
           // Ask backend to find or create sheet atomically by title
           const createRes = await axios.post(
             `${beUrl}/writing-sheets`,
-            { title: targetTitle, findIfExists: true },
+            { title: targetTitle, findIfExists: true, items: initialItems },
             { withCredentials: true }
           );
 
           const { sheet, isNew } = createRes.data;
 
           if (sheet) {
+            const updatedSheets = list.some(s => s.id === sheet.id) ? list : [sheet, ...list];
+            setSavedSheets(updatedSheets);
+            setCurrentSheetId(sheet.id);
+            setSheetTitle(sheet.title);
+            const sorted = [...(sheet.items || [])].sort((a, b) => Number(a.id) - Number(b.id));
+            setItems(sorted);
             if (isNew) {
-              // Newly created sheet -> add vocabulary items once
-              const newItems = [];
-              if (navVocabs && navVocabs.length > 0) {
-                for (const v of navVocabs) {
-                  const vocab = v.word || v.vocab || v.vocabulary || '';
-                  const pinyin = v.pinyin || '';
-                  const meaning = v.trans || v.meaning || '';
-                  if (vocab && pinyin && meaning) {
-                    const itemRes = await axios.post(
-                      `${beUrl}/writing-sheets/${sheet.id}/items`,
-                      { vocab, pinyin, meaning },
-                      { withCredentials: true }
-                    );
-                    if (itemRes.data.item) {
-                      newItems.push(itemRes.data.item);
-                    }
-                  }
-                }
-              }
-              sheet.items = newItems;
-              const updatedSheets = [sheet, ...list.filter(s => s.id !== sheet.id)];
-              setSavedSheets(updatedSheets);
-              setCurrentSheetId(sheet.id);
-              setSheetTitle(sheet.title);
-              setItems(newItems.sort((a, b) => Number(a.id) - Number(b.id)));
-              showToast(`Đã tạo file luyện viết "${sheet.title}" với ${newItems.length} từ vựng!`, 'success');
+              showToast(`Đã tạo file luyện viết "${sheet.title}" với ${sorted.length} từ vựng!`, 'success');
             } else {
-              // Sheet already existed in DB -> Open it without adding duplicate items
-              const updatedSheets = list.some(s => s.id === sheet.id) ? list : [sheet, ...list];
-              setSavedSheets(updatedSheets);
-              setCurrentSheetId(sheet.id);
-              setSheetTitle(sheet.title);
-              const sorted = [...(sheet.items || [])].sort((a, b) => Number(a.id) - Number(b.id));
-              setItems(sorted);
               showToast(`Đã mở file luyện viết "${sheet.title}"`, 'info');
             }
           }
@@ -307,18 +290,13 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
         { vocab: '謝謝', pinyin: 'xièxie', meaning: 'Cảm ơn' }
       ];
 
-      const newItems = [];
-      for (const s of samples) {
-        const res = await axios.post(
-          `${beUrl}/writing-sheets/${activeSheetId}/items`,
-          s,
-          { withCredentials: true }
-        );
-        if (res.data.item) {
-          newItems.push(res.data.item);
-        }
-      }
-      setItems(prev => [...prev, ...newItems]);
+      const res = await axios.post(
+        `${beUrl}/writing-sheets/${activeSheetId}/items`,
+        samples,
+        { withCredentials: true }
+      );
+      const addedItems = Array.isArray(res.data.items) ? res.data.items : (res.data.item ? [res.data.item] : []);
+      setItems(prev => [...prev, ...addedItems]);
       showToast('Đã thêm 5 từ vựng mẫu!', 'success');
     } catch (err) {
       console.error("Error adding sample data to DB:", err);
