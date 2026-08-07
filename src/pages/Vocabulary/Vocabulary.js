@@ -382,63 +382,73 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                   </div>
                 </div>
                 {/* Lessons Grid */}
-                <div className="lessons-grid">
-                  {lessonsList.map((lesson) => {
-                    const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
-                    const learnedInLesson = lessonWords.filter(v => v.learned).length;
-                    const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
-                    const displayTranslation = lesson.trans || '';
-                    const isPremium = lesson.isPremium !== undefined ? (lesson.isPremium === true || lesson.isPremium === 1 || lesson.isPremium === '1' || String(lesson.isPremium).toLowerCase() === 'true') : lesson.premium;
-                    const isSelected = selectedLessonIdsForReview.includes(lesson.id);
+                {totalLessons === 0 ? (
+                  <div className="neo-card" style={{ padding: '40px', textAlign: 'center', marginTop: '20px', border: '2px dashed var(--color-primary)' }}>
+                    <span style={{ fontSize: '50px', marginBottom: '10px', display: 'block' }}>📭</span>
+                    <h3 style={{ margin: '10px 0', color: 'var(--color-primary)' }}>Chưa có dữ liệu bài học</h3>
+                    <p style={{ fontSize: '15px', color: '#666', maxWidth: '500px', margin: '0 auto', lineHeight: '1.6' }}>
+                      Giáo trình này hiện chưa có bài học nào được thêm vào hoặc đang trong quá trình cập nhật. Vui lòng quay lại sau!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="lessons-grid">
+                    {lessonsList.map((lesson) => {
+                      const lessonWords = vocabWords.filter(v => parseInt(v.bookId) === parseInt(selectedBook) && parseInt(v.lessonId) === parseInt(lesson.id));
+                      const learnedInLesson = lessonWords.filter(v => v.learned).length;
+                      const displayTitle = lesson.lessonName ? `${lesson.lessonName}: ${lesson.title}` : lesson.title;
+                      const displayTranslation = lesson.trans || '';
+                      const isPremium = lesson.isPremium !== undefined ? (lesson.isPremium === true || lesson.isPremium === 1 || lesson.isPremium === '1' || String(lesson.isPremium).toLowerCase() === 'true') : lesson.premium;
+                      const isSelected = selectedLessonIdsForReview.includes(lesson.id);
 
-                    return (
-                      <div
-                        key={lesson.id}
-                        className={`neo-card lesson-select-card ${isSelected ? 'selected-for-review' : ''}`}
-                        style={isSelected ? { border: '2.5px solid var(--color-primary)', backgroundColor: 'var(--color-primary-light)' } : {}}
-                        onClick={() => {
-                          if (isPremium && !hasPremiumAccess) {
-                            showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
-                            if (!reviewSelecting) {
-                              navigate('/settings');
-                            }
-                          } else {
-                            if (reviewSelecting) {
-                              if (isSelected) {
-                                setSelectedLessonIdsForReview(prev => prev.filter(id => id !== lesson.id));
-                              } else {
-                                setSelectedLessonIdsForReview(prev => [...prev, lesson.id]);
+                      return (
+                        <div
+                          key={lesson.id}
+                          className={`neo-card lesson-select-card ${isSelected ? 'selected-for-review' : ''}`}
+                          style={isSelected ? { border: '2.5px solid var(--color-primary)', backgroundColor: 'var(--color-primary-light)' } : {}}
+                          onClick={() => {
+                            if (isPremium && !hasPremiumAccess) {
+                              showToast("Bài học này chỉ dành cho tài khoản Premium. Vui lòng nâng cấp tài khoản!", "warning");
+                              if (!reviewSelecting) {
+                                navigate('/settings');
                               }
                             } else {
-                              navigate(`/vocab/${currentBook?.slug || bookId}/${lesson.slug || lesson.id}`);
+                              if (reviewSelecting) {
+                                if (isSelected) {
+                                  setSelectedLessonIdsForReview(prev => prev.filter(id => id !== lesson.id));
+                                } else {
+                                  setSelectedLessonIdsForReview(prev => [...prev, lesson.id]);
+                                }
+                              } else {
+                                navigate(`/vocab/${currentBook?.slug || bookId}/${lesson.slug || lesson.id}`);
+                              }
                             }
-                          }
-                        }}
-                      >
-                        <div className="lesson-select-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                          <div>
-                            <h4 className="lesson-select-title">
-                              {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
-                            </h4>
-                            {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
-                            <div className="lesson-select-meta">
-                              <span>📖 {lessonWords.length} từ vựng</span>
-                              <span>✓ Đã thuộc {learnedInLesson}/{lessonWords.length}</span>
+                          }}
+                        >
+                          <div className="lesson-select-info" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <div>
+                              <h4 className="lesson-select-title">
+                                {displayTitle} {isPremium && <span className="premium-badge">👑 Premium</span>}
+                              </h4>
+                              {displayTranslation && <span className="lesson-select-translation">{displayTranslation}</span>}
+                              <div className="lesson-select-meta">
+                                <span>📖 {lessonWords.length} từ vựng</span>
+                                <span>✓ Đã thuộc {learnedInLesson}/{lessonWords.length}</span>
+                              </div>
                             </div>
+                            {reviewSelecting && (
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                readOnly
+                                style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+                              />
+                            )}
                           </div>
-                          {reviewSelecting && (
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              readOnly
-                              style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
-                            />
-                          )}
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })()}
