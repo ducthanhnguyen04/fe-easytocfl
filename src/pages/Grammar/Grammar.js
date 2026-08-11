@@ -108,6 +108,7 @@ const Grammar = ({ playAudio }) => {
         );
         return {
           id: v.id,
+          createdAt: v.createdAt,
           bookId: selectedGrammarBook,
           lessonId: v.lessonId,
           title: v.grammar,
@@ -124,7 +125,12 @@ const Grammar = ({ playAudio }) => {
             : (staticMatch ? staticMatch.exercises : [])
         };
       });
-      const sortedMapped = mapped.sort((a, b) => Number(a.id) - Number(b.id));
+      const sortedMapped = mapped.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+        return Number(a.id) - Number(b.id);
+      });
       setLocalLessonGrammars(sortedMapped);
     }).catch(err => {
       console.error('Error fetching lesson grammars:', err);
