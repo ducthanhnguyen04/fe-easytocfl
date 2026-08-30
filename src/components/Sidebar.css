@@ -55,6 +55,7 @@
   color: var(--color-white);
   font-size: 26px;
   box-shadow: var(--shadow-thin);
+  filter: url(#hand-drawn-sm);
 }
 
 .logo-text {
@@ -137,6 +138,7 @@
   border-color: var(--color-black);
   transform: translate(-2px, -2px);
   box-shadow: var(--shadow-thin);
+  filter: url(#hand-drawn-md);
 }
 
 .sidebar-link.active {
@@ -144,6 +146,7 @@
   color: var(--color-white);
   border: var(--border-thick);
   box-shadow: var(--shadow-thin);
+  filter: url(#hand-drawn-md);
 }
 
 .sidebar-link.active svg {
@@ -155,6 +158,7 @@
   color: var(--color-white);
   transform: none;
   box-shadow: var(--shadow-thin);
+  filter: url(#hand-drawn-md);
 }
 
 .sidebar-link .demo-badge {
@@ -187,6 +191,7 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  filter: url(#hand-drawn-md);
 }
 
 .user-profile-widget:hover {
@@ -249,6 +254,7 @@
   top: 20px;
   left: 20px;
   transition: all 0.15s ease;
+  filter: url(#hand-drawn-sm);
 }
 
 .mobile-menu-btn:hover {
@@ -383,7 +389,7 @@
   color: var(--color-black);
   text-decoration: none;
   border-radius: var(--radius-md);
-  border: 2px solid transparent;
+  border: 3px double transparent;
   background: none;
   text-align: left;
   width: 100%;
@@ -396,13 +402,15 @@
   border-color: var(--color-black);
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0px #000;
+  filter: url(#hand-drawn-sm);
 }
 
 .sidebar-sublink.active {
   background-color: var(--color-primary-light);
-  border: 2px solid var(--color-black);
+  border: 3px double var(--color-black);
   box-shadow: 2px 2px 0px #000;
   font-weight: 800;
+  filter: url(#hand-drawn-sm);
 }
 
 .sidebar-sublink svg {

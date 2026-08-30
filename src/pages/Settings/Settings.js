@@ -58,7 +58,7 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
 
   // Themes list definition
   const themes = [
-    { id: 'terracotta', name: 'Terracotta Red', desc: 'Đỏ Đất Nung (Mặc định)', primaryColor: '#e55b44', bgColor: '#fcf9f5' },
+    { id: 'terracotta', name: 'Terracotta Red', desc: 'Đỏ Đất Nung (Mặc định)', primaryColor: '#e55b44', bgColor: '#f7f4ed' },
     { id: 'ocean', name: 'Ocean Blue', desc: 'Xanh Đại Dương', primaryColor: '#3d84b8', bgColor: '#f2f7fa' },
     { id: 'gold', name: 'Jiufen Gold', desc: 'Cửu Phần Cổ Kính', primaryColor: '#e9c46a', bgColor: '#fdfaf4' },
     { id: 'mint', name: 'Neo Mint', desc: 'Xanh Bạc Hà Tươi Mới', primaryColor: '#2a9d8f', bgColor: '#f4faf8' },

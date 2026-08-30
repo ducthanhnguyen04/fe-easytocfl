@@ -30,6 +30,26 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!-- SVG filters for hand-drawn / wavy borders -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; width: 0; height: 0; pointer-events: none;" width="0" height="0">
+      <defs>
+        <!-- Filter for larger cards and sections -->
+        <filter id="hand-drawn-lg" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.005 0.015" numOctaves="3" result="noise" seed="1" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <!-- Filter for medium items like buttons -->
+        <filter id="hand-drawn-md" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.01 0.025" numOctaves="3" result="noise" seed="2" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+        <!-- Filter for smaller elements like badges, inputs, progress bars -->
+        <filter id="hand-drawn-sm" x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.015 0.04" numOctaves="3" result="noise" seed="3" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

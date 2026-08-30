@@ -6,7 +6,7 @@
   --font-chinese-elegant: 'ZCOOL XiaoWei', serif;
   --font-chinese-modern: 'ZCOOL QingKe HuangYou', sans-serif;
 
-  --bg-primary: #fcf9f5;
+  --bg-primary: #f7f4ed;
   --bg-grid: #faf4eb;
   --grid-line: rgba(229, 91, 68, 0.08);
   
@@ -24,16 +24,16 @@
   --color-yellow: #e9c46a; /* Jiufen Gold Lantern */
   --color-yellow-light: #fef9eb;
   
-  --border-thick: 3px solid var(--color-black);
-  --border-medium: 2px solid var(--color-black);
+  --border-thick: 3px double var(--color-black);
+  --border-medium: 3px double var(--color-black);
   --shadow-thick: 5px 5px 0px var(--color-black);
   --shadow-medium: 4px 4px 0px var(--color-black);
   --shadow-thin: 2px 2px 0px var(--color-black);
   --shadow-hover: 8px 8px 0px var(--color-black);
   
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  --radius-sm: 8px 6px 9px 5px / 5px 9px 6px 8px;
+  --radius-md: 12px 8px 14px 10px / 10px 14px 8px 12px;
+  --radius-lg: 20px 14px 18px 16px / 16px 18px 14px 20px;
 }
 
 * {
@@ -103,6 +103,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-thick);
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: url(#hand-drawn-lg);
 }
 
 .neo-card:hover {
@@ -127,6 +128,7 @@ h1, h2, h3, h4, h5, h6 {
   user-select: none;
   text-decoration: none;
   color: var(--color-black);
+  filter: url(#hand-drawn-md);
 }
 
 .neo-btn:hover {
@@ -159,6 +161,26 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--radius-sm);
   background-color: var(--color-white);
   box-shadow: var(--shadow-thin);
+  filter: url(#hand-drawn-sm);
+}
+
+/* Global inputs, textarea, select styling for hand-drawn look */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select,
+.neo-input,
+.vocab-input,
+.search-input,
+.admin-search-input,
+.settings-input,
+.chat-text-input,
+.roleplay-input,
+.typing-text-input {
+  filter: url(#hand-drawn-sm) !important;
+  border-radius: var(--radius-sm) !important;
 }
 
 /* Color Themes */
@@ -221,8 +243,8 @@ body.theme-cyber {
   --color-yellow: #eab308;
   --color-yellow-light: #3c320d;
 
-  --border-thick: 3px solid #ffffff;
-  --border-medium: 2px solid #ffffff;
+  --border-thick: 3px double #ffffff;
+  --border-medium: 3px double #ffffff;
   --shadow-thick: 5px 5px 0px #ffffff;
   --shadow-medium: 4px 4px 0px #ffffff;
   --shadow-thin: 2px 2px 0px #ffffff;
@@ -396,6 +418,7 @@ body.theme-cyber .page-title-banner p {
   border: var(--border-medium);
   box-shadow: var(--shadow-medium);
   transition: box-shadow 0.2s ease;
+  filter: url(#hand-drawn-md);
 }
 
 .book-cover-item-card:hover .book-cover-img-wrapper {
@@ -433,4 +456,25 @@ body.theme-cyber .page-title-banner p {
   }
 }
 
+/* Global Shadow Removal Overrides (Chalkboard/whiteboard sketch style) */
+*,
+::before,
+::after {
+  box-shadow: none !important;
+}
 
+/* Disable translations associated with removed shadows on hover/active */
+.neo-card:hover,
+.neo-btn:hover,
+.neo-btn:active,
+.sidebar-link:hover,
+.sidebar-sublink:hover,
+.user-profile-widget:hover,
+.mobile-menu-btn:hover,
+.mobile-menu-btn:active,
+.contact-fab-trigger:hover,
+.contact-fab-trigger:active,
+.theme-toggle-floating:hover,
+.theme-toggle-floating:active {
+  transform: none !important;
+}
