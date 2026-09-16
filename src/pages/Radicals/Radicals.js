@@ -65,7 +65,10 @@ const Radicals = () => {
     return (
       <div className="radicals-page">
         <div className="page-title-banner">
-          <div>
+          <div className="dashboard-header-mascot">
+            <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+          </div>
+          <div style={{ flexGrow: 1 }}>
             <h2>Bộ Thủ Tiếng Trung (Traditional Radicals)</h2>
             <p>Học các bộ thủ phồn thể thường gặp để tra cứu và ghi nhớ chữ Hán dễ dàng hơn</p>
           </div>
@@ -80,7 +83,10 @@ const Radicals = () => {
   return (
     <div className="radicals-page">
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Bộ Thủ Tiếng Trung (Traditional Radicals)</h2>
           <p>Học các bộ thủ phồn thể thường gặp để tra cứu và ghi nhớ chữ Hán dễ dàng hơn</p>
         </div>

@@ -22,6 +22,9 @@
   box-shadow: var(--shadow-thick);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .roleplay-badge-row {

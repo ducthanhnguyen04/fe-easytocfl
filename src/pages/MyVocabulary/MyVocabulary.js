@@ -299,7 +299,10 @@ const MyVocabulary = ({ playAudio }) => {
     return (
       <div className="my-vocab-page">
         <div className="page-title-banner">
-          <div>
+          <div className="dashboard-header-mascot">
+            <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+          </div>
+          <div style={{ flexGrow: 1 }}>
             <h2>Bộ từ vựng cá nhân</h2>
             <p>Tự thiết lập và ôn luyện các chủ đề từ vựng của riêng bạn</p>
           </div>
@@ -325,7 +328,10 @@ const MyVocabulary = ({ playAudio }) => {
     <div className="my-vocab-page">
       {/* HEADER BANNER */}
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Bộ từ vựng cá nhân</h2>
           <p>
             {selectedList
@@ -386,7 +392,10 @@ const MyVocabulary = ({ playAudio }) => {
                 </div>
 
                 <div className="page-title-banner">
-                  <div>
+                  <div className="dashboard-header-mascot">
+                    <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+                  </div>
+                  <div style={{ flexGrow: 1 }}>
                     <h2>Học từ vựng: {selectedList.name}</h2>
                     <p>Bộ từ vựng cá nhân của bạn</p>
                   </div>

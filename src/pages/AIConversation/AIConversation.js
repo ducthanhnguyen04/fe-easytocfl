@@ -221,13 +221,18 @@ const AIConversation = ({ playAudio }) => {
         <div className="roleplay-setup-container">
           {/* Header Banner */}
           <div className="neo-card roleplay-banner-card">
-            <div className="roleplay-badge-row">
-              <span className="neo-badge roleplay-badge-new">NEW</span>
+            <div className="dashboard-header-mascot">
+              <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
             </div>
-            <h2 className="roleplay-banner-title">Hội thoại nhập vai (對話)</h2>
-            <p className="roleplay-banner-subtitle">
-              Tự chọn chủ đề & vai — gia sư AI nhập vai trò chuyện, sửa lỗi & gợi ý
-            </p>
+            <div style={{ flexGrow: 1 }}>
+              <div className="roleplay-badge-row">
+                <span className="neo-badge roleplay-badge-new">NEW</span>
+              </div>
+              <h2 className="roleplay-banner-title">Hội thoại nhập vai (對話)</h2>
+              <p className="roleplay-banner-subtitle">
+                Tự chọn chủ đề & vai — gia sư AI nhập vai trò chuyện, sửa lỗi & gợi ý
+              </p>
+            </div>
           </div>
 
           {/* Configuration Form Card */}

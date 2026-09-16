@@ -390,7 +390,10 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
     <div className="writing-practice-container">
       {/* Title Banner */}
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>📝 Tạo File Luyện Viết Từ Vựng</h2>
           <p>Tự tạo tập viết chữ Hán Phồn thể chuẩn khung ô Điền Tự Cách (田字格) có nét in mờ & xuất file in/PDF</p>
         </div>

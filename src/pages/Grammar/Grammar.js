@@ -154,7 +154,10 @@ const Grammar = ({ playAudio }) => {
       {selectedGrammarBook === null && (
         <div>
           <div className="page-title-banner">
-            <div>
+            <div className="dashboard-header-mascot">
+              <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+            </div>
+            <div style={{ flexGrow: 1 }}>
               <h2>Giáo trình Ngữ pháp</h2>
               <p>Chọn giáo trình thời đại để học cấu trúc ngữ pháp tương ứng</p>
             </div>
@@ -201,7 +204,10 @@ const Grammar = ({ playAudio }) => {
             </div>
 
             <div className="page-title-banner">
-              <div>
+              <div className="dashboard-header-mascot">
+                <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+              </div>
+              <div style={{ flexGrow: 1 }}>
                 <h2>{currentBook?.viTitle || currentBook?.levelName}</h2>
                 <p>{totalLessons} bài học chính thức</p>
               </div>
@@ -294,7 +300,10 @@ const Grammar = ({ playAudio }) => {
             </div>
 
             <div className="page-title-banner">
-              <div>
+              <div className="dashboard-header-mascot">
+                <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+              </div>
+              <div style={{ flexGrow: 1 }}>
                 <h2>{currentLesson?.title}</h2>
                 <p>{currentLesson?.trans} • Ngữ pháp cốt lõi</p>
               </div>

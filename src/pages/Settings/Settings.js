@@ -141,7 +141,10 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
     return (
       <div>
         <div className="page-title-banner">
-          <div>
+          <div className="dashboard-header-mascot">
+            <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+          </div>
+          <div style={{ flexGrow: 1 }}>
             <h2>Cài Đặt Hệ Thống</h2>
             <p>Tuỳ chỉnh tài khoản, đổi mật khẩu và thiết lập học tập của bạn</p>
           </div>
@@ -164,7 +167,10 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
   return (
     <div>
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Cài Đặt Hệ Thống</h2>
           <p>Tuỳ chỉnh tài khoản, đổi mật khẩu và thiết lập học tập của bạn</p>
         </div>

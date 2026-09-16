@@ -40,7 +40,10 @@ const Leaderboard = () => {
   return (
     <div>
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Bảng Xếp Hạng Học Viên</h2>
           <p>Thi đua học tập cùng các học viên khác trên hệ thống. Top học viên tích cực trong tuần.</p>
         </div>

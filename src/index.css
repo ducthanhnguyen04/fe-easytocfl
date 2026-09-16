@@ -337,6 +337,13 @@ body.theme-dark hr {
   }
 }
 
+.page-title-banner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
 /* Global Dark Mode adjustments for Page Title Banner subtitle */
 body.theme-dark .page-title-banner p,
 body.theme-cyber .page-title-banner p {

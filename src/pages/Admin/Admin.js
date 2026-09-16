@@ -95,7 +95,10 @@ const Admin = ({ refreshGlobalData }) => {
   return (
     <div className="admin-container">
       <div className="page-title-banner" style={{ marginBottom: '30px' }}>
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Hệ Thống Quản Trị (CMS)</h2>
           <p>Thêm và cập nhật nội dung giáo trình, bài học, ngữ pháp và ví dụ cho ứng dụng</p>
         </div>

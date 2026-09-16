@@ -5,7 +5,10 @@ const Exam = () => {
   return (
     <div>
       <div className="page-title-banner">
-        <div>
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
+        <div style={{ flexGrow: 1 }}>
           <h2>Luyện Thi Thử TOCFL</h2>
           <p>Thực hành làm đề thi thử nghiệm để chuẩn bị tốt nhất cho kỳ thi chính thức</p>
         </div>

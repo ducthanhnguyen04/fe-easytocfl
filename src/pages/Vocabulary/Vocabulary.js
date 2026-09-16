@@ -276,7 +276,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
       {selectedBook === null ? (
         <div>
           <div className="page-title-banner">
-            <div>
+            <div className="dashboard-header-mascot">
+              <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+            </div>
+            <div style={{ flexGrow: 1 }}>
               <h2>Từ vựng tiếng Trung Phồn thể</h2>
               <p>Chọn giáo trình thời đại TOCFL để bắt đầu học từ vựng</p>
             </div>
@@ -375,7 +378,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             return (
               <div>
                 <div className="page-title-banner">
-                  <div>
+                  <div className="dashboard-header-mascot">
+                    <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+                  </div>
+                  <div style={{ flexGrow: 1 }}>
                     <h2>{currentBook?.viTitle || currentBook?.levelName}</h2>
                     <p>{totalLessons} bài học chính thức</p>
                   </div>
@@ -506,7 +512,10 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
                 return (
                   <div className="page-title-banner">
-                    <div>
+                    <div className="dashboard-header-mascot">
+                      <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+                    </div>
+                    <div style={{ flexGrow: 1 }}>
                       <h2>{lessonTitleText}</h2>
                       <p>{currentBook?.viTitle || currentBook?.levelName} {lessonSubTitleText ? `— ${lessonSubTitleText}` : ''}</p>
                     </div>
