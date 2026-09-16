@@ -371,7 +371,6 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
 
           {(() => {
             const totalLessons = lessonsList.length;
-            const bookColor = currentBook?.color || getBookColor(selectedBook);
 
             return (
               <div>

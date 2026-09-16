@@ -192,7 +192,6 @@ const Grammar = ({ playAudio }) => {
       {/* Case 2: Select Lesson */}
       {selectedGrammarBook !== null && selectedGrammarLesson === null && (() => {
         const totalLessons = lessonsList.length;
-        const bookColor = currentBook?.color || getBookColor(selectedGrammarBook);
         return (
           <div>
             <div className="back-btn-container">
