@@ -56,11 +56,13 @@
 }
 
 .welcome-title {
+  font-family: 'Itim', cursive, sans-serif;
   font-size: 26px;
   margin-bottom: 6px;
 }
 
 .welcome-subtitle {
+  font-family: 'Itim', cursive, sans-serif;
   font-size: 14px;
   color: #666;
   font-weight: 500;
