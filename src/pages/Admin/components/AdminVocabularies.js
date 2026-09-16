@@ -57,7 +57,13 @@ const AdminVocabularies = ({
         }
       );
       if (response.status === 200 || response.data) {
-        showSuccess(`Nhập dữ liệu thành công! Đã thêm ${response.data.count || 0} từ vựng.`);
+        const count = response.data.count || 0;
+        const examplesCount = response.data.examplesCount || 0;
+        let successMsg = `Nhập dữ liệu thành công! Đã thêm ${count} từ vựng.`;
+        if (examplesCount > 0) {
+          successMsg += ` (Đã tự động thêm ${examplesCount} ví dụ vào CSDL)`;
+        }
+        showSuccess(successMsg);
         onRefresh();
         resetForm();
       } else {
@@ -248,7 +254,10 @@ const AdminVocabularies = ({
 
         {!editId && (
           <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '2px dashed var(--color-black)' }}>
-            <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '10px' }}>📥 Nhập danh sách từ Excel</h4>
+            <h4 style={{ fontSize: '13px', fontWeight: '900', marginBottom: '4px' }}>📥 Nhập danh sách từ Excel</h4>
+            <p style={{ fontSize: '11px', color: '#666', marginBottom: '12px', lineHeight: '1.4' }}>
+              Hỗ trợ các cột: <code>Từ vựng</code>, <code>Phiên âm</code>, <code>Nghĩa tiếng Việt</code>, <code>Nghĩa tiếng Anh</code>, <code>Mã bài học</code>, <code>Ví dụ</code>, <code>Nghĩa ví dụ</code>, <code>Phiên âm ví dụ</code>.
+            </p>
             <input
               type="file"
               accept=".xlsx, .xls"
@@ -257,15 +266,27 @@ const AdminVocabularies = ({
               ref={fileInputRef}
               id="excelImportInput"
             />
-            <button
-              type="button"
-              className="neo-btn"
-              style={{ backgroundColor: 'var(--color-yellow-light)', width: '100%' }}
-              onClick={() => document.getElementById('excelImportInput').click()}
-              disabled={loading}
-            >
-              {loading ? '⏳ Đang xử lý file...' : '📊 Import từ Excel (.xlsx, .xls)'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                className="neo-btn"
+                style={{ backgroundColor: 'var(--color-yellow-light)', flex: 1 }}
+                onClick={() => document.getElementById('excelImportInput').click()}
+                disabled={loading}
+              >
+                {loading ? '⏳ Đang xử lý file...' : '📊 Import từ Excel (.xlsx, .xls)'}
+              </button>
+
+              <a
+                href="/mau_import_tu_vung.xlsx"
+                download="mau_import_tu_vung.xlsx"
+                className="neo-btn"
+                style={{ backgroundColor: '#e2e8f0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: '#000', fontSize: '13px', padding: '0 15px' }}
+                title="Tải file Excel mẫu chuẩn"
+              >
+                📄 Tải file mẫu
+              </a>
+            </div>
           </div>
         )}
       </div>
