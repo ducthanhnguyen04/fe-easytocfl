@@ -29,6 +29,32 @@
   );
 }
 
+.dashboard-header-text {
+  flex-grow: 1;
+  z-index: 1;
+}
+
+.dashboard-header-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.header-mascot-img {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(2px 3px 0px rgba(0, 0, 0, 0.15));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.header-mascot-img:hover {
+  transform: scale(1.12) rotate(4deg);
+}
+
 .welcome-title {
   font-size: 26px;
   margin-bottom: 6px;
