@@ -93,12 +93,12 @@ const Home = ({ dailyWord, handleWordLearned, playAudio }) => {
     <div>
       {/* Header / Welcome widget */}
       <header className="dashboard-header">
+        <div className="dashboard-header-mascot">
+          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
+        </div>
         <div className="dashboard-header-text">
           <h1 className="welcome-title">Chào, {loading ? '...' : (user?.name || 'bạn')} 👋</h1>
           <p className="welcome-subtitle">Chúc bạn một ngày học tập đầy hứng khởi! Cùng chinh phục TOCFL nào.</p>
-        </div>
-        <div className="dashboard-header-mascot">
-          <img src="/taiwan_mascot.png" alt="Taiwan Mascot" className="header-mascot-img" />
         </div>
       </header>
       <section className="section-container">
