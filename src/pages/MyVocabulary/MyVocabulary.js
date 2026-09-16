@@ -385,7 +385,7 @@ const MyVocabulary = ({ playAudio }) => {
                   </button>
                 </div>
 
-                <div className="page-title-banner" style={{ borderLeft: '10px solid var(--color-primary)' }}>
+                <div className="page-title-banner">
                   <div>
                     <h2>Học từ vựng: {selectedList.name}</h2>
                     <p>Bộ từ vựng cá nhân của bạn</p>

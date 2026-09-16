@@ -389,7 +389,7 @@ const WritingPractice = ({ initialVocabs = [], onBack }) => {
   return (
     <div className="writing-practice-container">
       {/* Title Banner */}
-      <div className="page-title-banner" style={{ borderLeft: '10px solid var(--color-primary)' }}>
+      <div className="page-title-banner">
         <div>
           <h2>📝 Tạo File Luyện Viết Từ Vựng</h2>
           <p>Tự tạo tập viết chữ Hán Phồn thể chuẩn khung ô Điền Tự Cách (田字格) có nét in mờ & xuất file in/PDF</p>

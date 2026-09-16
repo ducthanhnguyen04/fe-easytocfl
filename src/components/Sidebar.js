@@ -285,7 +285,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/radicals"
                     className={`sidebar-sublink ${location.pathname.startsWith('/radicals') ? 'active' : ''}`}
                   >
-                    🧩 Học bộ thủ chữ Hán
+                    🧩 214 bộ thủ
                   </Link>
                 </li>
                 <li className="sidebar-subitem">

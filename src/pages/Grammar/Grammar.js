@@ -201,7 +201,7 @@ const Grammar = ({ playAudio }) => {
               </button>
             </div>
 
-            <div className="page-title-banner" style={{ borderLeft: `10px solid ${bookColor}` }}>
+            <div className="page-title-banner">
               <div>
                 <h2>{currentBook?.viTitle || currentBook?.levelName}</h2>
                 <p>{totalLessons} bài học chính thức</p>
@@ -294,7 +294,7 @@ const Grammar = ({ playAudio }) => {
               </button>
             </div>
 
-            <div className="page-title-banner" style={{ borderLeft: `8px solid ${bookColor}` }}>
+            <div className="page-title-banner">
               <div>
                 <h2>{currentLesson?.title}</h2>
                 <p>{currentLesson?.trans} • Ngữ pháp cốt lõi</p>

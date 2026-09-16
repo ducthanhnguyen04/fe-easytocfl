@@ -148,10 +148,10 @@ const AdminGrammars = ({
           </div>
           <div className="settings-input-group">
             <label className="settings-label">Cấu trúc công thức *</label>
-            <input
-              type="text"
+            <textarea
               className="settings-input"
               placeholder="Ví dụ: Chủ ngữ + 是 + [Mốc thời gian/Địa điểm/Cách thức] + Động từ + 的"
+              style={{ minHeight: '80px', fontFamily: 'inherit' }}
               value={grammarStructure}
               onChange={(e) => setGrammarStructure(e.target.value)}
               required
