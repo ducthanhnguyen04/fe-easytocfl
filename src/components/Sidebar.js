@@ -4,11 +4,13 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Icon from './Icon';
 import './Sidebar.css';
 import { useAuth } from '../context/authContext';
+import { useLanguage } from '../context/languageContext';
 import beUrl from '../api-url/api-backend';
 import { showToast } from '../utils/toast';
 
 const Sidebar = ({ theme, toggleDarkMode }) => {
   const { user, setUser, loading } = useAuth();
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [showUserModal, setShowUserModal] = useState(false);
@@ -237,14 +239,14 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
           </button>
         </div>
 
-        <span className="sidebar-section-title">Học tập chính</span>
+        <span className="sidebar-section-title">{t('mainLearning')}</span>
         <ul className="sidebar-menu">
           <li className="sidebar-item">
             <Link
               to="/"
               className={`sidebar-link ${isActive('/') ? 'active' : ''}`}
             >
-              <Icon name="home" /> Trang chủ
+              <Icon name="home" /> {t('home')}
             </Link>
           </li>
 
@@ -258,7 +260,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Icon name="vocab" /> Từ vựng
+                <Icon name="vocab" /> {t('vocabulary')}
               </div>
               <span style={{
                 fontSize: '10px',
@@ -277,7 +279,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/vocab"
                     className={`sidebar-sublink ${location.pathname === '/vocab' || (location.pathname.startsWith('/vocab/') && !location.pathname.startsWith('/vocab/writing-practice')) ? 'active' : ''}`}
                   >
-                    <Icon name="vocab" /> Từ vựng
+                    <Icon name="vocab" /> {t('vocabulary')}
                   </Link>
                 </li>
                 <li className="sidebar-subitem">
@@ -285,7 +287,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/radicals"
                     className={`sidebar-sublink ${location.pathname.startsWith('/radicals') ? 'active' : ''}`}
                   >
-                    🧩 214 bộ thủ
+                    🧩 {t('radicals')}
                   </Link>
                 </li>
                 <li className="sidebar-subitem">
@@ -293,7 +295,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/my-vocabularies"
                     className={`sidebar-sublink ${location.pathname.startsWith('/my-vocabularies') ? 'active' : ''}`}
                   >
-                    ➕ Sổ tay từ vựng
+                    ➕ {t('myVocabulary')}
                   </Link>
                 </li>
                 <li className="sidebar-subitem">
@@ -301,7 +303,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                     to="/vocab/writing-practice"
                     className={`sidebar-sublink ${location.pathname === '/vocab/writing-practice' ? 'active' : ''}`}
                   >
-                    ✍️ Tạo file luyện viết
+                    ✍️ {t('writingPractice')}
                   </Link>
                 </li>
               </ul>
@@ -312,7 +314,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/grammar"
               className={`sidebar-link ${isActive('/grammar') ? 'active' : ''}`}
             >
-              <Icon name="grammar" /> Ngữ pháp
+              <Icon name="grammar" /> {t('grammar')}
             </Link>
           </li>
           <li className="sidebar-item">
@@ -320,7 +322,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/shadowing"
               className={`sidebar-link ${isActive('/shadowing') ? 'active' : ''}`}
             >
-              <Icon name="shadowing" /> Shadowing
+              <Icon name="shadowing" /> {t('shadowing')}
             </Link>
           </li>
           <li className="sidebar-item">
@@ -328,7 +330,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/roleplay"
               className={`sidebar-link ${isActive('/roleplay') ? 'active' : ''}`}
             >
-              <Icon name="conversation" /> Hội thoại nhập vai
+              <Icon name="conversation" /> {t('roleplay')}
             </Link>
           </li>
           <li className="sidebar-item">
@@ -336,7 +338,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/exam"
               className={`sidebar-link ${isActive('/exam') ? 'active' : ''}`}
             >
-              <Icon name="exam" /> Đề thi thử
+              <Icon name="exam" /> {t('practiceExam')}
               <span className="demo-badge">TOCFL</span>
             </Link>
           </li>
@@ -345,7 +347,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/leaderboard"
               className={`sidebar-link ${isActive('/leaderboard') ? 'active' : ''}`}
             >
-              <Icon name="leaderboard" /> Bảng xếp hạng
+              <Icon name="leaderboard" /> {t('leaderboard')}
             </Link>
           </li>
           <li className="sidebar-item">
@@ -353,7 +355,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               to="/settings"
               className={`sidebar-link ${isActive('/settings') ? 'active' : ''}`}
             >
-              <Icon name="settings" /> Cài đặt
+              <Icon name="settings" /> {t('settings')}
             </Link>
           </li>
           {user?.role === 'admin' && (
@@ -362,7 +364,7 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
                 to="/admin"
                 className={`sidebar-link ${isActive('/admin') ? 'active' : ''}`}
               >
-                <Icon name="admin" /> Quản trị (Admin)
+                <Icon name="admin" /> {t('admin')}
               </Link>
             </li>
           )}
@@ -371,12 +373,12 @@ const Sidebar = ({ theme, toggleDarkMode }) => {
               onClick={toggleDarkMode}
               className="sidebar-link"
               style={{ width: '100%' }}
-              title={theme === 'dark' || theme === 'cyber' ? "Chuyển sang chế độ sáng" : "Chuyển sang chế độ tối"}
+              title={theme === 'dark' || theme === 'cyber' ? t('lightMode') : t('darkMode')}
             >
               <span style={{ fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px' }}>
                 {theme === 'dark' || theme === 'cyber' ? '☀️' : '🌙'}
               </span>
-              {theme === 'dark' || theme === 'cyber' ? 'Chế độ sáng' : 'Chế độ tối'}
+              {theme === 'dark' || theme === 'cyber' ? t('lightMode') : t('darkMode')}
             </button>
           </li>
         </ul>

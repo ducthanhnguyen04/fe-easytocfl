@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AudioButton from '../../../components/AudioButton';
+import { useLanguage } from '../../../context/languageContext';
 
 const FlashcardMode = ({
   currentLessonWords,
@@ -8,6 +9,7 @@ const FlashcardMode = ({
   isReviewMode = false,
   onRepeatRound,
 }) => {
+  const { getVocabMeaning, getExampleMeaning } = useLanguage();
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
   const [flashTranslationMode, setFlashTranslationMode] = useState('ZH-VI'); // 'ZH-VI' or 'VI-ZH'
@@ -253,7 +255,7 @@ const FlashcardMode = ({
                 <div className="flashcard-word" style={{ color: 'var(--color-primary)' }}>{activeFlashWord?.word}</div>
                 <div className="flashcard-pinyin">{activeFlashWord?.pinyin}</div>
                 <div className="vocab-translation" style={{ fontSize: '16px', fontWeight: '800', marginTop: '5px' }}>
-                  {activeFlashWord?.trans}
+                  {getVocabMeaning(activeFlashWord)}
                 </div>
               </div>
             ) : flashTranslationMode === 'ZH-VI' ? (
@@ -263,10 +265,7 @@ const FlashcardMode = ({
               </div>
             ) : (
               <div className="flashcard-trans">
-                <div>{activeFlashWord?.trans}</div>
-                {activeFlashWord?.englishMeaning && (
-                  <div className="flashcard-english">{activeFlashWord.englishMeaning}</div>
-                )}
+                <div>{getVocabMeaning(activeFlashWord)}</div>
               </div>
             )}
             <div className="flashcard-hint">✨ Click hoặc Space để lật thẻ</div>
@@ -297,15 +296,12 @@ const FlashcardMode = ({
                   {activeExample?.pinyin}
                 </div>
                 <div style={{ fontSize: '15px', color: 'var(--color-black)', opacity: 0.8, fontWeight: '600' }}>
-                  {activeExample?.meaning}
+                  {getExampleMeaning(activeExample)}
                 </div>
               </div>
             ) : flashTranslationMode === 'ZH-VI' ? (
               <div className="flashcard-trans">
-                <div>{activeFlashWord?.trans}</div>
-                {activeFlashWord?.englishMeaning && (
-                  <div className="flashcard-english">{activeFlashWord.englishMeaning}</div>
-                )}
+                <div>{getVocabMeaning(activeFlashWord)}</div>
               </div>
             ) : (
               <div>

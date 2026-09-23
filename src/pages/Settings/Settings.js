@@ -3,9 +3,11 @@ import axios from 'axios';
 import beUrl from '../../api-url/api-backend';
 import './Settings.css';
 import { AuthContext } from '../../context/authContext';
+import { useLanguage } from '../../context/languageContext';
 
 const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
   const { user, setUser } = useContext(AuthContext);
+  const { language, changeLanguage, t } = useLanguage();
   const isGoogleUser = !!user?.isGoogleLogin;
 
   // Profile state
@@ -176,27 +178,64 @@ const Settings = ({ resetVocabProgress, activeTheme, handleThemeChange }) => {
         </div>
       </div>
 
+      {/* App Language selection card */}
+      <div className="neo-card" style={{ padding: '25px', marginBottom: '25px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px', marginBottom: '15px' }}>
+          {t('appLanguage')}
+        </h3>
+        <p style={{ fontSize: '13px', color: '#666', marginBottom: '15px', fontWeight: '600' }}>
+          {t('appLanguageDesc')}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+          {[
+            { code: 'vi', flag: '🇻🇳', name: 'Tiếng Việt', desc: 'Ngôn ngữ mặc định' },
+            { code: 'en', flag: '🇬🇧', name: 'English', desc: 'Global English' },
+            { code: 'id', flag: '🇮🇩', name: 'Bahasa Indonesia', desc: 'Indonesian Language' }
+          ].map((langItem) => (
+            <button
+              key={langItem.code}
+              className={`theme-select-btn ${language === langItem.code ? 'active' : ''}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 16px',
+                backgroundColor: language === langItem.code ? 'var(--color-primary-light)' : 'var(--color-white)',
+                borderColor: language === langItem.code ? 'var(--color-primary)' : 'var(--color-black)'
+              }}
+              onClick={() => changeLanguage(langItem.code)}
+            >
+              <span style={{ fontSize: '28px' }}>{langItem.flag}</span>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontWeight: '900', fontSize: '14px', color: 'var(--color-black)' }}>{langItem.name}</div>
+                <div style={{ fontSize: '11px', color: '#666', fontWeight: '600' }}>{langItem.desc}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Theme selection card */}
       <div className="neo-card" style={{ padding: '25px', marginBottom: '30px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: '900', borderBottom: '3px solid var(--color-black)', paddingBottom: '10px', marginBottom: '20px' }}>
-          🎨 Giao diện ứng dụng (Themes)
+          {t('appThemes')}
         </h3>
         <div className="themes-row">
-          {themes.map((t) => (
+          {themes.map((tItem) => (
             <button
-              key={t.id}
-              className={`theme-select-btn ${activeTheme === t.id ? 'active' : ''}`}
-              onClick={() => handleThemeChange(t.id)}
+              key={tItem.id}
+              className={`theme-select-btn ${activeTheme === tItem.id ? 'active' : ''}`}
+              onClick={() => handleThemeChange(tItem.id)}
             >
               <div
                 className="theme-preview-dot"
                 style={{
-                  background: `linear-gradient(135deg, ${t.primaryColor} 50%, ${t.bgColor} 50%)`
+                  background: `linear-gradient(135deg, ${tItem.primaryColor} 50%, ${tItem.bgColor} 50%)`
                 }}
               />
               <div>
-                <div className="theme-select-name">{t.name}</div>
-                <div className="theme-select-desc">{t.desc}</div>
+                <div className="theme-select-name">{tItem.name}</div>
+                <div className="theme-select-desc">{tItem.desc}</div>
               </div>
             </button>
           ))}

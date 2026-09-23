@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { playCorrectSound } from '../../../utils/sound';
+import { useLanguage } from '../../../context/languageContext';
 
 const TypingMode = ({ currentLessonWords }) => {
+  const { getVocabMeaning } = useLanguage();
   const [typingIndex, setTypingIndex] = useState(0);
   const [typingInput, setTypingInput] = useState('');
   const [typingFeedback, setTypingFeedback] = useState(null);
@@ -116,12 +118,7 @@ const TypingMode = ({ currentLessonWords }) => {
       <div className="workspace-card typing-orange">
         <div style={{ fontSize: '15px', color: '#666' }}>Gõ chữ Hán Phồn thể có nghĩa là:</div>
         <div style={{ fontSize: '28px', fontWeight: '800', margin: '20px 0', color: 'var(--color-primary)' }}>
-          <div>{activeTypingWord?.trans}</div>
-          {activeTypingWord?.englishMeaning && (
-            <div style={{ fontSize: '16px', color: '#555', marginTop: '8px', fontWeight: 'normal', fontStyle: 'italic' }}>
-              ({activeTypingWord.englishMeaning})
-            </div>
-          )}
+          <div>{getVocabMeaning(activeTypingWord)}</div>
         </div>
         {typingFeedback && (
           <div className={`typing-feedback ${typingFeedback.success ? 'success' : 'error'}`} style={{ color: typingFeedback.success ? 'var(--color-secondary)' : 'var(--color-primary)' }}>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AudioButton from '../../../components/AudioButton';
+import { useLanguage } from '../../../context/languageContext';
 
 const VocabList = ({
   currentLessonWords,
@@ -8,16 +9,18 @@ const VocabList = ({
   handlePlayAudio,
   examplesList = [],
 }) => {
+  const { getVocabMeaning, getExampleMeaning } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredVocab = useMemo(() => {
     return currentLessonWords.filter(v => {
+      const meaningText = getVocabMeaning(v);
       const matchesSearch = v.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
         v.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.trans.toLowerCase().includes(searchQuery.toLowerCase());
+        meaningText.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesSearch;
     });
-  }, [currentLessonWords, searchQuery]);
+  }, [currentLessonWords, searchQuery, getVocabMeaning]);
 
   return (
     <>
@@ -47,10 +50,7 @@ const VocabList = ({
                   <span className="vocab-pinyin">({item.pinyin})</span>
                   <AudioButton onClick={() => handlePlayAudio(item)} showLabel={true} label="Nghe" />
                 </div>
-                <p className="vocab-translation">{item.trans}</p>
-                {item.englishMeaning && (
-                  <p className="vocab-translation-en">{item.englishMeaning}</p>
-                )}
+                <p className="vocab-translation">{getVocabMeaning(item)}</p>
 
                 {/* Example sentence block */}
                 <div className="vocab-example-block" style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px dashed #e2e8f0', fontSize: '13px' }}>
@@ -72,7 +72,7 @@ const VocabList = ({
                             </div>
                           )}
                           <div style={{ fontSize: '12px', color: '#555', fontWeight: '500' }}>
-                            {activeExample.meaning}
+                            {getExampleMeaning(activeExample)}
                           </div>
                         </div>
                       );

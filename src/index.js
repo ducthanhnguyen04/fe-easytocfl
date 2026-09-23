@@ -8,6 +8,7 @@ import { showToast } from './utils/toast';
 import './utils/toast.css';
 
 import { AuthProvider } from "./context/authContext";
+import { LanguageProvider } from "./context/languageContext";
 
 // Global Axios response interceptor for connection failure (server offline)
 axios.interceptors.response.use(
@@ -28,7 +29,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </AuthProvider>
   </React.StrictMode>
 );

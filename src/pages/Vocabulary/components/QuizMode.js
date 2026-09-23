@@ -3,11 +3,13 @@ import axios from 'axios';
 import beUrl from '../../../api-url/api-backend';
 import { showToast } from '../../../utils/toast';
 import { playCorrectSound } from '../../../utils/sound';
+import { useLanguage } from '../../../context/languageContext';
 
 const QuizMode = ({
   currentLessonWords,
   vocabWords,
 }) => {
+  const { getVocabMeaning, t } = useLanguage();
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizSelectedOption, setQuizSelectedOption] = useState(null);
   const [quizChecked, setQuizChecked] = useState(false);
@@ -23,10 +25,11 @@ const QuizMode = ({
   useEffect(() => {
     if (currentLessonWords.length > 0 && quizIndex < currentLessonWords.length) {
       const correctWord = currentLessonWords[quizIndex % currentLessonWords.length];
-      const correctOption = correctWord.trans;
+      const correctOption = getVocabMeaning(correctWord);
       const dbTranslations = vocabWords
-        .filter(w => w.word !== correctWord.word && w.trans && w.trans !== correctWord.trans)
-        .map(w => w.trans);
+        .filter(w => w.word !== correctWord.word)
+        .map(w => getVocabMeaning(w))
+        .filter(Boolean);
       let pool = dbTranslations;
       if (pool.length < 3) {
         const fallbacks = ['Chào buổi sáng', 'Tạm biệt', 'Thành phố Đài Bắc', 'Ăn cơm', 'Uống trà', 'Vé tàu cao tốc', 'Trà Ô Long', 'Trực tiếp'];
@@ -38,7 +41,7 @@ const QuizMode = ({
       setQuizSelectedOption(null);
       setQuizChecked(false);
     }
-  }, [quizIndex, currentLessonWords, vocabWords]);
+  }, [quizIndex, currentLessonWords, vocabWords, getVocabMeaning]);
 
   const handleQuizChoice = (idx) => {
     if (quizChecked) return;
@@ -46,7 +49,8 @@ const QuizMode = ({
     setQuizChecked(true);
     const correctWord = currentLessonWords[quizIndex % currentLessonWords.length];
     if (correctWord) {
-      const isCorrect = quizOptions[idx] === correctWord.trans;
+      const correctMeaning = getVocabMeaning(correctWord);
+      const isCorrect = quizOptions[idx] === correctMeaning;
       if (isCorrect) {
         playCorrectSound();
       }
@@ -183,7 +187,7 @@ const QuizMode = ({
       </div>
 
       <div className="workspace-card quiz-green">
-        <div style={{ fontSize: '15px', color: '#555', marginBottom: '10px' }}>Nghĩa của từ này là gì?</div>
+        <div style={{ fontSize: '15px', color: '#555', marginBottom: '10px' }}>{t('whatMeaning')}</div>
         <div className="font-kaiti" style={{ fontSize: '38px', fontWeight: '800', margin: '15px 0' }}>{activeQuizWord?.word}</div>
         <div style={{ fontSize: '18px', color: '#666' }}>({activeQuizWord?.pinyin})</div>
       </div>
@@ -192,7 +196,7 @@ const QuizMode = ({
         {quizOptions.map((opt, idx) => {
           let btnClass = "";
           if (quizChecked) {
-            if (opt === activeQuizWord.trans) {
+            if (opt === getVocabMeaning(activeQuizWord)) {
               btnClass = "correct";
             } else if (idx === quizSelectedOption) {
               btnClass = "incorrect";
