@@ -17,11 +17,34 @@ const FlashcardMode = ({
   const [flipDuration, setFlipDuration] = useState(3);
   const [nextDuration, setNextDuration] = useState(2);
   const [slideDirection, setSlideDirection] = useState('next'); // 'next' or 'prev'
+  
+  // Track visited cards in current round to enforce 100% completion before awarding XP
+  const [visitedIndices, setVisitedIndices] = useState(new Set([0]));
+  const [roundCompleted, setRoundCompleted] = useState(false);
 
   const vocabBtnRef = useRef(null);
   const exampleBtnRef = useRef(null);
 
   const activeFlashWord = currentLessonWords[flashIndex % currentLessonWords.length];
+
+  // Track progress and auto-trigger XP award when 100% of cards in lesson are visited
+  useEffect(() => {
+    if (!currentLessonWords || currentLessonWords.length === 0) return;
+    const actualIndex = flashIndex % currentLessonWords.length;
+
+    setVisitedIndices(prev => {
+      const newSet = new Set(prev);
+      newSet.add(actualIndex);
+
+      if (newSet.size === currentLessonWords.length && !roundCompleted) {
+        setRoundCompleted(true);
+        if (onRepeatRound) {
+          onRepeatRound(activeFlashWord?.lessonId);
+        }
+      }
+      return newSet;
+    });
+  }, [flashIndex, currentLessonWords, roundCompleted, onRepeatRound, activeFlashWord]);
 
   const activeExample = useMemo(() => {
     if (!activeFlashWord) return null;
@@ -308,30 +331,32 @@ const FlashcardMode = ({
           ← Trước
         </button>
 
-        <button
-          className="neo-btn neo-btn-primary"
-          style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-black)' }}
-          onClick={() => {
-            if (onRepeatRound) {
-              onRepeatRound(activeFlashWord?.lessonId);
-            }
-            setIsAutoPlayActive(false);
-            setFlashIndex(0);
-            setFlashFlipped(false);
-          }}
-          title="Tích điểm thưởng lượt học Flashcard này vào Bảng xếp hạng"
-        >
-          🔄 Hoàn thành lượt (+10 XP)
-        </button>
+        {roundCompleted ? (
+          <button
+            className="neo-btn neo-btn-primary"
+            style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-black)' }}
+            onClick={() => {
+              setIsAutoPlayActive(false);
+              setVisitedIndices(new Set([0]));
+              setRoundCompleted(false);
+              setFlashIndex(0);
+              setFlashFlipped(false);
+            }}
+            title="Luyện tập lại lượt này từ đầu để tiếp tục tích lũy XP"
+          >
+            🎉 Đã hoàn thành! 🔄 Học lại từ đầu
+          </button>
+        ) : (
+          <div className="neo-badge" style={{ backgroundColor: 'var(--color-bg)', border: '1.5px solid var(--color-black)', padding: '8px 16px', fontSize: '13px', color: 'var(--color-black)', fontWeight: '700' }}>
+            📖 Tiến độ: {visitedIndices.size} / {currentLessonWords.length} từ
+          </div>
+        )}
 
         <button
           className="neo-btn"
           onClick={() => {
             setIsAutoPlayActive(false);
             const nextIdx = (flashIndex + 1) % currentLessonWords.length;
-            if (nextIdx === 0 && onRepeatRound) {
-              onRepeatRound(activeFlashWord?.lessonId);
-            }
             setSlideDirection('next');
             setFlashIndex(nextIdx);
             setFlashFlipped(false);
@@ -341,7 +366,7 @@ const FlashcardMode = ({
         </button>
       </div>
       <div className="hotkey-guide-text">
-        Dùng phím ← → để điều hướng, Space để lật thẻ, A để nghe âm thanh, P để tự động phát. Hoàn thành lượt để cộng XP tích lũy!
+        Dùng phím ← → để điều hướng, Space để lật thẻ. Xem hết {currentLessonWords.length} từ vựng để tự động tích điểm XP!
       </div>
 
       {/* Tự động phát thẻ Modal */}
