@@ -196,6 +196,30 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
     }
   }, [currentLessonWords, selectedLesson, lessonSubmittedMap]);
 
+  const handleRepeatFlashcardScore = (lId) => {
+    const targetLessonId = lId || selectedLesson;
+    if (!targetLessonId) {
+      showToast("🎉 Chúc mừng! Bạn đã hoàn thành lượt ôn tập Flashcard!", "success");
+      return;
+    }
+
+    const timeSpent = Math.max(10, Math.round((Date.now() - lessonStartTimeRef.current) / 1000));
+    lessonStartTimeRef.current = Date.now();
+
+    axios.post(`${beUrl}/score/lesson`, {
+      lessonId: targetLessonId,
+      timeSpent: timeSpent
+    }, { withCredentials: true })
+      .then(res => {
+        const points = res.data.data?.pointsEarned || 10;
+        showToast(`🎉 Chúc mừng! Bạn được cộng +${points} XP cho lượt ôn tập Flashcard!`, 'success');
+      })
+      .catch(err => {
+        console.error("Gửi điểm làm lại thất bại:", err);
+        showToast(err.response?.data?.message || 'Không thể gửi điểm bài học.', 'error');
+      });
+  };
+
   const handlePlayAudio = (wordOrObj) => {
     let vocabObj = null;
     if (typeof wordOrObj === 'string') {
@@ -281,7 +305,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
             </div>
             <div style={{ flexGrow: 1 }}>
               <h2>Từ vựng tiếng Trung Phồn thể</h2>
-              <p>Chọn giáo trình thời đại TOCFL để bắt đầu học từ vựng</p>
+              <p>Chọn giáo trình để bắt đầu học từ vựng</p>
             </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <button
@@ -552,6 +576,7 @@ const Vocabulary = ({ vocabWords, toggleVocabLearned, playAudio }) => {
                       handlePlayAudio={handlePlayAudio}
                       examplesList={examplesList}
                       isReviewMode={isReviewMode}
+                      onRepeatRound={handleRepeatFlashcardScore}
                     />
                   );
                 }

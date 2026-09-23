@@ -77,7 +77,8 @@ export function AuthProvider({ children }) {
                         if (
                             prev.streakCount === data.streakCount &&
                             prev.studyTimeToday === data.studyTimeToday &&
-                            prev.longestStreak === data.longestStreak
+                            prev.longestStreak === data.longestStreak &&
+                            prev.score === data.score
                         ) {
                             return prev;
                         }
@@ -94,6 +95,7 @@ export function AuthProvider({ children }) {
                             longestStreak: data.longestStreak,
                             studyTimeToday: data.studyTimeToday,
                             lastStudyDate: data.lastStudyDate,
+                            score: data.score !== undefined ? data.score : prev.score,
                         };
                     });
                 }

@@ -6,6 +6,7 @@ const FlashcardMode = ({
   handlePlayAudio,
   examplesList = [],
   isReviewMode = false,
+  onRepeatRound,
 }) => {
   const [flashIndex, setFlashIndex] = useState(0);
   const [flashFlipped, setFlashFlipped] = useState(false);
@@ -308,11 +309,31 @@ const FlashcardMode = ({
         </button>
 
         <button
+          className="neo-btn neo-btn-primary"
+          style={{ backgroundColor: 'var(--color-secondary)', color: 'var(--color-black)' }}
+          onClick={() => {
+            if (onRepeatRound) {
+              onRepeatRound(activeFlashWord?.lessonId);
+            }
+            setIsAutoPlayActive(false);
+            setFlashIndex(0);
+            setFlashFlipped(false);
+          }}
+          title="Tích điểm thưởng lượt học Flashcard này vào Bảng xếp hạng"
+        >
+          🔄 Hoàn thành lượt (+10 XP)
+        </button>
+
+        <button
           className="neo-btn"
           onClick={() => {
             setIsAutoPlayActive(false);
+            const nextIdx = (flashIndex + 1) % currentLessonWords.length;
+            if (nextIdx === 0 && onRepeatRound) {
+              onRepeatRound(activeFlashWord?.lessonId);
+            }
             setSlideDirection('next');
-            setFlashIndex((flashIndex + 1) % currentLessonWords.length);
+            setFlashIndex(nextIdx);
             setFlashFlipped(false);
           }}
         >
@@ -320,7 +341,7 @@ const FlashcardMode = ({
         </button>
       </div>
       <div className="hotkey-guide-text">
-        Dùng phím ← → để điều hướng, Space để lật thẻ, A để nghe âm thanh, P để tự động phát
+        Dùng phím ← → để điều hướng, Space để lật thẻ, A để nghe âm thanh, P để tự động phát. Hoàn thành lượt để cộng XP tích lũy!
       </div>
 
       {/* Tự động phát thẻ Modal */}
